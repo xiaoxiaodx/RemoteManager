@@ -23,7 +23,6 @@ Rectangle{
         GradientStop { position: 1.0; color: "#2D76E7"}
     }
 
-
     width: txt.width+ textLeftMargin *2
 
     Rectangle{

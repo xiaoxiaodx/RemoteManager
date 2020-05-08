@@ -9,6 +9,8 @@ Rectangle {
     signal swinMin();
     signal swinMax();
     signal swinClose();
+    signal sFullScreen();
+    signal sLogin();
 
     Settings {
         id:setting1
@@ -21,45 +23,38 @@ Rectangle {
         color: "#00ffffff"
         Image {
             id: btnImg
-
             anchors.left: parent.left
-
-            anchors.leftMargin: 40
-
+            anchors.leftMargin: 30
             anchors.verticalCenter: parent.verticalCenter
             //            anchors.bottom: parent.bottom
             //            anchors.bottomMargin: 10
-            width: 188
-            height: 41
+            width: 144
+            height: 40
             source: "qrc:/images/logo.png"
-
         }
 
         QmlTabBarButtonH{
             id:tabbarBtn
             height: parent.height
-            width: 500
+            width: parent.width - btnImg.width - windowMenu.width-60
             anchors.left: btnImg.right
             anchors.leftMargin: 60
             btnBgColor:"transparent"
             btnBgSelectColor:"#272727"
-            mflagColor:"white"
+            mflagColor:"#80ffffff"
             textColor: "white"
             textSelectColor:"white"
             txtLeftMargin:7
             textSize:18
             Component.onCompleted: {
-
                 tabbarBtn.barModel.append({txtStr:qsTr("主预览")})
                 tabbarBtn.barModel.append({txtStr:qsTr("录像回放")})
                 tabbarBtn.barModel.append({txtStr:qsTr("设备管理")})
                 tabbarBtn.barModel.append({txtStr:qsTr("告警管理")})
                 tabbarBtn.barModel.append({txtStr:qsTr("数据管理")})
                 tabbarBtn.barModel.append({txtStr:qsTr("关于")})
-
                 setLanguage(curLanguage)
             }
-
         }
 
         MouseArea{
@@ -82,79 +77,100 @@ Rectangle {
 
                 if(!homeMenu.isDoubleClick){
                     var offset = Qt.point(mouse.x - clickPoint.x, mouse.y - clickPoint.y)
-
                     dragPosChange(offset.x, offset.y)
+
                 }
             }
         }
     }
 
-    Rectangle{
-        id:rectLanguage
-        width: imgl.width + cmb.width +line.width+10
-        height: parent.height
-        color: "#00ffffff"
-        anchors.right: windowAdjust.left
-        anchors.rightMargin: 20
-        anchors.verticalCenter: parent.verticalCenter
-        Image {
-            id: imgl
+
+    Row{
+        id:windowMenu
+        anchors.right: parent.right
+        anchors.rightMargin: 10
+        width: 350
+        height: 20
+        anchors.topMargin: 6
+        anchors.top: parent.top
+        spacing:20
+
+        QmlImageButton{
             width: 20
             height: 20
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            source: "qrc:/images/language.png"
+            imgSourseHover: "qrc:/images/fullScreen.png"
+            imgSourseNormal: "qrc:/images/fullScreen.png"
+            imgSoursePress: "qrc:/images/fullScreen_p.png"
+            onClick:sFullScreen()
         }
-        MyComBox{
-            id:cmb
-            width:110
+
+        QmlImageButton{
+            width: 20
             height: 20
-            anchors.left: imgl.right
-            anchors.rightMargin: 10
+            imgSourseHover: "qrc:/images/login.png"
+            imgSourseNormal: "qrc:/images/login.png"
+            imgSoursePress: "qrc:/images/login.png"
+            onClick:sLogin()
+        }
+
+        Rectangle{
+            id:rectLanguage
+            width: imgl.width + cmb.width
+            height: parent.height
+            color: "#00ffffff"
             anchors.verticalCenter: parent.verticalCenter
-            contentBg: "#00FFFFFF"
-            itemColorBgNor:"#ffffff"
-            itemColorBgHoverd: "#E7EAF1"
-            indicatorImgSrc:"qrc:/images/language_down.png"
-            indicatorW: 11
-            indicatorH: 7
-            itemLeftMargin:-12
-            itemTopMargin:0
-
-            model: ListModel{
-                ListElement{showStr:"简体中文"}
-                ListElement{showStr:"English"}
-                ListElement{showStr:"Italian"}
-                ListElement{showStr:"Korean"}
-                ListElement{showStr:"Russian"}
+            Image {
+                id: imgl
+                width: 20
+                height: 20
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                source: "qrc:/images/language.png"
             }
-            //{["showStr":"简体中文" "showStr":"English","Italian","Korean"]}
-            onCurrentIndexChanged: {
-                console.debug("**********************" + cmb.currentIndex)
-                curLanguage = cmb.currentIndex
-                main.s_setLanguage(curLanguage);
+            MyComBox{
+                id:cmb
+                width:110
+                height: 20
+                anchors.left: imgl.right
+                anchors.rightMargin: 10
+                anchors.verticalCenter: parent.verticalCenter
+                contentBg: "#00FFFFFF"
+                itemColorBgNor:"#ffffff"
+                itemColorBgHoverd: "#E7EAF1"
+                indicatorImgSrc:"qrc:/images/language_down.png"
+                indicatorW: 11
+                indicatorH: 7
+                itemLeftMargin:-12
+                itemTopMargin:0
+                currentIndex:1
+                model: ListModel{
+                    ListElement{showStr:"简体中文"}
+                    ListElement{showStr:"English"}
+//                    ListElement{showStr:"Italian"}
+//                    ListElement{showStr:"Korean"}
+//                    ListElement{showStr:"Russian"}
+//                    ListElement{showStr:"Lithuanian"}
+                }
 
-            }
+                //{["showStr":"简体中文" "showStr":"English","Italian","Korean"]}
+                onCurrentIndexChanged:{
+                    console.debug("**********************" + cmb.currentIndex)
+                    curLanguage = cmb.currentIndex
+                    main.s_setLanguage(curLanguage);
+                }
 
-            Component.onCompleted: {
+                Component.onCompleted: {
+                }
             }
         }
+
         Rectangle{
             id:line
             width: 2
             height: 18
-            anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
         }
-    }
 
-    Row{
-        id:windowAdjust
-        anchors.right: parent.right
-        anchors.rightMargin: 10
-        width: 100
-        anchors.verticalCenter: parent.verticalCenter
-        spacing:20
         QmlImageButton{
             width: 20
             height: 20
@@ -194,31 +210,13 @@ Rectangle {
         switch(type){
         case lEnglish:
             tabbarBtn.barModel.get(index++).txtStr =  "Main Preview"
-            tabbarBtn.barModel.get(index++).txtStr =  "录像回放"
-            tabbarBtn.barModel.get(index++).txtStr =  "系统设置"
-            tabbarBtn.barModel.get(index++).txtStr =  "Device Settings"
+            tabbarBtn.barModel.get(index++).txtStr =  "Record"
+            tabbarBtn.barModel.get(index++).txtStr =  "Device management"
             tabbarBtn.barModel.get(index++).txtStr =  "Alarm Management"
-            tabbarBtn.barModel.get(index++).txtStr =  "关于"
-            break;
-        case lKorean:
-            tabbarBtn.barModel.get(index++).txtStr =  "미리보기"
-            tabbarBtn.barModel.get(index++).txtStr =  "录像回放"
-            tabbarBtn.barModel.get(index++).txtStr =  "系统设置"
-            tabbarBtn.barModel.get(index++).txtStr =  "장비설정"
-            tabbarBtn.barModel.get(index++).txtStr =  "알람관리"
-            tabbarBtn.barModel.get(index++).txtStr =  "关于"
-            break;
-        case lItaly:
-            tabbarBtn.barModel.get(index++).txtStr =  "Vista Principale"
-            tabbarBtn.barModel.get(index++).txtStr =  "录像回放"
-            tabbarBtn.barModel.get(index++).txtStr =  "系统设置"
-            tabbarBtn.barModel.get(index++).txtStr =  "Settaggio"
-            tabbarBtn.barModel.get(index++).txtStr =  "Gestione Allarmi"
-            tabbarBtn.barModel.get(index++).txtStr =  "关于"
+            tabbarBtn.barModel.get(index++).txtStr =  "Data Management"
+            tabbarBtn.barModel.get(index++).txtStr =  "About"
             break;
         case lChinese:
-
-
             tabbarBtn.barModel.get(index++).txtStr =  "主预览"
             tabbarBtn.barModel.get(index++).txtStr =  "录像回放"
             tabbarBtn.barModel.get(index++).txtStr =  "设备管理"
@@ -227,16 +225,11 @@ Rectangle {
             tabbarBtn.barModel.get(index++).txtStr =  "关于"
 
             break;
-        case lRussian:
-            tabbarBtn.barModel.get(index++).txtStr =  "Основной просмотр"
-            tabbarBtn.barModel.get(index++).txtStr =  "录像回放"
-            tabbarBtn.barModel.get(index++).txtStr =  "系统设置"
-            tabbarBtn.barModel.get(index++).txtStr =  "Конфигурация устройства"
-            tabbarBtn.barModel.get(index++).txtStr =  "Сигнал тревоги"
-            tabbarBtn.barModel.get(index++).txtStr =  "关于"
-            break;
+
         }
     }
 
 
 }
+
+

@@ -1,4 +1,4 @@
-
+import Qt.labs.settings 1.0
 import QtQuick 2.0
 import QtQuick.Controls 2.5
 import "../simpleControl"
@@ -20,6 +20,14 @@ Rectangle {
     color: "#EEF3FA"
 
 
+    //    Settings{
+    //        id:settings
+    //        fileName: "config.ini"
+    //        property alias window1: value;
+    //        property alias window1: value;
+    //        property alias window1: value;
+    //        property alias window1: value;
+    //    }
     Rectangle{
         id:recDeviceArea
         width: parent.width-420 >1200?(parent.width-420):1200
@@ -29,13 +37,13 @@ Rectangle {
         color: "#ffffff"
         radius: 10
         //加个矩形是为了解决listview显示越界的问题
-//        Rectangle{
-//            anchors.top: recDeviceArea.top
-//            width: parent.width
-//            height: 84
-//            color: "#ffffff"
-//            z:1
-//        }
+        //        Rectangle{
+        //            anchors.top: recDeviceArea.top
+        //            width: parent.width
+        //            height: 84
+        //            color: "#ffffff"
+        //            z:1
+        //        }
         //第一排控件
 
         Rectangle{
@@ -84,7 +92,7 @@ Rectangle {
                                                                                                                curLanguage===lItaly?"Cancella Tutta la Selezione?":
                                                                                                                                      curLanguage===lRussian?"Вы уверены, что хотите удалить информацию?":""
                     askDialog.imgSrc = "qrc:/images/ico_warn.png"
-                    askDialog.curType = askDialog.warnInfoMutipleDelete
+                    askDialog.curType = askDialog.deviceInfoMutipleDelete
                     askDialog.open();
                 }
                 onPressed: rectBatchDelete.color = "#81C3FF"
@@ -125,8 +133,12 @@ Rectangle {
                 anchors.fill: parent
 
                 onClicked: {
+                    //deviceModel.funtest();
 
-                    deviceModel.funtest();
+                    deviceconfig.isBatchSet = true
+
+
+                    deviceconfig.open()
                 }
                 onPressed: rectBatchSet.color = "#B3E19D"
                 onReleased: rectBatchSet.color = "#71C648"
@@ -167,10 +179,10 @@ Rectangle {
 
                 onClicked: {
 
-
+                    adddevice.open();
                 }
-                onReleased: imgDeviceAdd.color = "#FB893F"
-                onPressed: imgDeviceAdd.color = "#FFCE83"
+                onReleased: rectDeviceAdd.color = "#FB893F"
+                onPressed: rectDeviceAdd.color = "#FFCE83"
             }
         }
 
@@ -210,7 +222,12 @@ Rectangle {
                 border.width: 0
                 //text:screenv.funGetCurPath()
                 font.pixelSize: fontSize
-                placeholderText: "输入关键词"
+                placeholderText: switch(curLanguage){
+                                 case lChinese:
+                                     "输入关键词";break;
+                                 case lEnglish:
+                                     "Enter the keyword";break;
+                                 }
                 placeholderTxtColor: "#909399"
                 isNeedDoubleClickEdit: false
                 textLeftPadding:0
@@ -220,10 +237,15 @@ Rectangle {
                 //onTextChanged: s_screenShotPathSet(inputScreenShotPath.text)
             }
         }
+        ListModel{
+            id:netstateModel
+            ListElement{showStr:"在线"}
+            ListElement{showStr:"离线"}
+        }
 
         MyComBox{
             id:cmbStateSelect
-            width:60
+            width:80
             height: 34
             z:2
             anchors.right: rectSearch.left
@@ -242,10 +264,7 @@ Rectangle {
             contentFontSize: fontSize
             bordColor:"#DCDFE6"
             mRadius:4
-            model: ListModel{
-                ListElement{showStr:"在线"}
-                ListElement{showStr:"离线"}
-            }
+            model: netstateModel
             onCurrentIndexChanged: {
 
                 //                    curLanguage = currentIndex
@@ -272,19 +291,20 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: checkedHeaderLeftMargin
-                source: isAllSelect?"qrc:/images/warnmanager/btnSelect_s.png":"qrc:/images/warnmanager/btnSelect.png"
+                source: deviceModel.isAllSelect?"qrc:/images/warnmanager/btnSelect_s.png":"qrc:/images/warnmanager/btnSelect.png"
 
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        if(isAllSelect){
-                            // imgSelect.source ="qrc:/images/btnSelect.png"
-                            isAllSelect = false;
-                        }else{
-                            //imgSelect.source ="qrc:/images/btnSelect_s.png"
-                            isAllSelect = true;
-                        }
-                        warnmodel.funSetAllSelect(isAllSelect);
+                        //                        if(isAllSelect){
+                        //                            // imgSelect.source ="qrc:/images/btnSelect.png"
+                        //                            isAllSelect = false;
+                        //                        }else{
+                        //                            //imgSelect.source ="qrc:/images/btnSelect_s.png"
+                        //                            isAllSelect = true;
+                        //                        }
+                        deviceModel.isAllSelect = !deviceModel.isAllSelect;
+                        deviceModel.funSetAllSelect(deviceModel.isAllSelect);
                     }
                 }
             }
@@ -350,6 +370,8 @@ Rectangle {
             model: deviceModel
             z:0
             ScrollBar.vertical: ScrollBar {size:10}
+
+            Component.onCompleted: deviceModel.funflushDevice();
             delegate: Rectangle{
                 property bool enter: false
                 width: parent.width
@@ -370,8 +392,9 @@ Rectangle {
                             model.isSelect = !model.isSelect;
 
                             if(!model.isSelect){
-                                isAllSelect = false;
-                                warnmodel.funSetInitSelectFalse();
+                                deviceModel.isAllSelect = false;
+
+                                //warnmodel.funSetInitSelectFalse();
                             }
                         }
                     }
@@ -410,7 +433,7 @@ Rectangle {
                     anchors.left: parent.left
                     anchors.leftMargin:stateHeaderLeftMargin
                     anchors.verticalCenter: parent.verticalCenter
-                    source: model.netState === 2?"qrc:/images/systemset/online.png":"qrc:/images/systemset/offline.png"
+                    source: model.netState?"qrc:/images/systemset/online.png":"qrc:/images/systemset/offline.png"
                 }
                 Text {
                     id: devicestatetxt
@@ -418,14 +441,27 @@ Rectangle {
                     anchors.leftMargin: 7
                     anchors.verticalCenter: parent.verticalCenter
                     font.pixelSize: fontSize
-                    color: model.netState === 2?"#67C23A":"#FF4141"
-                    text: model.netState === 2?("在线"):("离线")
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked:{
-                            console.debug("absolutePath:"+model.absolutePath)
-                            imgshow.source ="file:///"+ model.absolutePath
-                            imgpop.open();
+                    color: model.netState?"#67C23A":"#FF4141"
+                    text: {
+                        if(model.netState){
+                            switch(curLanguage){
+                            case lEnglish:
+                                "Online";
+                                break;
+                            case lChinese:
+                                "在线";
+                                break;
+                            }
+                        }else{
+                            switch(curLanguage){
+                            case lEnglish:
+                                "Offline";
+                                break;
+                            case lChinese:
+                                "离线";
+                                break;
+                            }
+
                         }
                     }
                 }
@@ -438,11 +474,16 @@ Rectangle {
                     anchors.leftMargin: doHeaderLeftMargin
                     font.pixelSize: fontSize
                     color: "#0486FE"
-                    text:curLanguage === lChinese?"删除":
-                                                   curLanguage === lEnglish?"Remove":
-                                                                             curLanguage === lKorean?"삭제":
-                                                                                                      curLanguage === lItaly?"Cancella":
-                                                                                                                              curLanguage === lRussian?"Удалить":""
+                    text:switch(curLanguage){
+                         case lChinese:
+                             "删除";
+                             break;
+                         case lEnglish:
+                             "Remove"
+                             break;
+                         }
+
+
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
@@ -450,6 +491,7 @@ Rectangle {
                                 askDialog.width = 500
                             else
                                 askDialog.width = 427
+
                             askDialog.height = 176
 
                             var askstr = "";
@@ -472,7 +514,7 @@ Rectangle {
                             }
                             askDialog.askStr = askstr
                             askDialog.imgSrc = "qrc:/images/ico_warn.png"
-                            askDialog.curType = askDialog.warnInfoSingleDelete
+                            askDialog.curType = askDialog.deviceInfoSingleDelete
                             askDialog.open();
                             // warnmodel.funDeleteIndex(index);
                         }
@@ -496,10 +538,28 @@ Rectangle {
                     anchors.leftMargin: 6
                     font.pixelSize: fontSize
                     color: "#0486FE"
-                    text: qsTr("设置")
+                    text: {
+
+                        switch(curLanguage){
+                        case lEnglish:
+                            "Set";
+                            break;
+                        case lChinese:
+                            "设置";
+                            break;
+                        }
+
+
+                    }
                     MouseArea{
                         anchors.fill: parent
-                        onClicked: deviceconfig.open()
+                        onClicked: {
+                            deviceconfig.isBatchSet = false
+                            deviceconfig.open()
+                            setDevicePar(model);
+                            // deviceModel.recordSavePath = "11111111";
+                            //recordSavePath
+                        }
                     }
                 }
 
@@ -510,7 +570,6 @@ Rectangle {
                     onEntered:enter = true
                     onExited: enter = false;
                     onClicked: {
-
                         deviceList.currentIndex = index;
                         mouse.accepted = false
                     }
@@ -519,7 +578,6 @@ Rectangle {
         }
     }
 
-
     DeviceConfig{
         id:deviceconfig
         width: 800
@@ -527,60 +585,19 @@ Rectangle {
         anchors.centerIn: parent
     }
 
-
-    Popup {
-        id: imgpop
-        x:(parent.width-720)/2
-        y:(parent.height-520)/2
-        width: 720
-        height: 520
-        modal: true
-        focus: true
-        //设置窗口关闭方式为按“Esc”键关闭
-        closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
-        //设置窗口的背景控件，不设置的话Popup的边框会显示出来
-        background: rect
-
-        Rectangle{
-            id:rect
-            color: "#00000000"
-            anchors.fill: parent
-            Image {
-                id: imgshow
-                width: 600
-                height: 400
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                source: ""
-            }
-
-            Image {
-                id: imgclose
-                width: 40
-                height: 40
-                anchors.left: imgshow.right
-                anchors.bottom: imgshow.top
-                anchors.leftMargin: 20
-                anchors.bottomMargin: 20
-                source: "qrc:/images/img_close.png"
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: imgpop.close();
-                }
-            }
-
-        }
+    function setDevicePar(model){
+        // deviceconfig.set
+        model.recordSavePath = "11111111";
     }
-
 
     Connections{
         target: askDialog
         onS_CurTypeMsg:{
-            if(askDialog.warnInfoMutipleDelete === type){
-                warnmodel.funDeleteSelect();
+            if(askDialog.deviceInfoMutipleDelete === type){
+                deviceModel.funDeleteSelect();
                 isAllSelect = false;
-            }else if(askDialog.warnInfoSingleDelete === type)
-                warnmodel.funDeleteIndex(deviceList.currentIndex)
+            }else if(askDialog.deviceInfoSingleDelete === type)
+                deviceModel.funDeleteIndex(deviceList.currentIndex)
         }
     }
 
@@ -592,52 +609,32 @@ Rectangle {
 
     function setLanguage(type){
 
-        //        switch(type){
-        //        case lEnglish:
-        //            textitle.text = "Log list";
-        //            txtBatchDelete.text = "Batch Remove"
-        //            txtDo.text = "Operation"
-        //            txtWarnTime.text = "Alarm Time"
-        //            txtWarnTemp.text = "Alarm Temperature"
-        //            warnImg.text = "Snapshots"
-        //            //deletetxt.text = "Remove"
-        //            break;
-        //        case lKorean:
-        //            textitle.text = "로그정보";
-        //            txtBatchDelete.text = "전체삭제"
-        //            txtDo.text = "설정"
-        //            txtWarnTime.text = "알람시간"
-        //            txtWarnTemp.text = "알람온도"
-        //            warnImg.text = "화면저장"
-        //            //deletetxt.text = "삭제"
-        //            break;
-        //        case lItaly:
-        //            textitle.text = "Elenco eventi";
-        //            txtBatchDelete.text = "Cancella tutti eventi"
-        //            txtDo.text = "Operazione"
-        //            txtWarnTime.text = "Ora Allarme"
-        //            txtWarnTemp.text = "Temperatura Allarme"
-        //            warnImg.text = "Istantanea"
-        //            //deletetxt.text = "Cancella"
-        //            break;
-        //        case lChinese:
-        //            textitle.text = "日志列表";
-        //            txtBatchDelete.text = "批量删除"
-        //            txtDo.text = "操作"
-        //            txtWarnTime.text = "告警时间"
-        //            txtWarnTemp.text = "告警温度"
-        //            warnImg.text = "抓拍图片"
-        //            //deletetxt.text = "删除"
-        //            break;
-        //        case lRussian:
-        //            textitle.text = "Список журналов";
-        //            txtBatchDelete.text = "Очистить все события"
-        //            txtDo.text = "Операция"
-        //            txtWarnTime.text = "Время"
-        //            txtWarnTemp.text = "Температура"
-        //            warnImg.text = "Снимок"
-        //            //deletetxt.text = "删除"
-        //            break;
-        //        }
+        switch(type){
+        case lEnglish:
+            txtBatchDelete.text = "Batch Remove";
+            txtBatchSet.text = "Set in batches";
+            txtDeviceAdd.text = "Add"
+            txtDeviceID.text = "Device ID"
+            txtName.text = "Name"
+            txtRecordPath.text = "Storage path"
+            txtState.text = "Network status"
+            txtDo.text = "Operate"
+
+            netstateModel.get(0).showStr = "Online"
+            netstateModel.get(1).showStr = "Offline"
+            break;
+        case lChinese:
+            txtBatchDelete.text = "批量删除";
+            txtBatchSet.text = "批量设置";
+            txtDeviceAdd.text = "设备添加"
+            txtDeviceID.text = "设备编码"
+            txtName.text = "名称"
+            txtRecordPath.text = "录像存储地址"
+            txtState.text = "网络状态"
+            txtDo.text = "操作"
+            netstateModel.get(0).showStr = "在线"
+            netstateModel.get(1).showStr = "离线"
+            break;
+        }
     }
 }

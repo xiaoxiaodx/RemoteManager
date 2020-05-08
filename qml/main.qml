@@ -18,7 +18,7 @@ Window {
     width:1400
     height:900
 
-    property bool isLocker: false
+    property bool isFullScreen: false
     visibility : "AutomaticVisibility"
 
     property int mouseAdjustWidth: 4
@@ -26,9 +26,13 @@ Window {
     property int minH: 900
 
     property string toastStr: ""
-    signal lockerCHange(bool lockchange);
-    onIsLockerChanged: lockerCHange(isLocker)
+    signal sfullScreenChange(bool isFull);
+    //onIsLockerChanged: lockerCHange(isLocker)
 
+
+    onIsFullScreenChanged: {
+        sfullScreenChange(isFullScreen)
+    }
     property int restoreX: 0
     property int restoreY: 0
     property int restoreW: 0
@@ -64,18 +68,19 @@ Window {
         width: parent.width
         height: parent.height
         visible: true//isMainContent?true:false
-
         onWinMin: {
 //            if(main.visibility === 4)
 //                isSpecilState = true;
             main.visibility = "Minimized"
         }
+
         onWinMax: {
             if(windowSizeState === 1)
                 maxWindow()
             else if(windowSizeState === 2)
                 restoreWindow();
         }
+
         onWinClose:{
             askDialog.width = 427
             askDialog.height = 176
@@ -103,16 +108,14 @@ Window {
         color: "#00000000"
         width: parent.width
         height: parent.height
-        visible: isLocker
+        visible: isFullScreen
         MouseArea{
             anchors.fill: parent
             propagateComposedEvents: true
             onClicked: {
-                if(!isLocker)
+                if(!isFullScreen)
                     mouse.accepted = false;
-                isLocker = false;
-
-
+                isFullScreen = false;
             }
         }
     }
@@ -150,14 +153,11 @@ Window {
         onExited: cursorShape = Qt.ArrowCursor
         onPressed:  mousePressPt  = Qt.point(mouse.x, mouse.y)
         onPositionChanged: {
-
-
             if(pressed){
                 var offsetX = mouse.x + mousePressPt.x
                 var offsetY = mouse.y + mousePressPt.y
                 adjustWindow(MainContent.ADJUSTW.WRIGHT,offsetX,0);
             }
-
         }
     }
 

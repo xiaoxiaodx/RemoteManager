@@ -19,10 +19,36 @@ Popup {
     property color fontColor: "#333333"
     property color bgColor: "#ffffff"
 
+    property alias calendarEventModel: model
     signal s_yearChange(var value)
     signal s_mouthChange(var value)
     signal s_dayChange(var value)
     signal s_dayChange1(var value)
+
+
+    ListModel{
+        id:model
+
+        function getDateEvent(tmpData){
+
+            var dayNum = Qt.formatDate(tmpData,"dd")-1
+            //console.debug("getDateEvent:    "+dayNum + "  "+calendarEventModel.count+"  "+calendarEventModel.get(dayNum))
+
+            if(calendarEventModel.count == 0)
+                return "#ffffff"
+            if(calendarEventModel.get(dayNum)=== undefined)
+                return "#ffffff"
+
+            if(calendarEventModel.get(dayNum).type==="1")
+                return "#3A3D41";
+            else if(calendarEventModel.get(dayNum).type==="2")
+                return "#f64054"
+            else //if(calendarEventModel.get(dayNum).type==="0")
+                return "#ffffff"
+
+
+        }
+    }
 
     Rectangle {
         id: rect
@@ -187,9 +213,9 @@ Popup {
                     //                       : (styleData.visibleMonth && styleData.valid
                     //                          ?Qt.rgba(6/255,45/255,51/255,1)
                     //                          : Qt.rgba(3/255,28/255,35/255,1));
-                    //color: styleData.selected?"#409EFF":((styleData.visibleMonth && styleData.valid)?(calendarEventModel.getDateEvent(styleData.date)):"#191919")
-                    color: styleData.selected?"#8AB8FF":bgColor//(styleData.visibleMonth && styleData.valid)?(calendarEventModel.getDateEvent(styleData.date)):bgColor
-
+                    color: styleData.selected?"#8AB8FF":((styleData.visibleMonth && styleData.valid)?(calendarEventModel.getDateEvent(styleData.date)):bgColor)
+                    //color: styleData.selected?"#8AB8FF":bgColor//(styleData.visibleMonth && styleData.valid)?(calendarEventModel.getDateEvent(styleData.date)):bgColor
+                    radius: 2
                     Label {
                         text: styleData.date.getDate()
                         anchors.centerIn: parent
@@ -198,7 +224,7 @@ Popup {
                         //                    color: styleData.valid
                         //                           ?Qt.rgba(197/255,1,1,1)
                         //                           : Qt.rgba(16/255,100/255,100/255,1)
-                        color: styleData.today?"#3B84F6":(((styleData.visibleMonth && styleData.valid)?fontColor:Qt.rgba(0,0,0,0.25)))
+                        color: styleData.today?"#3B84F6":(((styleData.visibleMonth && styleData.valid)?(styleData.selected?"#ffffff":fontColor):Qt.rgba(0,0,0,0.25)))
                         //color:styleData.visibleDay?"red":"white"
                     }
                 }

@@ -64,7 +64,7 @@ void WriteH264::slot_writeH264(QImage img,int capx,int capy,int capw,int caph){
     QImage img2 = img1.scaled(QSize(960,600),Qt::IgnoreAspectRatio);
 
     if(mPeriodIndex*mPeriod < 1800000){
-        convern.rgbToYuv(img2,960,600,file);
+       // convern.rgbToYuv(img2,960,600,file);
         mPeriodIndex++;
     }else {
         //超过30分钟，关闭文件，这样在继续录文件时会重新打开一个文件

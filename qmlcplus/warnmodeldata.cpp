@@ -2,7 +2,6 @@
 
 WarnModelData::WarnModelData(const bool &isSelect,const QString &warnTime,const QString &warnTemp,QString imgName,QString path,QObject *parent)
     :QObject(parent),m_isSelect(isSelect),m_warnTime(warnTime),m_warnTemp(warnTemp),m_imgName(imgName),m_absolutePath(path)
-
 {
 
 }

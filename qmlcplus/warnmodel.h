@@ -21,10 +21,11 @@ public:
     };
     Q_INVOKABLE void funFlushWarnInfo(QString capturePaht,QString logFileName);
     Q_INVOKABLE void funDeleteIndex(int index);
+    Q_INVOKABLE void funDeleteSelect();
     Q_INVOKABLE int funFindIndex(QString h,QString m,QString s);
     Q_INVOKABLE void funSetAllSelect(bool isSelect);//选中所有数据
     Q_INVOKABLE void funSetInitSelectFalse();//将数据初始化选中属性修改为false
-    Q_INVOKABLE void funDeleteSelect();
+
 
     //截屏
     Q_INVOKABLE bool funScreenShoot(QString path,QQuickWindow *quic,int capx,int capy,int capw,int caph,float warnTemp);

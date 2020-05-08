@@ -11,17 +11,109 @@ Rectangle {
 
 
 
-    property int fontSize: 14
+    property int fontSize: 12
     property color fontColor: "#606266"
+
+    property bool isRevicse: false//是否有修改
     //与线的左对齐线
-    property int parSetFirstAlignLine: 78
+
+    property int parSetFirstAlignLine: curLanguage === lChinese?78:curLanguage === lEnglish?108:78
     color: "#ffffff"
 
     Settings {
         id:setting
-
         fileName: "config.ini"
+        property alias recordclose: checkRecordClose.checked
+        property alias recordwarnvideo: checkWarnVideo.checked
+        property alias recordfullday: checkRecordFullDay.checked
+        property alias recordresolution:cmbResolution.currentIndex
+        property alias recordpath: inputrecordPath.text
+        property alias recordstarttime: txttimeStart.text
+        property alias recordendtime: txttimeEnd.text
+        property alias recordmonday: checkMonday.checked
+        property alias recordtusday:checkTusday.checked
+        property alias recordwensday:checkWensday.checked
+        property alias recordtursday:checkTursday.checked
+        property alias recordfriday:checkFriday.checked
+        property alias recordsatday:checkSatday.checked
+        property alias recordsunday:checkSunday.checked
+        property alias recordallweekly:weeklyAllSelect.checked
+    }
 
+    function setRecord(type,resolution,path,startT,endT,weekly){
+
+        isRevicse = false
+        if(type === 0)
+            checkRecordClose.checked = true;
+        else if(type === 1)
+            checkWarnVideo.checked = true;
+        else if(type === 2)
+            checkRecordFullDay.checked = true
+
+        inputrecordPath.text = path
+        txttimeStart.text = startT
+        txttimeEnd.text = endT
+
+        switch(weekly){
+        case 0:
+            weeklyAllSelect.checked = true;
+            break;
+        case 1:
+            checkMonday.checked = true;
+            break;
+        case 2:
+            checkTusday.checked = true;
+            break;
+        case 3:
+            checkWensday.checked = true;
+            break;
+        case 4:
+            checkTursday.checked = true;
+            break;
+        case 5:
+            checkFriday.checked = true;
+            break;
+        case 6:
+            checkSatday.checked = true;
+            break;
+        case 7:
+            checkSunday.checked = true;
+            break;
+        }
+    }
+
+    function updateParameterInfo(model){
+
+        if(isRevicse){
+            return;
+        }else{
+            var videoType = -1;
+            if(checkRecordClose.checked)
+                videoType = 0
+            if(checkWarnVideo.checked)
+                videoType = 1
+            if(checkRecordFullDay.checked)
+               videoType = 2
+
+            var weeklySelect = -1;
+            if(weeklyAllSelect.checked)
+                weeklySelect = 0
+            if(checkMonday.checked)
+                weeklySelect = 1
+            if(checkTusday.checked)
+                weeklySelect = 2
+            if(checkWensday.checked)
+                weeklySelect = 3
+            if(checkTursday.checked)
+                weeklySelect = 4
+            if(checkFriday.checked)
+                weeklySelect = 5
+            if(checkSatday.checked)
+                weeklySelect = 6
+            if(checkSunday.checked)
+                weeklySelect = 7
+            model.updateRecord(isBatchSet,videoType,cmbResolution.currentIndex,txttimeStart.text,txttimeEnd.text,weeklySelect)
+        }
     }
 
     Text {
@@ -30,7 +122,7 @@ Rectangle {
         anchors.leftMargin: 20
         anchors.bottom: line.top
         anchors.bottomMargin: 10
-        font.pixelSize: fontPixSize
+        font.pixelSize: 14
         color: fontColor
         text: qsTr("设置")
     }
@@ -63,6 +155,7 @@ Rectangle {
         anchors.topMargin: 20
         text: "录像关闭"
     }
+
     SimpleCheckedButton{
         id:checkWarnVideo
         exclusiveGroup:buttonGroup
@@ -77,6 +170,7 @@ Rectangle {
         anchors.verticalCenter: checkRecordClose.verticalCenter
         text: "告警录像"
     }
+
     SimpleCheckedButton{
         id:checkRecordFullDay
         exclusiveGroup:buttonGroup
@@ -89,7 +183,7 @@ Rectangle {
         anchors.left: checkWarnVideo.right
         anchors.leftMargin: 30
         anchors.verticalCenter: checkRecordClose.verticalCenter
-        text: "全体录像"
+        text: "全天录像"
     }
 
     Text {
@@ -97,11 +191,11 @@ Rectangle {
         text: qsTr("分辨率")
         font.pixelSize: fontSize
         color: fontColor
-        anchors.right: cmbResolution.left
-        anchors.rightMargin: 10
+        anchors.left: line.left
+        anchors.leftMargin: 20
+        //anchors.rightMargin: 10
         anchors.verticalCenter: cmbResolution.verticalCenter
     }
-
 
     ListModel{
         id:resolutionModel
@@ -113,10 +207,10 @@ Rectangle {
         id:cmbResolution
         width:130
         height: 28
-        anchors.left: line.left
-        anchors.leftMargin: parSetFirstAlignLine
+        anchors.left: labelResolution.right
+        anchors.leftMargin:10
         anchors.top: line.bottom
-        anchors.topMargin: 52
+        anchors.topMargin: 54
         contentBg: "#ffffff"
         itemColorBgNor:"#FFFFFF"
         itemColorBgHoverd: "#E7EAF1"
@@ -201,20 +295,16 @@ Rectangle {
         }
     }
 
-
-
-
     Text {
         id: recordTimetext
         anchors.left: line1.left
         anchors.leftMargin: 20
         anchors.bottom: line1.top
         anchors.bottomMargin: 10
-        font.pixelSize: fontPixSize
+        font.pixelSize: 14
         color: fontColor
         text: qsTr("录像时间")
     }
-
 
     Rectangle{
         id:line1
@@ -225,7 +315,6 @@ Rectangle {
         anchors.topMargin: 237
         color: "#EBEEF5"
     }
-
 
     //时间选择
     Rectangle{
@@ -267,8 +356,8 @@ Rectangle {
             onPressed: {
                 selecttimeStart.open()
             }
-            onEntered: txttimeStart.source = "qrc:/images/warnmanager/time.png"
-            onReleased: txttimeStart.source = "qrc:/images/warnmanager/time.png"
+            onEntered: imgtimeStart.source = "qrc:/images/warnmanager/time.png"
+            onReleased: imgtimeStart.source = "qrc:/images/warnmanager/time.png"
         }
     }
 
@@ -336,8 +425,8 @@ Rectangle {
         onS_ensure: {
             var timeStr = timeh+":"+timem+":"+times
             txttimeStart.text = timeStr
-//            var curIndex = warnmodel.funFindIndex(timeh,timem,times)
-//            console.debug("curIndex "+curIndex)
+            //            var curIndex = warnmodel.funFindIndex(timeh,timem,times)
+            //            console.debug("curIndex "+curIndex)
 
 
         }
@@ -469,5 +558,58 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: "周六"
+    }
+
+    Connections{
+        target: main
+        onS_setLanguage:setLanguage(typeL);
+    }
+
+    function setLanguage(type){
+        switch(type){
+        case lEnglish:
+
+            settxt.text = "Set"
+
+            checkRecordFullDay.text = "All"
+            checkWarnVideo.text = "Alarm"
+            checkRecordClose.text ="Disable"
+
+            checkMonday.text = "Monday"
+            checkTusday.text = "Tuesday"
+            checkWensday.text = "Wednesday"
+            checkTursday.text = "Thursday"
+            checkFriday.text = "Friday"
+            checkSatday.text = "Saturday"
+            checkSunday.text = "Sunday"
+            weeklyAllSelect.text = "All"
+
+            labelRecordPath.text = "Storage path"
+            recordTimetext.text = "Record time"
+            labelResolution.text = "Resolution"
+            break;
+        case lChinese:
+            settxt.text = "设置"
+
+            checkRecordFullDay.text = "全天录像"
+            checkWarnVideo.text = "告警录像"
+            checkRecordClose.text ="录像关闭"
+
+            checkMonday.text = "周一"
+            checkTusday.text = "周二"
+            checkWensday.text = "周三"
+            checkTursday.text = "周四"
+            checkFriday.text = "周五"
+            checkSatday.text = "周六"
+            checkSunday.text = "周日"
+            weeklyAllSelect.text = "全选"
+
+            labelRecordPath.text = "存储路径"
+            recordTimetext.text = "录像时间"
+            labelResolution.text = "分辨率"
+
+
+            break;
+        }
     }
 }

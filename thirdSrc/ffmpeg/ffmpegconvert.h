@@ -12,16 +12,16 @@ extern "C"{
 #include "libavutil/opt.h"
 #include "libavcodec/avcodec.h"
 }
-#include <QFile>
+//#include <QFile>
 #include <QMutex>
 class FfmpegConvert : public QObject
 {
     Q_OBJECT
 public:
     explicit FfmpegConvert(QObject *parent = nullptr);
-  void rgb32ToH264(QImage img,int w,int h,QFile &file);
+  //void rgb32ToH264(QImage img,int w,int h,QFile &file);
   void rgb32ToH264(QImage img,QByteArray &arr,bool &gotPic);
-  void rgbToYuv(QImage img,int resW,int resH,QFile &yuvFlie);
+ // void rgbToYuv(QImage img,int resW,int resH,QFile &yuvFlie);
   bool initConvert(int resW,int resH);
   void unInitConvert();
 
@@ -42,7 +42,7 @@ private:
     AVFrame *rgbFrame = nullptr;
     AVPacket pkt;
     QImage testImg;
-    QFile *fileSaveYuv;
+    //QFile *fileSaveYuv;
     QMutex mutex;
 
 

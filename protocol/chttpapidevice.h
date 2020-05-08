@@ -99,7 +99,6 @@ private:
 
     QTimer *timerReSendCmd = nullptr;
 
-
 };
 
 #endif

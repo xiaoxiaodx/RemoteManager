@@ -12,6 +12,7 @@ Rectangle {
     property alias txtColor: checktxt.color
     property alias text: checktxt.text
 
+    property bool isOnlySelect: false
     property bool checked: false
     property ExclusiveGroup exclusiveGroup: null //对外开放一个ExclusiveGroup接口，用于绑定同个组
 
@@ -46,7 +47,10 @@ Rectangle {
     MouseArea{
         anchors.fill: parent
         onClicked: {
-            checked = !checked
+            if(isOnlySelect)
+                checked = true
+            else
+                checked = !checked
         }
     }
 }

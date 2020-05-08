@@ -1,5 +1,16 @@
-QT += quick
+QT += quick multimedia network opengl
 CONFIG += c++11
+
+#QT += concurrent
+#TEMPLATE = app
+#QT += qml quick
+#QT += opengl
+#QT += gui
+#QT += quick
+#QT += network
+#QT += core
+#CONFIG += c++11
+#QT += multimedia
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -40,7 +51,6 @@ SOURCES += \
     thirdSrc/ffmpeg/ffmpegcodec.cpp \
     thirdSrc/ffmpeg/ffmpegconvert.cpp \
     thirdSrc/ffmpeg/ffmpegreplay.cpp \
-    thirdSrc/ffmpeg/ffmpegwriteavi.cpp \
     protocol/chttpapidevice.cpp \
     protocol/mysearch1.cpp \
     protocol/tcpworker.cpp \
@@ -56,7 +66,14 @@ SOURCES += \
     thirdSrc/avi/hi_avi.cpp \
     recordVideo/record/avirecord.cpp \
     qmlcplus/devicemodel.cpp \
-    qmlcplus/facedatamodel.cpp
+    qmlcplus/facedatamodel.cpp \
+    playAudio/mydevice.cpp \
+    playAudio/playaudio.cpp \
+#    deivceconnectionmanager.cpp \
+    protocol/p2pworker.cpp \
+    protocol/p2pprotrol.cpp \
+    qmlcplus/devicemodeldata.cpp \
+
 
 
 HEADERS += \
@@ -71,7 +88,6 @@ HEADERS += \
     thirdSrc/ffmpeg/ffmpegcodec.h \
     thirdSrc/ffmpeg/ffmpegconvert.h \
     thirdSrc/ffmpeg/ffmpegreplay.h \
-    thirdSrc/ffmpeg/ffmpegwriteavi.h \
     protocol/chttpapidevice.h \
     protocol/mysearch1.h \
     protocol/tcpworker.h \
@@ -93,7 +109,15 @@ HEADERS += \
     recordVideo/record/avirecord.h \
     qmlcplus/devicemodel.h \
     util/help.h \
-    qmlcplus/facedatamodel.h
+    qmlcplus/facedatamodel.h \
+    playAudio/mydevice.h \
+    playAudio/playaudio.h \
+#    deivceconnectionmanager.h \
+    protocol/p2pworker.h \
+    protocol/protocal_pkg.h \
+    protocol/p2pprotrol.h \
+    qmlcplus/devicemodeldata.h \
+
 
 
 
@@ -107,6 +131,7 @@ INCLUDEPATH += $$PWD/thirdSrc/avi
 INCLUDEPATH += $$PWD/recordVideo/captureScreen
 INCLUDEPATH += $$PWD/util
 INCLUDEPATH += $$PWD/qmlcplus
+INCLUDEPATH += $$PWD/playAudio
 
 
 INCLUDEPATH += $$PWD/thirdLib/ffmpeg64/include
@@ -119,5 +144,8 @@ LIBS += $$PWD/thirdLib/ffmpeg64/lib/avcodec.lib \
         $$PWD/thirdLib/ffmpeg64/lib/swresample.lib \
         $$PWD/thirdLib/ffmpeg64/lib/swscale.lib
 
-
+#P2P 库
+LIBS+= -L $$PWD/thirdLib/p2p_ppcs/ -l PPCS_API
+INCLUDEPATH += $$PWD/thirdLib/p2p_ppcs/include \
+               $$PWD/P2P/
 

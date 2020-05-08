@@ -16,7 +16,7 @@ Rectangle {
     property int fontSize: 14
 
     property int listviewClickIndex: -1
-    property bool isAllSelect: false
+
 
     signal s_allselect(bool isSelect);
 
@@ -298,19 +298,16 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.leftMargin: checkedHeaderLeftMargin
-                source: isAllSelect?"qrc:/images/warnmanager/btnSelect_s.png":"qrc:/images/warnmanager/btnSelect.png"
+                source: faceDateModel.isAllSelect?"qrc:/images/warnmanager/btnSelect_s.png":"qrc:/images/warnmanager/btnSelect.png"
 
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        if(isAllSelect){
-                            // imgSelect.source ="qrc:/images/btnSelect.png"
-                            isAllSelect = false;
-                        }else{
-                            //imgSelect.source ="qrc:/images/btnSelect_s.png"
-                            isAllSelect = true;
-                        }
-                        warnmodel.funSetAllSelect(isAllSelect);
+
+
+                        faceDateModel.isAllSelect = !faceDateModel.isAllSelect
+
+                        faceDateModel.funSetAllSelect(faceDateModel.isAllSelect);
                     }
                 }
             }
@@ -396,7 +393,7 @@ Rectangle {
                             model.isSelect = !model.isSelect;
 
                             if(!model.isSelect){
-                                isAllSelect = false;
+                                faceDateModel.isAllSelect = false;
                                 //warnmodel.funSetInitSelectFalse();
                             }
                         }
@@ -408,7 +405,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: photoHeaderLeftMargin
-                    source:model.faceimgPath===undefine? "":model.faceimgPath
+                    source:(model.faceimgPath===undefine)? "":model.faceimgPath
                 }
                 Text {
                     id: facenumber
@@ -499,11 +496,11 @@ Rectangle {
             y:67
             Component.onCompleted: {
 
-                curDateStr = Qt.formatDate(calendar.getCurrentData(),"yyyyMMdd");
+               // curDateStr = Qt.formatDate(calendar.getCurrentData(),"yyyyMMdd");
                // warnmodel.funFlushWarnInfo(deviceconfig.getScrennShotPath(),curDateStr);
             }
             onS_dayChange:{
-                curDateStr = value;
+              //  curDateStr = value;
                 //warnmodel.funFlushWarnInfo(deviceconfig.getScrennShotPath(),curDateStr);
             }
             onS_dayChange1: txtDate.text = value
@@ -520,11 +517,11 @@ Rectangle {
             onS_ensure: {
                 var timeStr = timeh+":"+timem+":"+times
                 txttime.text = timeStr
-                var curIndex = warnmodel.funFindIndex(timeh,timem,times)
+                //var curIndex = warnmodel.funFindIndex(timeh,timem,times)
                 console.debug("curIndex "+curIndex)
 
-                warnList.positionViewAtIndex(curIndex,ListView.Beginning)
-                warnList.currentIndex = curIndex;
+               // warnList.positionViewAtIndex(curIndex,ListView.Beginning)
+                //warnList.currentIndex = curIndex;
                 //warnList.currentIndex = curIndex
             }
 
@@ -541,10 +538,10 @@ Rectangle {
         target: askDialog
         onS_CurTypeMsg:{
             if(askDialog.warnInfoMutipleDelete === type){
-                warnmodel.funDeleteSelect();
-                isAllSelect = false;
+               faceDateModel.funDeleteSelect();
+
             }else if(askDialog.warnInfoSingleDelete === type)
-                warnmodel.funDeleteIndex(dataList.currentIndex)
+               faceDateModel.funDeleteIndex(dataList.currentIndex)
         }
     }
 

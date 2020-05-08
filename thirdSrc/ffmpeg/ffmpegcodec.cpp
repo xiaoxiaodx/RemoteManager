@@ -16,7 +16,7 @@ FfmpegCodec::FfmpegCodec(QObject *parent) : QObject(parent)
 void FfmpegCodec::initVariable()
 {
 
-    audioSrc = nullptr;
+    //audioSrc = nullptr;
     m_pVoutBuffer = nullptr;
     m_VstreamIndex = -1;
     m_AstreamIndex = -1;

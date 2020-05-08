@@ -29,6 +29,9 @@ class FaceDateModel : public QAbstractListModel
 public:
     explicit FaceDateModel(QObject *parent = nullptr);
 
+    QML_PROPERTY(bool,isAllSelect)
+
+public:
     enum datasourceRoles {
         ISSELECT = Qt::UserRole ,
         FACEIMGPATH,
@@ -38,6 +41,9 @@ public:
     };
 
     Q_INVOKABLE void funtest();
+    Q_INVOKABLE void funDeleteIndex(int index);
+    Q_INVOKABLE void funDeleteSelect();
+    Q_INVOKABLE void funSetAllSelect(bool isSelect);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role ) const override;

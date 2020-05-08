@@ -17,14 +17,14 @@ public:
     ~ReplayTimeline();
 
     Q_INVOKABLE void setSizeType(int type);
-
+    Q_INVOKABLE void setTimeWarn(QVariant timeInfo);
     Q_INVOKABLE int getIndicatorTime();
     Q_INVOKABLE void updateDate(QString relativePath,QString date);
     void init();
     void setDate(QDate date);
 
 signals:
-    void indicatorTimeChange(QTime curTime);
+    void indicatorTimeChange(QString curTime);
 public slots:
     void slot_24hSelect();
     void slot_2hSelect();
@@ -66,6 +66,7 @@ private:
 
     void appendTime(QString startT,QString longt);
     void removeTime();
+    void mergeTimeInterval(QTime startT,int timeLen,int videoType);
     QRectF rectFIndicator;
     bool isIndicatorPress = false;
     QPoint pressPt;

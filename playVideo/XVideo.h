@@ -1,119 +1,85 @@
-﻿#ifndef XVideo_H
+﻿
+#ifndef XVideo_H
 #define XVideo_H
 #include <QQuickPaintedItem>
 #include <QImage>
 #include <QList>
 #include <QTimer>
-
+#include <QAudioFormat>
+#include <QAudioDeviceInfo>
+#include <QAudioOutput>
+#include <QSGSimpleTextureNode>
 #include <QDateTime>
 #include <QDir>
 
 #include <QQuickWindow>
-#include "tcpworker.h"
+//#include "tcpworker.h"
+#include "playaudio.h"
+//#include "dispatchmsgmanager.h"
+//#include "p2pworker.h"
+//#include "mp4format.h"
 #include "ffmpegcodec.h"
-#include "mysearch1.h"
+//#include "avirecord.h"
 
-#include "chttpapidevice.h"
 
-#include "debuglog.h"
-class XVideo : public QQuickPaintedItem
+class ImageInfo{
+
+public:
+    QImage *pImg;
+    quint64 time;
+};
+class XVideo : public QQuickItem
 {
     Q_OBJECT
 public:
-
-    Q_INVOKABLE void startNormalVideo(float tp);
-    Q_INVOKABLE void fun_timeSwitch(bool isChecked);
-    Q_INVOKABLE void fun_temSet(QVariant mvalue);
-    Q_INVOKABLE void fun_getInitPar();
-    Q_INVOKABLE void fun_setListRect(QVariant);
-    Q_INVOKABLE void fun_updateDate();
-    Q_INVOKABLE void fun_setRectPar(int sx,int sy,int sw,int sh,int pw,int ph);
-    Q_INVOKABLE void fun_initRedFrame(int w,int h);
-    Q_INVOKABLE void fun_setInitPar(QString ip,int parentW,int parentH,int x,int y,int w,int h);
-    Q_INVOKABLE void fun_setIraInfo(QVariantMap map);
+    Q_INVOKABLE void funSendVideoData(QVariant buff);
+    Q_INVOKABLE void funSendAudioData(char *buff,int len);
 
     explicit XVideo();
     ~XVideo();
 
 signals:
-    //tcp
-    void signal_connentSer(QString ip,int port);
-    void signal_disconnentSer();
-    void signal_tcpSendAuthentication(QString did,QString name,QString pwd);
-    void signal_destoryTcpWork();
-    //qml
-    void signal_loginStatus(QString msg);
-    void signal_waitingLoad(QString msgload);
-    void signal_endLoad();
 
-    //
-    void signal_temp(float tempV);
-    //私有流参数
-    void signal_httpParSet(QMap<QString,QVariant> map);
-    void signal_httpUiParSet(QVariant map);
-    void signal_getInitPar();
-
-    //http 搜索
-    void signal_resetSearch();
-    void signal_finishSearch();
 
 public slots:
-    void slot_recH264(char *buff,int len,quint64 time);
 
-    void slog_HttpmsgCb(QMap<QString,QVariant>);
-    void recSearchIp(QString ip);
+
 protected:
-    //  QSGNode* updatePaintNode(QSGNode *old, UpdatePaintNodeData *);
-    void paint(QPainter *painter);
+    QSGNode* updatePaintNode(QSGNode *old, UpdatePaintNodeData *);
 private:
-    void createSearchIp();
-    void createTcpThread();
-    void createFFmpegDecodec();
-
-    void createHttpApi();
-
-    void updateUi();
 
 
-    FfmpegCodec *pffmpegCodec = nullptr;
 
-    QMutex buffMutex;
-
-
-    const int maxBuffLen = 5;
-    QList<QImage *> listBuffImg;
-    QMutex mMutex;
-    QImage *pBuffImg = nullptr;
-
-    bool isFirstData = false;
+    void writeDebugfile(QString filename,QString funname,int lineCount,QString strContent);
 
 
-    MySearch1 *psearch = nullptr;
-    QThread *searchThread = nullptr;
-
-    QString m_ip ="10.67.1.87";
-   //QString m_ip ="192.168.1.188" ;
+    FfmpegCodec *pffmpegCodec;
 
 
-    QThread *httpThread = nullptr;
-    CHttpApiDevice *httpDevice = nullptr;
+    PlayAudio *playAudio;
+    QThread *playAudioThread;
 
-    QThread *m_readThread = nullptr;
-    TcpWorker *worker = nullptr;
 
-    QVariantList listRectInfo;
+    QTimer timerUpdate;
 
-    float warnTemp ;
+    QList<ImageInfo> listImgInfo;
+    QImage *m_Img;
 
-    qreal showRectX = 65;
-    qreal showRectY = 41;
-    qreal showRectW = 349;
-    qreal showRectH = 327;
-    qreal showParentW = 494;
-    qreal showParentH = 369;
 
-    qreal tempImgResW =0;
-    qreal tempImgResH =0;
+    bool isImgUpdate = false;
+
+    int minBuffLen = 15;
+
+    bool isPlayAudio;
+    bool isRecord;
+    bool isStartRecord;//是否启动录像
+    bool isScreenShot;
+    bool isAudioFirstPlay;
+    bool isFirstData;
+
+    quint64 preAudioTime;
+    static int testIdIndex;
+    int testID;
 };
 
 #endif // XVideo_H

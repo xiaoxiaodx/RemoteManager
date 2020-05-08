@@ -57,14 +57,17 @@ void ReplayTimeline::initTimeLineInterval()
         TimeInterval *timeInterval24h = new TimeInterval;
         timeInterval24h->type = TIMELINE24H;
         timeInterval24h->startTime = QTime(0,0,0);
-        timeInterval24h->endTime = QTime(23,59,59,59);
+        timeInterval24h->endTime = QTime(23,59,59,999);
         listTimeInterval24H.append(timeInterval24h);
     }
     for (int i=0;i<24;i+=2) {
         TimeInterval *timeInterval2h = new TimeInterval();
         timeInterval2h->type = TIMELINE2H;
         timeInterval2h->startTime = QTime(i,0,0);
-        timeInterval2h->endTime = QTime(i+2,0,0);
+        if(i == 22)
+            timeInterval2h->endTime = QTime(i+1,59,59,999);
+        else
+            timeInterval2h->endTime = QTime(i+2,0,0);
         listTimeInterval2H.append(timeInterval2h);
     }
 
@@ -72,7 +75,10 @@ void ReplayTimeline::initTimeLineInterval()
         TimeInterval *timeInterval1h = new TimeInterval();
         timeInterval1h->type = TIMELINE1H;
         timeInterval1h->startTime = QTime(i,0,0);
-        timeInterval1h->endTime = QTime(i+1,0,0);
+        if(i==23)
+            timeInterval1h->endTime = QTime(i,59,59,999);
+        else
+            timeInterval1h->endTime = QTime(i+1,0,0);
         listTimeInterval1H.append(timeInterval1h);
     }
 
@@ -87,7 +93,10 @@ void ReplayTimeline::initTimeLineInterval()
         TimeInterval *timeInterval30m2 = new TimeInterval;
         timeInterval30m2->type = TIMELINE30M;
         timeInterval30m2->startTime = QTime(i,30,0);
-        timeInterval30m2->endTime = QTime(i+1,0,0);
+        if(i==23)
+            timeInterval30m2->endTime = QTime(i,59,59,999);
+        else
+            timeInterval30m2->endTime = QTime(i+1,0,0);
         listTimeInterval30M.append(timeInterval30m2);
     }
 }
@@ -209,10 +218,14 @@ void ReplayTimeline::drawScale(QPainter *painter,IntervalType type)
 
         int min = num*valuePerScale;
         QTime desTime = startT.addSecs(min*60);
-
+        QTime time0(0,0,0,0);
+        int startSec = time0.secsTo(startT);
         QString showtimeStr = desTime.toString("hh:mm");
-        if(min == 24*60)
+
+        if((startSec + min*60) == 24*3600)
             showtimeStr = "24:00";
+
+       // qDebug()<<"desTime  "<<desTime;
         QRect rect = fontMetrics.boundingRect(showtimeStr);
         painter->drawText(linex - rect.width()/2,rectTimeLine.y()-10,showtimeStr);
         painter->restore();
@@ -223,23 +236,47 @@ void ReplayTimeline::drawScale(QPainter *painter,IntervalType type)
     //绘制平铺图
     QTime endT = timeInterval->endTime;
     painter->save();
+    painter->setPen(Qt::NoPen);
     for(int i=0;i<drawListInterval.size();i++){
 
         TimeInterval *timeInterval = drawListInterval.at(i);
         QTime tileTimeStart = timeInterval->startTime;
         QTime tileEndStart = timeInterval->endTime;
-        qDebug()<<" time ***:"<<tileTimeStart<<"    "<<  tileEndStart;
-        if(tileTimeStart>=startT && tileEndStart<=endT){
-            qreal leftX = startT.secsTo(tileTimeStart)/secsPerPix;
-            qreal rightX = startT.secsTo(tileEndStart)/secsPerPix;
-            QRectF tmpRectF;
-            tmpRectF.setX(leftX+30);
-            tmpRectF.setY(35);
-            tmpRectF.setWidth(rightX - leftX);
-            tmpRectF.setHeight(18);
-            painter->fillRect(tmpRectF,QBrush(QColor(59,132,246,128)));
+        //qDebug()<<" time ***:"<<tileTimeStart<<"    "<<  tileEndStart;
+
+        qreal leftX;
+        qreal rightX;
+        //区间 在当前显示的时间范围内
+        if(tileTimeStart.secsTo(startT)<=0 && tileEndStart.secsTo(endT)>=0){
+
+            leftX = startT.secsTo(tileTimeStart)/secsPerPix;
+            rightX = startT.secsTo(tileEndStart)/secsPerPix;
+             //qDebug()<<"包含  "<<leftX<<" "<<rightX;
+        }
+        //区间 与当前显示的时间范围 左相交
+        else if(tileTimeStart.secsTo(startT)>=0 && tileEndStart.secsTo(startT)<=0  && tileEndStart.secsTo(endT)>=0 ){
+            leftX = 0;
+            rightX = startT.secsTo(tileEndStart)/secsPerPix;
+            // qDebug()<<"左相交  "<<leftX<<" "<<rightX;
+        }
+        //区间 与当前显示的时间范围 右相交
+        else if(tileTimeStart.secsTo(startT)<=0 && tileTimeStart.secsTo(endT)>=0 && tileEndStart.secsTo(endT)<=0){
+            leftX = startT.secsTo(tileTimeStart)/secsPerPix;
+            rightX = startT.secsTo(endT)/secsPerPix;
+        //     qDebug()<<"右相交  "<<leftX<<" "<<rightX;
+        }else {
+            continue;
         }
 
+        QRectF tmpRectF;
+        tmpRectF.setX(leftX+30);
+        tmpRectF.setY(34);
+        tmpRectF.setWidth(rightX - leftX);
+        tmpRectF.setHeight(20);
+        if(timeInterval->type == VIDEONORMAL)
+            painter->fillRect(tmpRectF,QBrush(QColor(255,97,73)));
+        else if(timeInterval->type == VIDEOALARM)
+            painter->fillRect(tmpRectF,QBrush(QColor(137,160,255)));
     }
     painter->restore();
     //绘制指示器
@@ -323,7 +360,7 @@ void ReplayTimeline::mouseReleaseEvent(QMouseEvent *event){
         replayCurrentTime = replayCurrentTime.addSecs(dSecs);
         qDebug()<<"mouseReleaseEvent replayCurrentTime1:"<<replayCurrentTime;
         //getIndicatorTime();
-        emit indicatorTimeChange(replayCurrentTime);
+        emit indicatorTimeChange(replayCurrentTime.toString("hh:mm:ss"));;
         update();
     }
 }
@@ -332,34 +369,34 @@ void ReplayTimeline::updateDate(QString relativePath,QString date)
 {
     qDebug()<<"updateDate:"<<relativePath<<"    "<<date;
 
-     QDir dir(relativePath+"/"+date);
+    QDir dir(relativePath+"/"+date);
 
-     if(!dir.exists()){
+    if(!dir.exists()){
 
-         qDebug()<<"文件路径不存在";
-     }
-     //设置文件过滤器
-     QStringList nameFilters;
-     //设置文件过滤格式
-     nameFilters << "*.yuv";
+        qDebug()<<"文件路径不存在";
+    }
+    //设置文件过滤器
+    QStringList nameFilters;
+    //设置文件过滤格式
+    nameFilters << "*.yuv";
 
-     QStringList files = dir.entryList(nameFilters, QDir::Files|QDir::Readable, QDir::Name);
+    QStringList files = dir.entryList(nameFilters, QDir::Files|QDir::Readable, QDir::Name);
 
-     removeTime();
-     for (int i=0;i<files.size();i++) {
-         QString tmpName = files.at(i);
-         QString fileName = tmpName.remove(".yuv");
-         qDebug()<<"files name:"<<fileName;
+    removeTime();
+    for (int i=0;i<files.size();i++) {
+        QString tmpName = files.at(i);
+        QString fileName = tmpName.remove(".yuv");
+        qDebug()<<"files name:"<<fileName;
 
-         QStringList fileNames = fileName.split("_");
-         if(fileNames.size() != 2)
-             continue;
+        QStringList fileNames = fileName.split("_");
+        if(fileNames.size() != 2)
+            continue;
 
-         QString timeStart = fileNames[0];
-         QString longt = fileNames[1];
-         appendTime(timeStart,longt);
-     }
-     update();
+        QString timeStart = fileNames[0];
+        QString longt = fileNames[1];
+        appendTime(timeStart,longt);
+    }
+    update();
 }
 void ReplayTimeline::appendTime(QString startT,QString longt){
 
@@ -385,3 +422,130 @@ void ReplayTimeline::removeTime(){
         delete drawListInterval.takeFirst();
     }
 }
+void ReplayTimeline::mergeTimeInterval(QTime intervalStartT,int secsLen,int videoType)
+{
+
+
+
+    if(videoType > 2){
+
+        qDebug()<<"video type is err";
+        return;
+    }
+
+
+    bool isDataIntersect = false;
+
+    IntervalType intervalVideotype;
+    if(videoType == 0 )
+        intervalVideotype = VIDEOLOSS;
+    else if(videoType == 1 )
+        intervalVideotype = VIDEONORMAL;
+    else if(videoType == 2 )
+        intervalVideotype = VIDEOALARM;
+
+    QTime intervalEndT = intervalStartT.addSecs(secsLen);
+
+    qDebug()<<"合并的区间:"<<intervalStartT.toString("hh:mm:ss")<<"    "<<intervalEndT.toString("hh:mm:ss");
+    for (int j=0;j<drawListInterval.size();j++) {
+
+        TimeInterval* timeInterval=drawListInterval.at(j);
+        QTime startT = timeInterval->startTime;
+        QTime endT = timeInterval->endTime;
+        IntervalType type = timeInterval->type;
+
+        //startT.msec();
+
+        if(intervalVideotype == type){
+
+            if(startT.secsTo(intervalStartT)<0 || endT.secsTo(intervalEndT)>0)
+                continue;
+
+            //添加区间与当前区间的左相交，则将起始时间设置为 添加区间的起始时间
+            if(startT.secsTo(intervalStartT)>=0 && endT.secsTo(intervalEndT)<=0){
+                timeInterval->startTime = intervalStartT;
+                isDataIntersect = true;
+                break;
+            }
+            //添加区间与当前区间的右相交，则将当前区间结束时间设置为 添加区间的结束时间
+            if(startT.secsTo(intervalStartT)<=0 && endT.secsTo(intervalEndT)>=0){
+                timeInterval->endTime = intervalEndT;
+                isDataIntersect = true;
+                break;
+            }
+            //添加区间 包含于当前区间，则不变
+            if(startT.secsTo(intervalStartT)>=0 && endT.secsTo(intervalEndT)<=0){
+                isDataIntersect = true;
+                break;
+            }
+        }
+    }
+    //没有可以合并的，则额外添加一个区间
+    if(!isDataIntersect){
+        TimeInterval *timeinterval = new TimeInterval;
+        timeinterval->startTime = intervalStartT;
+        timeinterval->endTime = intervalEndT;
+        timeinterval->type = intervalVideotype;
+        drawListInterval.append(timeinterval);
+    }
+
+
+
+//    for (int i=0;i<drawListInterval.size();i++) {
+//        TimeInterval *timeinterval = drawListInterval.at(i);
+//        qDebug()<<"qujian:"<<timeinterval->startTime.toString("hh:mm:ss")<<"    "<<timeinterval->endTime.toString("hh:mm:ss");
+//    }
+
+
+
+}
+//**time: "20200428230000"
+//**timeinfo: QMap(("cmd", QVariant(QString, "getrecordinginfo"))
+//("data", QVariant(QString,"111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"))
+//("infoType", QVariant(QString, "hourInfo"))
+//("msgid", QVariant(QString, "20200428230000"))
+//("statuscode", QVariant(int, 200))("time", QVariant(QString, "20200428230000")))
+void ReplayTimeline::setTimeWarn(QVariant timeInfo)
+{
+    QString time = timeInfo.toMap().value("time").toString();
+    QString timeTypeStr =  timeInfo.toMap().value("data").toString();
+
+    qDebug()<<"setTimeWarn:"<<timeInfo.toMap();
+    int sendcondH = time.mid(8,2).toInt();
+    //获取第一个字符
+    QString preIndexStr = timeTypeStr.at(0);
+
+    int startIndex = 0;//相同类型的一组数据的起始索引
+
+    for(int i=1;i<timeTypeStr.size();i++){
+        QString timeIndexstr = timeTypeStr.at(i);
+
+        if(preIndexStr.compare(timeIndexstr) != 0)//当前字符与前一个不同则将之前的时间加入  区间列表
+        {
+            int timeType = timeIndexstr.toInt();
+            int intervalLen = i - startIndex;   //相同类型的长度
+
+            QTime timeStart(sendcondH,0,0);
+            mergeTimeInterval(timeStart.addSecs(startIndex*20),intervalLen*20,timeType);
+            //更新索引位置  和字符
+            startIndex = i;
+            preIndexStr = timeIndexstr;
+        }
+    }
+
+
+    //最后一段同类型的区间直接合并
+    int intervalLen = timeTypeStr.size() - startIndex;   //相同类型的长度
+    QTime timeStart(sendcondH,0,0);
+
+    if(sendcondH == 23)//如果是23时 为了防止24:00：00计算后成为 00：00：00，故时长-1秒
+        mergeTimeInterval(timeStart.addSecs(startIndex*20),intervalLen*20-1,preIndexStr.toInt());
+    else
+        mergeTimeInterval(timeStart.addSecs(startIndex*20),intervalLen*20,preIndexStr.toInt());
+    //更新索引位置  和字符
+
+
+    update();
+}
+
+

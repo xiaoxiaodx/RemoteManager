@@ -140,7 +140,6 @@ void WarnModel::funDeleteIndex(int index)
         }
         file.close();
     }
-
 }
 void WarnModel::funFlushWarnInfo(QString capturePath,QString logFileName)//这里文件名就是日期"yyMMdd"
 {

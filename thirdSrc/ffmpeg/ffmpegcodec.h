@@ -19,7 +19,7 @@ extern "C"{
 #include <QThread>
 #include <QMutex>
 #include <QMutexLocker>
-#include <QFile>
+
 
 
 enum ENUM_CODEC_TYPE{
@@ -91,7 +91,7 @@ private:
     int m_VstreamIndex;
     int m_AstreamIndex;
 
-    QFile *audioSrc;
+    //QFile *audioSrc;
 
     bool m_videofirstParse;
     bool isPlay;

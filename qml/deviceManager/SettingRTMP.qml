@@ -11,20 +11,44 @@ Rectangle {
 
 
 
-    property int fontSize: 14
+    property int fontSize: 12
     property color fontColor: "#606266"
     //与线的左对齐线
     property int parSetFirstAlignLine: 88
     property int firstAlighnlineSpace: 10
+
+    property bool isRevicse: false//是否有修改
     color: "#ffffff"
 
     Settings {
         id:setting
 
         fileName: "config.ini"
-
+        property alias rtmpswith: swithRtmp.checked
+        property alias rtmpresolution: cmbResolution.currentText
+        property alias rtmpurl: inputurl.text
+        property alias rtmpaccount: inputaccount.text
+        property alias rtmppassword: inputpassword.text
     }
 
+    function setRtmp(enable,resolution,url,acc,pwd)
+    {
+        isRevicse = false
+        swithRtmp.checked = enable
+        cmbResolution.currentText = resolution
+        inputurl.text = url;
+        inputaccount.text = acc
+        inputpassword.text = pwd
+    }
+
+    function updateParameterInfo(model){
+
+        if(isRevicse){
+            return;
+        }else{
+            model.updateRtmp(isBatchSet,swithRtmp.checked,cmbResolution.currentIndex,inputurl.text,inputaccount.text,inputpassword.text);
+        }
+    }
     Text {
         id: settxt
         anchors.left: line.left
@@ -128,7 +152,7 @@ Rectangle {
 
     Text {
         id: txtUrl
-        font.pixelSize: fontPixSize
+        font.pixelSize: fontSize
         color: fontColor
         anchors.right: inputurl.left
         anchors.rightMargin: firstAlighnlineSpace
@@ -160,7 +184,7 @@ Rectangle {
 
     Text {
         id: txtaccount
-        font.pixelSize: fontPixSize
+        font.pixelSize: fontSize
         color: fontColor
         anchors.right: inputaccount.left
         anchors.rightMargin: firstAlighnlineSpace
@@ -190,7 +214,7 @@ Rectangle {
 
     Text {
         id: txtpassword
-        font.pixelSize: fontPixSize
+        font.pixelSize: fontSize
         color: fontColor
         anchors.right: inputpassword.left
         anchors.rightMargin: firstAlighnlineSpace
@@ -219,23 +243,29 @@ Rectangle {
         //onTextChanged: s_recordPathSet(inputrecordPath.text)
     }
 
+    Connections{
+        target: main
+        onS_setLanguage:setLanguage(typeL);
+    }
 
-    Rectangle{
-        id:btnEnsure
+    function setLanguage(type){
+        switch(type){
+        case lEnglish:
 
-        anchors.right: inputpassword.right
-        anchors.top: inputpassword.bottom
-        anchors.topMargin: 20
-        width: btnTxt.width + 20
-        height: btnTxt.height +12
-        color: "#0486FE"
-        Text {
-            id: btnTxt
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: fontPixSize
-            color: "#ffffff"
-            text: qsTr("确认")
+            settxt.text = "Set"
+            labelSwitchTime.text = "Time Switch"
+            labelResolution.text = "Resolution"
+            txtaccount.text = "Account"
+            txtpassword.text = "Password"
+            break;
+        case lChinese:
+            settxt.text = "设置"
+            labelSwitchTime.text = "时间开关"
+            labelResolution.text = "分辨率"
+            txtaccount.text = "用户名"
+            txtpassword.text = "密码"
+            break;
         }
     }
+
 }

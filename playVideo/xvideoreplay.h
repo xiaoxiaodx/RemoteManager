@@ -1,58 +1,89 @@
-#ifndef XVIDEOREPLAY_H
-#define XVIDEOREPLAY_H
+#ifndef XVideoREPLAY_H
+#define XVideoREPLAY_H
+#include <QQuickPaintedItem>
+#include <QImage>
+#include <QList>
+#include <QTimer>
+#include <QAudioFormat>
+#include <QAudioDeviceInfo>
+#include <QAudioOutput>
+#include <QSGSimpleTextureNode>
+#include <QDateTime>
+#include <QDir>
 
-#include <QObject>
-#include <QQuickItem>
-#include "render/texturenode.h"
-#include "render/renderthread.h"
 #include <QQuickWindow>
-#include "ffmpegreplay.h"
-#include <QFile>
-#include <QTime>
+//#include "tcpworker.h"
+#include "playaudio.h"
+//#include "dispatchmsgmanager.h"
+//#include "p2pworker.h"
+//#include "mp4format.h"
+#include "ffmpegcodec.h"
+//#include "avirecord.h"
+
+
+class ImageInfo1{
+
+public:
+    QImage *pImg;
+    quint64 time;
+};
 class XVideoReplay : public QQuickItem
 {
     Q_OBJECT
-
 public:
+
+
+
+    Q_INVOKABLE void funSendVideoData(QVariant buff);
+    Q_INVOKABLE void funSendAudioData(char *buff,int len);
+
+
+
+
     explicit XVideoReplay();
+    ~XVideoReplay();
 
-//    Q_INVOKABLE void funPlay(QString str);
-//    Q_INVOKABLE void funPause();
-
-    Q_INVOKABLE void funPlayTimeChange(QString path,QString date,QTime time);
 signals:
+
+
+public slots:
+
 
 protected:
     QSGNode* updatePaintNode(QSGNode *old, UpdatePaintNodeData *);
-public slots:
-    void ready();
 private:
-    QThread *pThreadFfmpeg;
-    RenderThread *m_renderThread{nullptr};
-
-    QByteArray yuvArr;
-
-    /*播放的视频信息，键值对形式存在
-        "videobuff":QByteArray buff   //视频数据buff,yuv格式
-        "videoStart":(int)       //视频开始时间:时分秒 hhmmss
-        "totalTime:":(int)      //视频总长
-    */
-    QVariant playMap;
-    yuvInfo yuvData;
-    QList<yuvInfo> listYuv;
-    FFmpegReplay freplay;
-    QFile *yuvfile;
-
-    QTimer timer;
 
 
-    QString findPlayFile(QString file,QString date,QTime time);
-    QString curFilePath = "";//当前播放文件属于哪一天
-    QTime playStartT;
-    int playTotalTime;
 
-    int timeoutIndex = 0;
+    void writeDebugfile(QString filename,QString funname,int lineCount,QString strContent);
 
+
+    FfmpegCodec *pffmpegCodec;
+
+
+    PlayAudio *playAudio;
+    QThread *playAudioThread;
+
+
+    QTimer timerUpdate;
+
+    QList<ImageInfo1> listImgInfo;
+    QImage *m_Img;
+
+
+    bool isImgUpdate = false;
+
+    int minBuffLen = 15;
+
+    bool isPlayAudio;
+    bool isRecord;
+    bool isStartRecord;//是否启动录像
+    bool isScreenShot;
+    bool isAudioFirstPlay;
+    bool isFirstData;
+
+    quint64 preAudioTime;
+    static int testIdIndex;
+    int testID;
 };
-
-#endif // XVIDEOREPLAY_H
+#endif // XVideoReplayREPLAY_H

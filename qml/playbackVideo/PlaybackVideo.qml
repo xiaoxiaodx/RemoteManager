@@ -1,13 +1,14 @@
 import QtQuick 2.0
-import QtQuick 2.12
-
-
+//import QtQuick 2.12
 import TimeLine 1.0
 import XVideoReplay 1.0
-
-
+import QtQuick.Controls 1.4
+import QtGraphicalEffects 1.12
+//import QtQuick.Controls 2.5
+import QtQuick.Controls.Styles 1.4
 import "../liveVedio"
 import "../simpleControl"
+import Qt.labs.settings 1.0
 Rectangle {
 
     id:playbackvideo
@@ -30,12 +31,15 @@ Rectangle {
 
     MouseArea{
         anchors.fill: parent
-
         onClicked: ;
         onPressed: ;
+    }
+    Settings {
+        id:setting
+
+        property alias adjustsize: rowAdjustSize.curIndex
 
     }
-
 
     Rectangle{
         id:maincontent
@@ -45,11 +49,10 @@ Rectangle {
         color: "#252525"
 
         XVideoReplay{
-            id:screen
+            id:xVideoReplay
             width:maincontent.width
             height:maincontent.height - rowRectHeight.height - timeline.height
         }
-
 
         Rectangle{
             id:rowRectHeight
@@ -65,7 +68,7 @@ Rectangle {
                 spacing: 26
                 Image {
                     id: imgslow
-                    source: "qrc:/images/play_slow.png"
+                    source: "qrc:/images/playback/play_slow.png"
 
                     width: 20
                     height: 20
@@ -73,14 +76,14 @@ Rectangle {
                     MouseArea{
                         anchors.fill: parent
                         hoverEnabled: true
-                        onPressed: imgslow.source = "qrc:/images/play_slow_p.png"
-                        onReleased: imgslow.source = "qrc:/images/play_slow.png"
+                        onPressed: imgslow.source = "qrc:/images/playback/play_slow_p.png"
+                        onReleased: imgslow.source = "qrc:/images/playback/play_slow.png"
                     }
                 }
 
                 Image {
                     id: imgplay
-                    source: "qrc:/images/play.png"
+                    source: "qrc:/images/playback/play.png"
 
                     width: 20
                     height: 20
@@ -90,16 +93,16 @@ Rectangle {
                         hoverEnabled: true
                         onPressed: {
 
-                            imgplay.source = "qrc:/images/play_h.png"
+                            imgplay.source = "qrc:/images/playback/play_h.png"
                             //player.play();
                         }
-                        onReleased: imgplay.source = "qrc:/images/play.png"
+                        onReleased: imgplay.source = "qrc:/images/playback/play.png"
                     }
                 }
 
                 Image {
                     id: imgfast
-                    source: "qrc:/images/play_fast.png"
+                    source: "qrc:/images/playback/play_fast.png"
                     width: 20
                     height: 20
                     anchors.verticalCenter: parent.verticalCenter
@@ -107,8 +110,8 @@ Rectangle {
                     MouseArea{
                         anchors.fill: parent
                         hoverEnabled: true
-                        onPressed: imgfast.source = "qrc:/images/play_fast_p.png"
-                        onReleased: imgfast.source = "qrc:/images/play_fast.png"
+                        onPressed: imgfast.source = "qrc:/images/playback/play_fast_p.png"
+                        onReleased: imgfast.source = "qrc:/images/playback/play_fast.png"
                     }
                 }
             }
@@ -123,7 +126,7 @@ Rectangle {
             }
             Row{
                 id:rowAdjustSize
-                property int curIndex: -1
+                property int curIndex: 0
                 height: parent.height
                 anchors.left: parent.left
                 anchors.leftMargin: 30
@@ -175,13 +178,13 @@ Rectangle {
                     anchors.leftMargin: 10
                     font.pixelSize: 12
                     color: "#ffffff"
-                    text: qsTr("")
+                    text: Qt.formatDate(calendar.getCurrentData(),"yyyy-MM-dd")
                 }
                 Image {
                     id: imgdate
                     width: 14
                     height: 12
-                    source: "qrc:/images/date.png"
+                    source: "qrc:/images/warnmanager/date.png"
                     anchors.right: parent.right
                     anchors.rightMargin: 10
                     anchors.verticalCenter: parent.verticalCenter
@@ -189,17 +192,198 @@ Rectangle {
                         anchors.fill: parent
                         hoverEnabled: true
                         onPressed: {
+                            imgdate.source = "qrc:/images/warnmanager/date_p.png"
+                            getRecordInfo(1,Qt.formatDate(calendar.getCurrentData(),"yyyyMMdd000000"));
+
                             calendar.open()
                         }
-                        onEntered: imgdate.source = "qrc:/images/date_p.png"
-                        onReleased: imgdate.source = "qrc:/images/date.png"
+
+                        onReleased: imgdate.source = "qrc:/images/warnmanager/date.png"
                     }
                 }
 
             }
+
+            //设备选择
+            Rectangle{
+                id:rectDeviceSelect
+                width: 130
+                height: 22
+                anchors.left: timeRect.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: 10
+                color: "#4C4C4C"
+                Text {
+                    id: txtDeviceSelect
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.leftMargin: 10
+                    font.pixelSize: 12
+                    color: "#ffffff"
+                    //text: Qt.formatDate(calendar.getCurrentData(),"yyyy-MM-dd")
+                }
+                Image {
+                    id: imgDeviceSelect
+                    width: 14
+                    height: 12
+                    source: "qrc:/images/playback/device.png"
+                    anchors.right: parent.right
+                    anchors.rightMargin: 10
+                    anchors.verticalCenter: parent.verticalCenter
+
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onPressed: {
+                        imgDeviceSelect.source = "qrc:/images/playback/device_p.png"
+                        if(deviceModel.rowCount() > 0){
+                            console.debug("********** "+deviceModel.rowCount())
+
+                            deviceSelectPop.height = deviceModel.rowCount() * 20
+                            deviceSelectPop.width = rectDeviceSelect.width
+                            deviceSelectPop.x = 440
+                            deviceSelectPop.y = main.height -175- deviceModel.rowCount() * 20
+                            deviceSelectPop.open()
+                        }
+                    }
+
+                    onReleased: imgDeviceSelect.source = "qrc:/images/playback/device.png"
+                }
+            }
+
+            Row{
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: 30
+                height: parent.height
+                spacing: 30
+
+                Rectangle{
+                    width: rectNormal.width + txtNormal.width + 8
+                    height: parent.height
+                    color: "transparent"
+                    Rectangle{
+                        id:rectNormal
+                        color: "#89A0FF"
+                        width: 8
+                        height: 8
+                        radius: 4
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Text {
+                        id: txtNormal
+                        anchors.left: rectNormal.right
+                        anchors.leftMargin: 5
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.pixelSize: 12
+                        color: "white"
+                        text: qsTr("正常录像")
+                    }
+                }
+                Rectangle{
+                    width: rectWarn.width + txtWarn.width + 8
+                    height: parent.height
+                    color: "transparent"
+                    Rectangle{
+                        id:rectWarn
+                        color: "#FF6149"
+                        width: 8
+                        height: 8
+                        radius: 4
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Text {
+                        id: txtWarn
+                        anchors.left: rectWarn.right
+                        anchors.leftMargin: 5
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.pixelSize: 12
+                        color: "white"
+                        text: qsTr("告警录像")
+                    }
+                }
+                Rectangle{
+                    width: rectNo.width + txtNo.width + 8
+                    height: parent.height
+                    color: "transparent"
+                    Rectangle{
+                        id:rectNo
+                        color: "#ffffff"
+                        width: 8
+                        height: 8
+                        radius: 4
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
+                    Text {
+                        id: txtNo
+                        anchors.left: rectNo.right
+                        anchors.leftMargin: 5
+                        anchors.verticalCenter: parent.verticalCenter
+                        font.pixelSize: 12
+                        color: "white"
+                        text: qsTr("录像丢失")
+                    }
+                }
+
+                Rectangle{
+                    height: parent.height
+                    width: imgvoice.width + voiceSlider.width+8
+                    color: "transparent"
+                    Image{
+                        id: imgvoice
+                        width: 24
+                        height: 17
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        source: "qrc:/images/playback/voice.png"
+                    }
+
+                    Slider {
+                        id:voiceSlider
+                        width: 140
+                        height:4
+                        anchors.left: imgvoice.right
+                        anchors.leftMargin: 5
+                        anchors.verticalCenter: parent.verticalCenter
+                        value: 0.5
+                        style: SliderStyle {
+                            groove: Rectangle {
+                                implicitWidth: 140
+                                implicitHeight: 4
+                                color: "#88ffffff"
+                                radius: 2
+                                Rectangle{
+                                    id:sliderrect1
+                                    anchors.left: parent.left
+                                    width: voiceSlider.value * parent.width
+                                    height: parent.height
+                                    color: "#0486FE"
+                                }
+                                Rectangle{
+                                    id:sliderrect2
+                                    anchors.left: sliderrect1.right
+                                    width: parent.width - sliderrect1.width
+                                    height: parent.height
+                                    color: "transparent"
+                                }
+
+                            }
+                            handle: Rectangle {
+                                anchors.centerIn: parent
+                                color: control.pressed ? "white" : "lightgray"
+                                implicitWidth: 10
+                                implicitHeight: 10
+                                radius: 5
+                            }
+                        }
+                    }
+                }
+            }
         }
-
-
 
         TimeLine{
             id:timeline
@@ -207,12 +391,24 @@ Rectangle {
             height:74
             anchors.bottom:parent.bottom
             property point mousePressPt: "0,0"
-
             onIndicatorTimeChange:{
-                screen.funPlayTimeChange(deviceconfig.getRecordPath(),Qt.formatDate(calendar.getCurrentData(),"yyyyMMdd"),curTime)
+                //screen.funPlayTimeChange(deviceconfig.getRecordPath(),Qt.formatDate(calendar.getCurrentData(),"yyyyMMdd"),curTime)
+                var str = Qt.formatDate(calendar.getCurrentData(),"yyyy:MM:dd:") +curTime;
+                var map = {time:str};
+                deviceModel.funSendData1(txtDeviceSelect.text,"replay",map);
+
             }
         }
     }
+
+    DeviceSelectPop{
+        id:deviceSelectPop
+
+        mmodel:deviceModel
+
+        onS_txtChange: txtDeviceSelect.text = txt
+    }
+
 
 
     MyCalendar{
@@ -223,46 +419,106 @@ Rectangle {
         x:228
         y:parent.height -115-314-2
         onS_dayChange:{
-            timeline.updateDate(deviceconfig.getRecordPath(),value)
+            //            timeline.updateDate(deviceconfig.getRecordPath(),value)
+
+            //timeline.clearTimeWarn();
+            getRecordInfo(2,value)
         }
         onS_dayChange1:{
 
             txtDate.text = value
         }
 
-        //onS_mouthChange:getRecordInfo(1,value)
+        onS_mouthChange:getRecordInfo(1,value)
 
         onS_yearChange: console.debug("onS_yearChange   "+value)
 
         // Component.onCompleted:getRecordInfo(2, Qt.formatDate(calendar.getCurrentData(),"yyyyMMdd000000"))
     }
 
-    ListModel{
-        id:calendarEventModel
-
-        function getDateEvent(tmpData){
-
-            var dayNum = Qt.formatDate(tmpData,"dd")-1
-            //console.debug("getDateEvent:    "+dayNum + "  "+calendarEventModel.count+"  "+calendarEventModel.get(dayNum))
 
 
-            if(calendarEventModel.count == 0)
-                return "#191919"
-            if(calendarEventModel.get(dayNum)=== undefined)
-                return "#191919"
 
-            if(calendarEventModel.get(dayNum).type==="1")
-                return "#3A3D41";
-            else if(calendarEventModel.get(dayNum).type==="2")
-                return "#f64054"
-            else if(calendarEventModel.get(dayNum).type==="0")
-                return "#191919"
+    function getRecordInfo(type,date){
+        console.debug("onS_mouthChange   "+type+"   "+date)
 
-            return "#191919"
+        if(txtDeviceSelect.text != ""){
+            var map = {method:type,time:date,msgid:date}
+            deviceModel.funSendData1(txtDeviceSelect.text,"getrecordinginfo",map)
+        }
+    }
+    Connections{
+        target:deviceModel
+
+        onSignal_p2pCallbackReply:{
+            console.debug("smap " + smap)
+            if(name === txtDeviceSelect.text){
+                if(smap.cmd === "getrecordinginfo"){
+                    if(smap.infoType==="hourInfo"){
+                        //发送给时间轴渲染
+                        timeline.setTimeWarn(smap);
+                    }else if(smap.infoType==="dayInfo"){
+                        var dayStr = Qt.formatDate(calendar.getCurrentData(),"yyyyMMdd");
+                        var listRecord = smap.data;
+                        for(var i=0;i<smap.data.length;i++){
+                            if(listRecord[i] !== "0"){
+                                var timeStr
+                                if(i <10)
+                                    timeStr= dayStr + "0"+i+"0000";
+                                else
+                                    timeStr= dayStr + i+"0000";
+                                getRecordInfo(3,timeStr)
+                            }
+                        }
+                    }else if(smap.infoType==="mounthInfo"){
+
+                        var listRecord = smap.data;
+                        for(var i=0;i<listRecord.length;i++){
+                            calendar.calendarEventModel.append({type:listRecord[i]})
+                        }
+                    }
+
+                }
+            }
+        }
+
+
+        onSignal_p2pCallbackReplayAudioData:{
+
+
+        }
+        //        onSignal_p2pCallbackReplayPause:isPlay = false
+        //        onSignal_p2pCallbackReplayContinue:isPlay=true
+        //        onSignal_p2pCallbackReplay:{
+        //            listdeviceInfo.get(listDevice.currentIndex).playBackState = "replay"
+        //            isPlay=true
+        //        }
+        // signal_p2pCallbackReplayVideoData(name,arr,arrlen);
+        onSignal_p2pCallbackReplayVideoData:{
+
+            //                    if(screenBlack.visible)
+            //                        screenBlack.visible = !screenBlack.visible
+            //     timeline.addMidValueTime(60);
+            xVideoReplay.funSendVideoData(h264Arr)
         }
     }
 
+
+    function setLanguage(type){
+
+        switch(type){
+        case lEnglish:
+            txtNormal.text = "Normal";
+            txtWarn.text = "Alarm"
+            txtNo.text = "Record lost"
+            break;
+        case lChinese:
+            txtNormal.text = "正常录像";
+            txtWarn.text = "报警录像"
+            txtNo.text = "录像丢失"
+            break;
+        }
+    }
+
+
 }
-
-
-

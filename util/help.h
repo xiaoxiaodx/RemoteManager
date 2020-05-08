@@ -13,7 +13,7 @@
 
 
 #define QML_PROPERTY(type,name) \
-    Q_PROPERTY(type name READ name WRITE set##name NOTIFY name##Change); \
+    Q_PROPERTY(type name READ name WRITE set##name NOTIFY name##Change) \
     public: type name() const { return m_##name;} \
     public Q_SLOTS: void set##name(type arg) { m_##name = arg; emit name##Change(arg);} \
     Q_SIGNALS:  \

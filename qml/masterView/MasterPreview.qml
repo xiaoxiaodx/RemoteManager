@@ -1,9 +1,43 @@
 import QtQuick 2.0
-
+import "../simpleControl"
+import QtQuick.Controls 1.4
+import Qt.labs.settings 1.0
 Rectangle {
 
 
 
+    Settings{
+        id:settings
+        fileName: "config.ini"
+        property alias window1: mW1.checked;
+        property alias window4: mW4.checked;
+        property alias window9: mW9.checked;
+        property alias window16: mW16.checked;
+    }
+    ListModel{
+        id:videoShowModel
+        ListElement{deviceBelong:""}
+        ListElement{deviceBelong:""}
+        ListElement{deviceBelong:""}
+        ListElement{deviceBelong:""}
+
+        ListElement{deviceBelong:""}
+        ListElement{deviceBelong:""}
+        ListElement{deviceBelong:""}
+        ListElement{deviceBelong:""}
+
+        ListElement{deviceBelong:""}
+        ListElement{deviceBelong:""}
+        ListElement{deviceBelong:""}
+        ListElement{deviceBelong:""}
+
+        ListElement{deviceBelong:""}
+        ListElement{deviceBelong:""}
+        ListElement{deviceBelong:""}
+        ListElement{deviceBelong:""}
+    }
+
+    property int numberWindow: 4
 
     Rectangle{
         id:rectlistDevice
@@ -51,7 +85,7 @@ Rectangle {
 
             Rectangle{
 
-                id:adddevice
+                id:adddevicerect
                 height: (imgAdd.height>txtAdd.height ? imgAdd.height : txtAdd.height)+6
                 width: imgAdd.width + txtAdd.width + 12
                 color: "#0486FE"
@@ -77,8 +111,13 @@ Rectangle {
                     font.pixelSize: 12
                     text: qsTr("添加")
                 }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: adddevice.open()
+                }
             }
         }
+
         ListView{
             id:listDevice
             width: parent.width
@@ -120,6 +159,22 @@ Rectangle {
                         onClicked: {
                             listDevice.currentIndex = index
                         }
+                    }
+                }
+
+                MouseArea{
+                    anchors.fill: parent
+
+                    onDoubleClicked: {
+                        console.debug("device onDoubleClicked")
+                        var map;
+                        //devicemanagerment.funP2pSendData(listdeviceInfo.get(index).devicename,"getVedio",map);
+
+                        videoShowModel.get(gridViewVideo.curSelectIndex).deviceBelong = model.deviceName
+
+
+                        deviceModel.funSendData(index,"getVedio",map)
+
                     }
                 }
             }
@@ -252,30 +307,13 @@ Rectangle {
         }
     }
 
-    Rectangle{
-        id:videoContent
-        anchors.top: parent.top
-        anchors.left: rectlistDevice.right
-
-        width: parent.width - rectlistDevice.width - rectlistpersoninfo.width
-        height: parent.height - rectlistwarninfo.height
-        color: "red"
-        GridView {
-            anchors.fill: parent
-
-        }
-    }
-
-
-
-
 
     Rectangle{
         id:rectlistwarninfo
         width: videoContent.width
         height: 180
         color: "#202020"
-
+        z:1
         anchors.left: rectlistDevice.right
         anchors.bottom: parent.bottom
         ListView{
@@ -329,6 +367,197 @@ Rectangle {
 
     }
 
+    Rectangle{
+        id:videoContent
+        anchors.top: parent.top
+        anchors.left: rectlistDevice.right
+        width: parent.width - rectlistDevice.width - rectlistpersoninfo.width
+        height: parent.height - rectlistwarninfo.height
+
+
+
+        Rectangle{
+            id:rectVideo
+            width: parent.width
+            height: videoContent.height - videoMutilWindow.height
+            GridView {
+                id:gridViewVideo
+                anchors.fill: parent
+                model: videoShowModel
+                interactive: false
+                cellWidth: (rectVideo.width)/numberWindow
+                cellHeight: (rectVideo.height)/numberWindow
+                property int curSelectIndex: -1
+                property int beforeMaxPos: 0
+                property int beforeMaxNumW: 0
+                property bool isMax: false
+                focus: true
+                delegate: Rectangle{
+                    id:delegateRect
+                    width: gridViewVideo.cellWidth
+                    height: gridViewVideo.cellHeight
+                    color: "#202020"
+                    border.width: 1
+                    border.color: gridViewVideo.curSelectIndex===index?"#5697FB":"#131415"
+                    VideoShow{
+                        id:videoshow
+
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width-2
+                        height: parent.height-2
+                        mIsSelected:gridViewVideo.curSelectIndex === index
+                        belongDeviceName: deviceBelong
+                        onClick: gridViewVideo.curSelectIndex = index
+
+                        onDoubleClick: {
+                            console.debug("onDoubleClick    " +gridViewVideo.isMax)
+                            if(mW1.checked)
+                                return;
+                            if(!gridViewVideo.isMax)
+                                gridViewVideo.maxW(index)
+                            else
+                                gridViewVideo.restoreW()
+
+                        }
+                    }
+                }
+                function maxW(posIndex){
+                    gridViewVideo.isMax = true
+
+                    console.debug(" maxW "+posIndex + "   "+numberWindow)
+
+                    gridViewVideo.beforeMaxPos = posIndex
+                    gridViewVideo.beforeMaxNumW = numberWindow
+
+                    videoShowModel.move(posIndex,0,1);
+
+                    numberWindow = 1;
+                }
+                function restoreW(){
+                    gridViewVideo.isMax = false
+
+                    console.debug(" restoreW "+gridViewVideo.beforeMaxNumW + "   "+gridViewVideo.beforeMaxPos)
+
+                    videoShowModel.move(0,gridViewVideo.beforeMaxPos,1);
+
+                    numberWindow = gridViewVideo.beforeMaxNumW;
+
+                    gridViewVideo.curSelectIndex = gridViewVideo.beforeMaxPos
+                }
+
+                function addjustWindowNum(num){
+                    if(num === 1){
+                        gridViewVideo.isMax = true
+                        var posIndex = gridViewVideo.curSelectIndex
+                        if(posIndex < 0)
+                            posIndex = 0;
+                        console.debug(" maxW "+posIndex + "   "+numberWindow)
+
+                        gridViewVideo.beforeMaxPos = posIndex
+                        gridViewVideo.beforeMaxNumW = numberWindow
+
+                        videoShowModel.move(posIndex,0,1);
+
+
+                    }else{
+
+                        if(gridViewVideo.isMax){
+                            gridViewVideo.isMax = false
+                            console.debug(" restoreW "+gridViewVideo.beforeMaxNumW + "   "+gridViewVideo.beforeMaxPos)
+                            videoShowModel.move(0,gridViewVideo.beforeMaxPos,1);
+                            numberWindow = gridViewVideo.beforeMaxNumW;
+                            gridViewVideo.curSelectIndex = gridViewVideo.beforeMaxPos
+                        }
+                    }
+                    numberWindow = num;
+                }
+            }
+        }
+        Rectangle{
+            id:videoMutilWindow
+            width: parent.width
+            height: isFullScreen ?0:34
+            anchors.bottom: parent.bottom
+
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#5D9CFF"}
+                GradientStop { position: 1.0; color: "#2D76E7"}
+            }
+            ExclusiveGroup { id: buttonGroup }
+
+            SimpleCheckedButton{
+                id:mW1
+                anchors.right: parent.right
+                anchors.rightMargin: 139
+                anchors.verticalCenter: parent.verticalCenter
+                exclusiveGroup: buttonGroup
+                isOnlySelect:true
+                color: "transparent"
+                imgW: 24
+                imgH: 24
+                imgSrc: "qrc:/images/masterpreview/video1.png"
+                imgCheckSrc: "qrc:/images/masterpreview/video1_s.png"
+                onCheckedChanged: {
+                    if(mW1.checked)gridViewVideo.addjustWindowNum(1);
+                }
+            }
+            SimpleCheckedButton{
+                id:mW4
+                anchors.right: parent.right
+                anchors.rightMargin: 102
+                anchors.verticalCenter: parent.verticalCenter
+                exclusiveGroup: buttonGroup
+                isOnlySelect:true
+                color: "transparent"
+                imgW: 24
+                imgH: 24
+                imgSrc: "qrc:/images/masterpreview/video4.png"
+                imgCheckSrc: "qrc:/images/masterpreview/video4_s.png"
+                onCheckedChanged: {
+
+                    if(mW4.checked)gridViewVideo.addjustWindowNum(2)
+                }
+
+            }
+
+            SimpleCheckedButton{
+                id:mW9
+                anchors.right: parent.right
+                anchors.rightMargin: 66
+                anchors.verticalCenter: parent.verticalCenter
+                color: "transparent"
+                exclusiveGroup: buttonGroup
+                isOnlySelect:true
+                imgW: 24
+                imgH: 24
+                imgSrc: "qrc:/images/masterpreview/video9.png"
+                imgCheckSrc: "qrc:/images/masterpreview/video9_s.png"
+                onCheckedChanged: {
+
+                    if(mW9.checked)gridViewVideo.addjustWindowNum(3)
+                }
+            }
+            SimpleCheckedButton{
+                id:mW16
+                anchors.right: parent.right
+                anchors.rightMargin: 30
+                anchors.verticalCenter: parent.verticalCenter
+                color: "transparent"
+                exclusiveGroup: buttonGroup
+                isOnlySelect:true
+                imgW: 24
+                imgH: 24
+                imgSrc: "qrc:/images/masterpreview/video16.png"
+                imgCheckSrc: "qrc:/images/masterpreview/video16_s.png"
+                onCheckedChanged: {
+
+                    if(mW16.checked)gridViewVideo.addjustWindowNum(4)
+                }
+            }
+        }
+    }
+
     Image {
         id: imgDecicelistDrag
 
@@ -372,7 +601,6 @@ Rectangle {
         easing.type: Easing.OutCubic
         onStopped: imgDecicelistDrag.isShow = true;
     }
-
 
     Image {
         id: imgPersoninfolistDrag
@@ -434,6 +662,39 @@ Rectangle {
     }
 
 
+    Connections{
+        target: main
+        onSfullScreenChange:{
 
+            if(isFull){
+                animationBottomHide.start();
+                animationRightHide.start();
+                animationLeftHide.start();
+                gridViewVideo.curSelectIndex = -1
+            }else{
+//                animationBottomShow.start();
+//                animationRightShow.start();
+//                animationLeftShow.start();
+            }
+        }
+    }
+
+
+    function setLanguage(type){
+
+        switch(type){
+        case lEnglish:
+            txttitle.text = "Alarm record";
+            devicelisttxt.text = "Device list"
+            txtAdd.text = "Add"
+            break;
+
+        case lChinese:
+            txttitle.text = "告警记录";
+            devicelisttxt.text = "设备列表"
+            txtAdd.text = "添加"
+            break;
+        }
+    }
 
 }

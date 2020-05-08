@@ -11,18 +11,42 @@ Rectangle {
 
 
 
-    property int fontSize: 14
+    property int fontSize: 12
     property color fontColor: "#606266"
     //与线的左对齐线
     property int parSetFirstAlignLine: 88
     property int firstAlighnlineSpace: 10
+
+    property bool isRevicse: false//是否有修改
+
     color: "#ffffff"
 
     Settings {
         id:setting
 
         fileName: "config.ini"
+        property alias timentpswitch: swithNtpEnable.checked
+        property alias timentpurl:inputurl.text
+        property alias timezone:cmbtimezone.currentIndex
+        property alias timesummertimeswitch:swithSummerEnable.checked
 
+    }
+
+    function settimePar(ntpenable,url,zone,summertimeenable){
+        isRevicse = false
+        swithNtpEnable.checked = ntpenable
+        inputurl.text = url
+        cmbtimezone.currentIndex = zone
+        swithSummerEnable.checked = summertimeenable
+    }
+
+    function updateParameterInfo(model){
+
+        if(isRevicse){
+            return;
+        }else{
+            model.updateTime(isBatchSet,swithNtpEnable.checked,inputurl.text,cmbtimezone.currentIndex,swithSummerEnable.checked);
+        }
     }
 
     Text {
@@ -74,7 +98,7 @@ Rectangle {
 
     Text {
         id: txtUrl
-        font.pixelSize: fontPixSize
+        font.pixelSize: fontSize
         color: fontColor
         anchors.right: inputurl.left
         anchors.rightMargin: firstAlighnlineSpace
@@ -103,28 +127,10 @@ Rectangle {
         //onTextChanged: s_recordPathSet(inputrecordPath.text)
     }
 
-    Rectangle{
-        id:btnUrlEnsure
-        anchors.left: inputurl.right
-        anchors.leftMargin: 20
-        anchors.verticalCenter: inputurl.verticalCenter
-        width: btnTxt.width + 20
-        height: btnTxt.height +12
-        color: "#0486FE"
-        Text {
-            id: btnTxt
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: fontPixSize
-            color: "#ffffff"
-            text: qsTr("确认")
-        }
-    }
-
     Text {
         id: labeltimezone
         text: qsTr("时区选择")
-        font.pixelSize: fontSize
+        font.pixelSize: 14
         color: fontColor
         anchors.left: line1.left
         anchors.leftMargin: 20
@@ -183,7 +189,7 @@ Rectangle {
     Text {
         id: labelSunmerSet
         text: qsTr("夏令时设置")
-        font.pixelSize: fontSize
+        font.pixelSize: 14
         color: fontColor
         anchors.left: line2.left
         anchors.leftMargin: 20
@@ -219,6 +225,31 @@ Rectangle {
         anchors.leftMargin: parSetFirstAlignLine
         anchors.top: line2.bottom
         anchors.topMargin: 20
-        // onCheckedChanged: s_timeSwith(checked)
+
+    }
+
+    Connections{
+        target: main
+        onS_setLanguage:setLanguage(typeL);
+    }
+
+    function setLanguage(type){
+        switch(type){
+        case lEnglish:
+            labelSummerEnable.text = "Enable"
+            labelSunmerSet.text = "夏令时设置"
+            labeltimezone.text = "时区选择"
+            labelSwitchEnable.text = "Enable"
+            settxt.text = "NTP设置"
+
+            break;
+        case lChinese:
+            labelSummerEnable.text = "使能开关"
+            labelSunmerSet.text = "夏令时设置"
+            labeltimezone.text = "时区选择"
+            labelSwitchEnable.text = "使能开关"
+            settxt.text = "NTP设置"
+            break;
+        }
     }
 }

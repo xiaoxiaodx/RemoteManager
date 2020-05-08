@@ -105,8 +105,6 @@
         <file>images/systemset/select.png</file>
         <file>images/systemset/unselect.png</file>
         <file>qml/About.qml</file>
-        <file>images/masterpreview/captureScreen.png</file>
-        <file>images/masterpreview/captureScreen_s.png</file>
         <file>images/masterpreview/deviceAdd.png</file>
         <file>images/masterpreview/devicedown.png</file>
         <file>images/masterpreview/deviceheader.png</file>
@@ -115,8 +113,6 @@
         <file>images/masterpreview/deviceset.png</file>
         <file>images/masterpreview/devicetemp.png</file>
         <file>images/masterpreview/labelRecord.png</file>
-        <file>images/masterpreview/recordScreen.png</file>
-        <file>images/masterpreview/recordScreen_p.png</file>
         <file>images/masterpreview/video1.png</file>
         <file>images/masterpreview/video1_s.png</file>
         <file>images/masterpreview/video4.png</file>
@@ -130,5 +126,29 @@
         <file>images/img_close.png</file>
         <file>images/masterpreview/devicelist_left.png</file>
         <file>images/masterpreview/devicelist_right.png</file>
+        <file>qml/masterView/VideoShow.qml</file>
+        <file>qml/dialog/AddDevice.qml</file>
+        <file>images/modal-close.png</file>
+        <file>images/masterpreview/img_delete.png</file>
+        <file>images/masterpreview/recordVideo_disable.png</file>
+        <file>images/masterpreview/recordVideo_ing.png</file>
+        <file>images/masterpreview/recordVideo_start.png</file>
+        <file>images/masterpreview/screenshot.png</file>
+        <file>images/masterpreview/screenshot_p.png</file>
+        <file>images/playback/play.png</file>
+        <file>images/playback/play_fast.png</file>
+        <file>images/playback/play_fast_h.png</file>
+        <file>images/playback/play_fast_p.png</file>
+        <file>images/playback/play_h.png</file>
+        <file>images/playback/play_slow.png</file>
+        <file>images/playback/play_slow_h.png</file>
+        <file>images/playback/play_slow_p.png</file>
+        <file>images/playback/device.png</file>
+        <file>images/playback/device_p.png</file>
+        <file>images/playback/voice.png</file>
+        <file>qml/playbackVideo/DeviceSelectPop.qml</file>
+        <file>images/fullScreen.png</file>
+        <file>images/fullScreen_p.png</file>
+        <file>images/login.png</file>
     </qresource>
 </RCC>

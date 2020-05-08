@@ -1,176 +1,127 @@
-#include "xvideoreplay.h"
+#include "XVideoReplay.h"
+#include <QPainter>
+#include <QDebug>
 
+
+int XVideoReplay::testIdIndex = 0;
 XVideoReplay::XVideoReplay()
 {
     setFlag(QQuickItem::ItemHasContents);
-    QSize size;
-    size.setWidth(640);
-    size.setHeight(360);
-    m_renderThread = new RenderThread(size,&listYuv,&yuvData,nullptr);
 
-    playStartT.setHMS(0,0,0);
-    playTotalTime = 0;
 
-    yuvData.data = new uchar[960*600 * 3 /2];
-//    yuvfile = new QFile("F:/work/doubleLight/avi/shot/20200407/212226_43.yuv");
-//    if(yuvfile->open(QIODevice::ReadOnly))
-//        yuvArr = yuvfile->readAll();
 
-    connect(&timer,&QTimer::timeout,[&]{
-//        if(yuvfile->open(QIODevice::ReadOnly)){
-//           //yuvfile->seek(timeoutIndex*960*600*3/2);
 
-//           QByteArray arr = yuvfile->read(960*600*3/2);
+    testIdIndex++;
+    //connect(&timerUpdate,&QTimer::timeout,this,&XVideoReplay::slot_timeout);
 
-//            memcpy(yuvData.data,arr.data(),960*600*3/2);
+    testID = testIdIndex;
+    m_Img = new QImage();
+}
 
-//            timeoutIndex++;
-//            yuvfile->close();
-//        }else{
-//            qDebug()<<"yuv 文件打开失败";
-//        }
 
-        if(yuvArr.size() > 0){
-            yuvData.resolutionH = 600;
-            yuvData.resolutionW = 960;
-            memcpy(yuvData.data,yuvArr.data(),960*600*3/2);
+QSGNode* XVideoReplay::updatePaintNode(QSGNode *old, UpdatePaintNodeData *data)
+{
+    //qDebug()<<"XVideoReplay updatePaintNode thread:"<<QThread::currentThreadId()<<"   "<<listImgInfo.size();
+    QSGSimpleTextureNode *oldTexture = static_cast<QSGSimpleTextureNode*>(old);
 
-            yuvArr.remove(0,960*600*3/2);
+    if (oldTexture == NULL) {
+        oldTexture = new QSGSimpleTextureNode();
+    }
+
+    //listImg的size必须要比3大，因为在更新时程序在执行到delete m_Img后，由于用户突然调整窗口大小，
+    //从而导致再次调用更新，此时m_Img 已经为空，以下代码将会致使程序崩溃
+    // QSGTexture *t = window()->createTextureFromImage(*m_Img)
+    if(listImgInfo.size() >= 3){
+        isImgUpdate = true;
+        delete m_Img;
+
+        m_Img = listImgInfo.at(0).pImg;
+        listImgInfo.removeAt(0);
+
+        QSGTexture *t = window()->createTextureFromImage(*m_Img);
+
+        if (t != nullptr) {
+
+            QSGTexture *tt = oldTexture->texture();
+            if (tt) {
+                tt->deleteLater();
+            }
+            oldTexture->setRect(boundingRect());
+            oldTexture->setTexture(t);
         }
 
-    });
-    //timer.start(40);
-
-}
-
-
-void XVideoReplay::ready()
-{
-    qDebug()<<"function ready";
-
-    m_renderThread->surface = new QOffscreenSurface(); //实例一个离屏的Surface，有点像不显示的Window，使得opengl的contex能够绑定到它上面
-    m_renderThread->surface->setFormat(m_renderThread->context->format());
-    m_renderThread->surface->create(); //根据文档QOffscreenSurface的create只能在GUI线程调用，所以在这里做了实例和初始化。
-    m_renderThread->moveToThread(m_renderThread); //移动到子线程循环
-    //当场景失效后，关闭子线程的资源
-    connect(window(), &QQuickWindow::sceneGraphInvalidated, m_renderThread, &RenderThread::shutDown, Qt::QueuedConnection);
-    //启动子线程
-    m_renderThread->start();
-    update(); //再update一次用于实例TextureNode，因为程序刚初始化时会调用一次，但在初始化子线程后，返回了，所以要再来一次实例TextureNode。
-}
-
-QSGNode* XVideoReplay::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
-{
-    TextureNode *node = static_cast<TextureNode *>(oldNode);
-    qDebug()<<"updatePaintNode  currentThread:"<<QThread::currentThreadId();
-
-    if (!m_renderThread->context) {
-        QOpenGLContext *current = window()->openglContext();
-        current->doneCurrent(); //取消opengl在当前上下文中的绑定，因为下面要设置shareContext，即将sharedContext移动到子线程
-        m_renderThread->context = new QOpenGLContext();
-        m_renderThread->context->setFormat(current->format());
-        m_renderThread->context->setShareContext(current);
-        m_renderThread->context->create();
-        m_renderThread->context->moveToThread(m_renderThread); //context有线程归属性，一个context只能被它关联的线程调用makeCurrent，不能被其它线程调用;也只能有一个对应的surface
-        //一个线程在同一时刻也只能有一个context
-        current->makeCurrent(window()); //恢复绑定
-        qDebug()<<"invokeMethod ready";
-        QMetaObject::invokeMethod(this, "ready"); //跨线程调用
-
-
-        return 0;
-    }
-
-    if (!node) {
-        node = new TextureNode(window()); //实例化自定义的纹理结点
-
-        //当纹理在子线程渲染好后，将纹理id、大小设置到自定义的QSimpleTextureNode结构中
-        connect(m_renderThread, &RenderThread::textureReady, node, &TextureNode::newTexture, Qt::DirectConnection);
-        //update函数调用后，渲染线程会在适当的时候发出beforRendering信号
-        connect(node, &TextureNode::pendingNewTexture, window(), &QQuickWindow::update, Qt::QueuedConnection);
-        //在开始渲染之前，把子线程渲染好的纹理设置到QSimpletTextureNode中，以便渲染线程使用
-        connect(window(), &QQuickWindow::beforeRendering, node, &TextureNode::prepareNode, Qt::DirectConnection);
-        //渲染好的纹理被使用后，通知子线程渲染下一帧
-        connect(node, &TextureNode::textureInUse, m_renderThread, &RenderThread::renderNext, Qt::QueuedConnection);
-
-        // Get the production of FBO textures started..
-        qDebug()<<"invokeMethod renderNext";
-        QMetaObject::invokeMethod(m_renderThread, "renderNext", Qt::QueuedConnection);
-    }
-
-    qDebug()<<"*************1";
-    node->setRect(boundingRect());//设置显示区域，为qml分配的整个区域
-    return node;
-}
-#include <QDir>
-void XVideoReplay::funPlayTimeChange(QString relativePath,QString date,QTime playTime){
-
-    QString tmpFilePath = findPlayFile(relativePath,date,playTime);
-
-    if(tmpFilePath == "")
-        return;
-
-    if(curFilePath.compare(tmpFilePath)==0){
-
-
+        return oldTexture;
     }else{
 
 
-        if(yuvfile != nullptr)
-            delete  yuvfile;
+        if(!isImgUpdate){
 
-        curFilePath = tmpFilePath;
-        qDebug()<<" curFilePath "<<curFilePath;
-        yuvfile = new QFile(curFilePath+".yuv");
+            isImgUpdate = true;
 
+            QSGTexture *t = window()->createTextureFromImage(*m_Img);
 
-            if(yuvfile->open(QIODevice::ReadOnly))
-                yuvArr = yuvfile->readAll();
-        timer.start(40);
+            if (t != nullptr) {
+
+                QSGTexture *tt = oldTexture->texture();
+                if (tt) {
+                    tt->deleteLater();
+                }
+                oldTexture->setRect(boundingRect());
+                oldTexture->setTexture(t);
+            }
+        }else
+            oldTexture->setRect(boundingRect());
+
+        return oldTexture;
+
     }
+    //qDebug()<<"XVideoReplay updatePaintNode thread:***";
+    //实时更新纹理而不使用老的纹理 是因为老的纹理的宽高未发生变化
+}
 
+void XVideoReplay::funSendVideoData(QVariant buff1)
+{
+
+    qDebug()<<" XVideoReplay funSendVideoData";
+    QImage *tmpImg = buff1.value<QImage*>();
+
+
+    if (tmpImg != nullptr && (!tmpImg->isNull()))
+    {
+
+        ImageInfo1 imgInfo;
+        imgInfo.pImg = tmpImg;
+        //imgInfo.time = time;
+
+        // qDebug()<<QString(__FUNCTION__) + "    "+QString::number(__LINE__) ;
+        if(listImgInfo.size() < minBuffLen){
+
+            listImgInfo.append(imgInfo);
+            update();
+        }else
+            delete tmpImg;
+    }else{
+        qDebug()<<" XVideoReplay funSendVideoData "<<"没有图片信息";
+
+    }
+}
+
+
+void XVideoReplay::funSendAudioData(char *buff,int len)
+{
 
 
 }
 
-QString XVideoReplay::findPlayFile(QString relativePath,QString date,QTime time){
 
-    QDir dir(relativePath+"/"+date);
+XVideoReplay::~XVideoReplay()
+{
 
-    if(!dir.exists()){
-        qDebug()<<"文件路径不存在";
-    }
-    //设置文件过滤器
-    QStringList nameFilters;
-    //设置文件过滤格式
-    nameFilters << "*.yuv";
-    QStringList files = dir.entryList(nameFilters, QDir::Files|QDir::Readable, QDir::Name);
-    for (int i=0;i<files.size();i++) {
-        QString tmpName = files.at(i);
-        QString fileName = tmpName.remove(".yuv");
-        qDebug()<<"files name:"<<fileName;
+    ////    if(playAudioThread != nullptr)
+    ////        playAudioThread->quit();
 
-        QStringList fileNames = fileName.split("_");
-        if(fileNames.size() != 2)
-            continue;
+    //    if(pffmpegCodec != nullptr)
+    //        pffmpegCodec->deleteLater();
 
-        QString timeStart = fileNames[0];
-        QString longt = fileNames[1];
-
-        //        int h = timeStart.mid(0,2).toInt();
-        //        int m = timeStart.mid(2,2).toInt();
-        //        int s = timeStart.mid(4,2).toInt();
-        int t = longt.toInt();
-
-        QTime startT = QTime::fromString(timeStart,"hhmmss");
-        QTime endT = startT.addSecs(t);
-
-        int secTime = time.msecsSinceStartOfDay();
-        int secStartT = startT.msecsSinceStartOfDay();
-        int secEndT = endT.msecsSinceStartOfDay();
-        if(secTime>= secStartT && secTime<=secEndT){
-            return (relativePath+"/"+date+"/"+tmpName);
-        }
-    }
-    return "";
 }
+

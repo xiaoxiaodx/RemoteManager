@@ -11,6 +11,7 @@ import "../qml/masterView"
 import "../qml/deviceManager"
 import "../qml/dataManager"
 import "../qml/warnManager"
+import "../qml/dialog"
 import "simpleControl"
 Rectangle {
 
@@ -40,7 +41,7 @@ Rectangle {
 
     property string versionstr: "version: v1.1.2"
 
-    property int curVindex: -1
+
 
 
     //   property int modelDataCurrentIndex: -1
@@ -60,18 +61,16 @@ Rectangle {
         anchors.left: parent.left
         width: parent.width
         height: 68
-        visible:!isLocker
-        z:2
+        z:isFullScreen?0:2
         gradient: Gradient {
             GradientStop { position: 0.0; color: "#5D9CFF"}
             GradientStop { position: 1.0; color: "#2D76E7"}
         }
 
-
         onSwinMin:  winMin()
         onSwinClose: winClose()
         onSwinMax: winMax()
-
+        onSFullScreen:isFullScreen = true
 
     }
     SwipeView {
@@ -110,7 +109,7 @@ Rectangle {
     ScreenVideo{
         id:screenv
         Component.onCompleted: {
-            screenv.funCreateAviRecordThread(deviceconfig.getScrennShotPath(),deviceconfig.getRecordPath(),captureScrennTimer.interval);
+            //screenv.funCreateAviRecordThread(deviceconfig.getScrennShotPath(),deviceconfig.getRecordPath(),captureScrennTimer.interval);
         }
     }
 
@@ -153,6 +152,49 @@ Rectangle {
         onTriggered: {
 
             warnTimer.isDelay1000 = true;
+        }
+    }
+
+
+
+    AddDevice{
+        id:adddevice
+        width: 427
+        height: 274
+        onS_addDevice: {
+
+
+            deviceModel.funAddDevice(devcieID,devicename,"admin","admin")
+        }
+    }
+
+
+    NumberAnimation{
+        id: animationMenuShow
+        target: homeMenu
+        properties:  "height"
+        to: 68
+        duration: 800
+        easing.type: Easing.OutCubic    //设置运动轨迹
+    }
+
+    NumberAnimation{
+        id: animationMenuHide
+        target: homeMenu
+        properties:  "height"
+        to: 0
+        duration: 800
+        easing.type: Easing.OutCubic    //设置运动轨迹
+    }
+
+    Connections{
+        target: main
+        onSfullScreenChange:{
+            if(isFull){
+                animationMenuHide.start()
+            }else{
+                animationMenuShow.start()
+            }
         }
     }
 }

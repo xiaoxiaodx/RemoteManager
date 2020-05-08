@@ -156,108 +156,108 @@ bool FfmpegConvert::initConvert(int resW,int resH)
 }
 
 
-void FfmpegConvert::rgbToYuv(QImage img,int resW,int resH,QFile &yuvFlie)
-{
-//    QMutexLocker locker(&mutex);
-//    try {
+//void FfmpegConvert::rgbToYuv(QImage img,int resW,int resH,QFile &yuvFlie)
+//{
+////    QMutexLocker locker(&mutex);
+////    try {
 
-//        rgbBuf = new unsigned char[2304000];
-//        // 其它代码
-//    } catch ( const std::bad_alloc& e ) {
-//        DebugLog::getInstance()->writeLog("ffmppeg rgb32分配内存失败");
-//        rgbBuf = nullptr;
-//    }
+////        rgbBuf = new unsigned char[2304000];
+////        // 其它代码
+////    } catch ( const std::bad_alloc& e ) {
+////        DebugLog::getInstance()->writeLog("ffmppeg rgb32分配内存失败");
+////        rgbBuf = nullptr;
+////    }
 
-//    if(rgbBuf == nullptr)
-//        return;
+////    if(rgbBuf == nullptr)
+////        return;
 
-//    return;
-    memcpy(rgbBuf,img.bits(),img.byteCount());
+////    return;
+//    memcpy(rgbBuf,img.bits(),img.byteCount());
 
-    //5 创建RGB视频帧并绑定RGB缓冲区（avpicture_fill是给rgbFrame初始化一些字段，并且会自动填充data和linesize）
-    rgbFrame = av_frame_alloc();
-    avpicture_fill((AVPicture *)rgbFrame, rgbBuf, AV_PIX_FMT_BGRA, resW, resH);
+//    //5 创建RGB视频帧并绑定RGB缓冲区（avpicture_fill是给rgbFrame初始化一些字段，并且会自动填充data和linesize）
+//    rgbFrame = av_frame_alloc();
+//    avpicture_fill((AVPicture *)rgbFrame, rgbBuf, AV_PIX_FMT_BGRA, resW, resH);
 
-    //qDebug()<<" rgbFrame :"<<rgbFrame->linesize[0]<<"   "<<rgbFrame->linesize[1]<<" "<<rgbFrame->linesize[2];
+//    //qDebug()<<" rgbFrame :"<<rgbFrame->linesize[0]<<"   "<<rgbFrame->linesize[1]<<" "<<rgbFrame->linesize[2];
 
-    //7 像素格式转换，转换后的YUV数据存放在yuvFrame
-    int outSliceH = sws_scale(swsCtx,  (const uint8_t* const*)rgbFrame->data, rgbFrame->linesize, 0, 600,
-                              yuvFrame->data, yuvFrame->linesize
-                              );
-    if (outSliceH <= 0)
-        qDebug()<<"outSliceH fail";
+//    //7 像素格式转换，转换后的YUV数据存放在yuvFrame
+//    int outSliceH = sws_scale(swsCtx,  (const uint8_t* const*)rgbFrame->data, rgbFrame->linesize, 0, 600,
+//                              yuvFrame->data, yuvFrame->linesize
+//                              );
+//    if (outSliceH <= 0)
+//        qDebug()<<"outSliceH fail";
 
-    qDebug()<<"***width***:"<<yuvFrame->linesize[0]<<yuvFrame->linesize[1]<<yuvFrame->linesize[2];
-    int wh = 960*600;
-    yuvFlie.write((char*)yuvFrame->data[0],wh);
-    yuvFlie.write((char*)yuvFrame->data[1],wh/4);
-    yuvFlie.write((char*)yuvFrame->data[2],wh/4);
+//    qDebug()<<"***width***:"<<yuvFrame->linesize[0]<<yuvFrame->linesize[1]<<yuvFrame->linesize[2];
+//    int wh = 960*600;
+//    yuvFlie.write((char*)yuvFrame->data[0],wh);
+//    yuvFlie.write((char*)yuvFrame->data[1],wh/4);
+//    yuvFlie.write((char*)yuvFrame->data[2],wh/4);
 
 
 
-}
+//}
 
 int pts = 0;
 int count = 0;
-void FfmpegConvert::rgb32ToH264(QImage img,int resW,int resH,QFile &file)
-{
-    memcpy(rgbBuf,img.bits(),img.byteCount());
-    int ret = 0;
-    //5 创建RGB视频帧并绑定RGB缓冲区（avpicture_fill是给rgbFrame初始化一些字段，并且会自动填充data和linesize）
-    rgbFrame = av_frame_alloc();
-    avpicture_fill((AVPicture *)rgbFrame, rgbBuf, AV_PIX_FMT_BGRA, resW, resH);
+//void FfmpegConvert::rgb32ToH264(QImage img,int resW,int resH,QFile &file)
+//{
+//    memcpy(rgbBuf,img.bits(),img.byteCount());
+//    int ret = 0;
+//    //5 创建RGB视频帧并绑定RGB缓冲区（avpicture_fill是给rgbFrame初始化一些字段，并且会自动填充data和linesize）
+//    rgbFrame = av_frame_alloc();
+//    avpicture_fill((AVPicture *)rgbFrame, rgbBuf, AV_PIX_FMT_BGRA, resW, resH);
 
-    //qDebug()<<" rgbFrame :"<<rgbFrame->linesize[0]<<"   "<<rgbFrame->linesize[1]<<" "<<rgbFrame->linesize[2];
+//    //qDebug()<<" rgbFrame :"<<rgbFrame->linesize[0]<<"   "<<rgbFrame->linesize[1]<<" "<<rgbFrame->linesize[2];
 
-    //7 像素格式转换，转换后的YUV数据存放在yuvFrame
-    int outSliceH = sws_scale(swsCtx,  (const uint8_t* const*)rgbFrame->data, rgbFrame->linesize, 0, resH,
-                              yuvFrame->data, yuvFrame->linesize
-                              );
-    if (outSliceH <= 0)
-        qDebug()<<"outSliceH fail";
-
-
-    /* 8 H264编码 */
-    // 将未压缩的AVFrame数据(yuv)给编码器
-    yuvFrame->pts = count++ * (codecCtx->time_base.num * 1000 / codecCtx->time_base.den);
-
-    yuvFrame->pts = (count++) * (codecCtx->time_base.den)  / (codecCtx->time_base.num *25);
+//    //7 像素格式转换，转换后的YUV数据存放在yuvFrame
+//    int outSliceH = sws_scale(swsCtx,  (const uint8_t* const*)rgbFrame->data, rgbFrame->linesize, 0, resH,
+//                              yuvFrame->data, yuvFrame->linesize
+//                              );
+//    if (outSliceH <= 0)
+//        qDebug()<<"outSliceH fail";
 
 
-    ret = avcodec_send_frame(codecCtx, yuvFrame);
-    if (ret != 0)
-    {
-        qDebug()<<"*-****************** fail 1";
-        return;
-    }
-    // 将编码数据保存在AVPacket
-    ret = avcodec_receive_packet(codecCtx, &pkt);
-    if (ret != 0){
-        qDebug()<<"*-****************** fail 2  "<<ret;
-        return;
-    }
+//    /* 8 H264编码 */
+//    // 将未压缩的AVFrame数据(yuv)给编码器
+//    yuvFrame->pts = count++ * (codecCtx->time_base.num * 1000 / codecCtx->time_base.den);
 
-    qDebug()<<"获取一幅图:"<<pkt.size;
-//    QFile file1("testAvi.h264");
-//    if(file1.open(QIODevice::WriteOnly | QIODevice::Append)){
+//    yuvFrame->pts = (count++) * (codecCtx->time_base.den)  / (codecCtx->time_base.num *25);
 
-//        int len =file1.write((char*)pkt.data,pkt.size);
 
-//        qDebug()<<"write  h264 succ :"<<len;
-//    }else{
-//        qDebug()<<"file open fail:";
+//    ret = avcodec_send_frame(codecCtx, yuvFrame);
+//    if (ret != 0)
+//    {
+//        qDebug()<<"*-****************** fail 1";
+//        return;
+//    }
+//    // 将编码数据保存在AVPacket
+//    ret = avcodec_receive_packet(codecCtx, &pkt);
+//    if (ret != 0){
+//        qDebug()<<"*-****************** fail 2  "<<ret;
+//        return;
 //    }
 
-    file.write((char*)pkt.data,pkt.size);
-    //gotpic = true;
-   // arr.append((char*)pkt.data,pkt.size);
+//    qDebug()<<"获取一幅图:"<<pkt.size;
+////    QFile file1("testAvi.h264");
+////    if(file1.open(QIODevice::WriteOnly | QIODevice::Append)){
 
-    //av_free_packet(&pkt);
-    //9 写入H264文件
-    //fwrite(pkt.data, 1, pkt.size, fpout);
-    //av_packet_unref(&pkt);
+////        int len =file1.write((char*)pkt.data,pkt.size);
 
-}
+////        qDebug()<<"write  h264 succ :"<<len;
+////    }else{
+////        qDebug()<<"file open fail:";
+////    }
+
+//    file.write((char*)pkt.data,pkt.size);
+//    //gotpic = true;
+//   // arr.append((char*)pkt.data,pkt.size);
+
+//    //av_free_packet(&pkt);
+//    //9 写入H264文件
+//    //fwrite(pkt.data, 1, pkt.size, fpout);
+//    //av_packet_unref(&pkt);
+
+//}
 void FfmpegConvert::rgb32ToH264(QImage img,QByteArray &arr,bool &gotPic)
 {
     memcpy(rgbBuf,img.bits(),img.byteCount());

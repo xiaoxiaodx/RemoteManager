@@ -45,13 +45,9 @@ public slots:
     void slot_disConnectSer();
     void slot_tcpSendAuthentication(QString did,QString name,QString pwd);
     void slot_tcpRecAuthentication(QString did,QString name,QString pwd);
-
-
     void creatNewTcpConnect(QString ip,int port);
 
 private:
-
-
     /*********************************/
     int saveVideoInfo(QByteArray &arr);
     int saveAudioInfo(QByteArray &arr);

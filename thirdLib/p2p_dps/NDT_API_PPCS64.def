@@ -1,0 +1,17 @@
+EXPORTS
+    NDT_PPCS_CloseHandle @1
+    NDT_PPCS_DeInitialize @2
+    NDT_PPCS_GetAPIVersion @3
+    NDT_PPCS_Initialize @4
+    NDT_PPCS_NetworkDetect @5
+    NDT_PPCS_Recv @6
+    NDT_PPCS_RecvFrom @7
+    NDT_PPCS_RecvFrom_Break @8
+    NDT_PPCS_Recv_Break @9
+    NDT_PPCS_SendBack @10
+    NDT_PPCS_SendBack_Break @11
+    NDT_PPCS_SendTo @12
+    NDT_PPCS_SendToByServer @13
+    NDT_PPCS_SendTo_Break @14
+    NDT_PPCS_StatusCheck @15
+    RunNDT_SM @16

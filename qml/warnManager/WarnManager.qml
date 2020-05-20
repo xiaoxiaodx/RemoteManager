@@ -1,6 +1,6 @@
 import QtQuick.Controls 2.5
 import QtQuick 2.0
-import WarnModel 1.0
+
 import "../playbackVideo"
 import "../dialog"
 Rectangle {
@@ -23,10 +23,7 @@ Rectangle {
         warnmodel.set
     }
     property string curDateStr: ""
-    WarnModel{
-        id:warnmodel
-        // Component.objectName: warnmodel.funFlushWarnInfo(deviceconfig.getScrennShotPath(),curDateStr);
-    }
+
 
     function screenShot(path,object,mx,my,mw,mh,temp){
         warnmodel.funScreenShoot(path,object,mx ,my,mw,mh,temp);
@@ -112,7 +109,7 @@ Rectangle {
                                        curLanguage===lEnglish?"Confirm to delete?":
                                        curLanguage===lKorean?"삭제하시겠습니까?":
                                        curLanguage===lItaly?"Cancella Tutta la Selezione?":
-                                       curLanguage===lRussian?"Вы уверены, что хотите удалить информацию?":""
+                                       curLanguage===lRussian?"Вы уверены, что хотите удалить информацию?":"";
                     askDialog.imgSrc = "qrc:/images/ico_warn.png"
                     askDialog.curType = askDialog.warnInfoMutipleDelete
                     askDialog.open();
@@ -428,11 +425,11 @@ Rectangle {
             Component.onCompleted: {
 
                 curDateStr = Qt.formatDate(calendar.getCurrentData(),"yyyyMMdd");
-               // warnmodel.funFlushWarnInfo(deviceconfig.getScrennShotPath(),curDateStr);
+                warnmodel.funFlushWarnInfo(screenv.funGetCurPath(),curDateStr);
             }
             onS_dayChange:{
                 curDateStr = value;
-                //warnmodel.funFlushWarnInfo(deviceconfig.getScrennShotPath(),curDateStr);
+                warnmodel.funFlushWarnInfo(screenv.funGetCurPath(),curDateStr);
             }
 
             onS_dayChange1: txtDate.text = value

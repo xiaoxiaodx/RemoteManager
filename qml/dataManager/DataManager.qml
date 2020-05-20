@@ -89,7 +89,7 @@ Rectangle {
                                                                 curLanguage===lEnglish?"Confirm to delete?":
                                                                                         curLanguage===lKorean?"삭제하시겠습니까?":
                                                                                                                curLanguage===lItaly?"Cancella Tutta la Selezione?":
-                                                                                                                                     curLanguage===lRussian?"Вы уверены, что хотите удалить информацию?":""
+                                                                                                                                     curLanguage===lRussian?"Вы уверены, что хотите удалить информацию?":"";
                     askDialog.imgSrc = "qrc:/images/ico_warn.png"
                     askDialog.curType = askDialog.warnInfoMutipleDelete
                     askDialog.open();

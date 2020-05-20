@@ -2,7 +2,6 @@ import QtQuick 2.5
 import QtQuick.Controls 1.4
 import QtQuick.Window 2.12
 import QtQml 2.12
-import ScreenVideo 1.0
 import QtMultimedia 5.8
 import QtQuick.Controls 2.5
 import "../qml/liveVedio"
@@ -71,8 +70,8 @@ Rectangle {
         onSwinClose: winClose()
         onSwinMax: winMax()
         onSFullScreen:isFullScreen = true
-
     }
+
     SwipeView {
         id:vedioContent
         anchors.left: parent.left
@@ -94,10 +93,11 @@ Rectangle {
         DeviceManager{
             id:systemsetting
         }
+
         WarnManager{
             id:warnmanger
-            //color: "#DFE1E6"
         }
+
         DataManager{
             id:dataManager
         }
@@ -106,13 +106,13 @@ Rectangle {
         }
     }
 
-    ScreenVideo{
-        id:screenv
-        Component.onCompleted: {
-            //screenv.funCreateAviRecordThread(deviceconfig.getScrennShotPath(),deviceconfig.getRecordPath(),captureScrennTimer.interval);
-        }
-    }
 
+    DeviceConfig{
+        id:deviceconfig
+        width: 800
+        height: 600
+        anchors.centerIn: parent
+    }
 
     MediaPlayer {
         id: playWarn
@@ -155,16 +155,25 @@ Rectangle {
         }
     }
 
-
-
     AddDevice{
         id:adddevice
         width: 427
         height: 274
         onS_addDevice: {
 
+            var channel = -1;
+            for(var i=0;i<videoShowModel.count;i++){
+                if(!videoShowModel.get(i).isBind){
+                    channel = videoShowModel.get(i).channel;
+                    videoShowModel.get(i).isBind = true
+                    break;
+                }
+            }
 
-            deviceModel.funAddDevice(devcieID,devicename,"admin","admin")
+            if(channel >-1)
+                deviceModel.funAddDevice(devcieID,devicename,channel,"admin","admin")
+            else
+                ;//提示通道已满
         }
     }
 

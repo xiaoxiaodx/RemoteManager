@@ -51,7 +51,6 @@ void MySearch1::startSearch()
     }
 }
 
-
 void MySearch1::resetSearch()
 {
     if(s_searchsocket != NULL)

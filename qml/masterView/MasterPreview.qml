@@ -2,6 +2,7 @@ import QtQuick 2.0
 import "../simpleControl"
 import QtQuick.Controls 1.4
 import Qt.labs.settings 1.0
+import QtGraphicalEffects 1.12
 Rectangle {
 
 
@@ -14,28 +15,7 @@ Rectangle {
         property alias window9: mW9.checked;
         property alias window16: mW16.checked;
     }
-    ListModel{
-        id:videoShowModel
-        ListElement{deviceBelong:""}
-        ListElement{deviceBelong:""}
-        ListElement{deviceBelong:""}
-        ListElement{deviceBelong:""}
 
-        ListElement{deviceBelong:""}
-        ListElement{deviceBelong:""}
-        ListElement{deviceBelong:""}
-        ListElement{deviceBelong:""}
-
-        ListElement{deviceBelong:""}
-        ListElement{deviceBelong:""}
-        ListElement{deviceBelong:""}
-        ListElement{deviceBelong:""}
-
-        ListElement{deviceBelong:""}
-        ListElement{deviceBelong:""}
-        ListElement{deviceBelong:""}
-        ListElement{deviceBelong:""}
-    }
 
     property int numberWindow: 4
 
@@ -44,6 +24,7 @@ Rectangle {
         x:0
         y:0
         width: 300
+        property int preWidth : 300
         height: parent.height
         color: "#F0F5FB"
 
@@ -157,24 +138,22 @@ Rectangle {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            listDevice.currentIndex = index
+                            systemsetting.openDeviceConfig(false,model.deviceChannel);
                         }
                     }
                 }
 
                 MouseArea{
                     anchors.fill: parent
-
+                    propagateComposedEvents: true
                     onDoubleClicked: {
-                        console.debug("device onDoubleClicked")
-                        var map;
-                        //devicemanagerment.funP2pSendData(listdeviceInfo.get(index).devicename,"getVedio",map);
+                        var map = {cmd:"getVedio"};
+                        deviceModel.funSendData1(deviceChannel,"getVedio",map)
+                    }
+                    onClicked: {
 
-                        videoShowModel.get(gridViewVideo.curSelectIndex).deviceBelong = model.deviceName
-
-
-                        deviceModel.funSendData(index,"getVedio",map)
-
+                        listDevice.currentIndex = index
+                        mouse.accepted = false
                     }
                 }
             }
@@ -183,7 +162,7 @@ Rectangle {
 
     Rectangle{
         id:rectlistpersoninfo
-
+        property int preWidth: 217
         anchors.right: parent.right
         anchors.top: parent.top
         width: 217
@@ -310,8 +289,9 @@ Rectangle {
 
     Rectangle{
         id:rectlistwarninfo
+        property int preHeight: 160
         width: videoContent.width
-        height: 180
+        height: 160
         color: "#202020"
         z:1
         anchors.left: rectlistDevice.right
@@ -320,51 +300,61 @@ Rectangle {
             width: parent.width
             height: parent.height
             orientation:ListView.Horizontal
-
+            model: warnmodel
             delegate: Rectangle{
-                Image {
-                    anchors.fill: parent
-                    source: "file"
-                }
+                width: 120
+                height: parent.height
+                color: "#202020"
                 Rectangle{
-                    color: "#193548"
-                    width: parent.width
-                    height: 38
-                    anchors.bottom: parent.bottom
 
-                    Text {
+                    anchors.fill: parent
+                    anchors.margins: 5
 
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        anchors.leftMargin: 10
-                        anchors.topMargin: 7
-                        font.pixelSize: 8
-                        color: "#ffffff"
-                        text: qsTr("监控1")
+                    Image {
+                        anchors.fill: parent
+                        source: "file:///"+ model.absolutePath
                     }
-
-                    Text {
-                        anchors.right: parent.right
-                        anchors.top: parent.top
-                        anchors.rightMargin: 10
-                        anchors.topMargin: 2
-                        font.pixelSize: 16
-                        color: "#FA3F00"
-                        text: qsTr("37.5°C")
-                    }
-                    Text {
-                        anchors.left: parent.left
+                    Rectangle{
+                        color: "#cc193548"
+                        width: parent.width
+                        height: 38
                         anchors.bottom: parent.bottom
-                        anchors.leftMargin: 10
-                        anchors.bottomMargin:4
-                        font.pixelSize: 8
-                        color: "#ffffff"
-                        text: qsTr("2020-03-01 14:20:01")
+
+                        Text {
+
+                            anchors.left: parent.left
+                            anchors.top: parent.top
+                            anchors.leftMargin: 10
+                            anchors.topMargin: 7
+                            font.pixelSize: 8
+                            color: "#ffffff"
+                            text: model.deviceChannel
+                        }
+
+                        Text {
+                            anchors.right: parent.right
+                            anchors.top: parent.top
+                            anchors.rightMargin: 10
+                            anchors.topMargin: 2
+                            font.pixelSize: 16
+                            color: "#FA3F00"
+                            text: model.warnTemp
+                        }
+                        Text {
+                            anchors.left: parent.left
+                            anchors.bottom: parent.bottom
+                            anchors.leftMargin: 10
+                            anchors.bottomMargin:4
+                            font.pixelSize: 8
+                            color: "#ffffff"
+                            text: model.warnTime
+                        }
                     }
                 }
             }
         }
 
+        layer.enabled: true
     }
 
     Rectangle{
@@ -407,7 +397,7 @@ Rectangle {
                         width: parent.width-2
                         height: parent.height-2
                         mIsSelected:gridViewVideo.curSelectIndex === index
-                        belongDeviceName: deviceBelong
+                        belongDevice: channel
                         onClick: gridViewVideo.curSelectIndex = index
 
                         onDoubleClick: {
@@ -656,7 +646,7 @@ Rectangle {
         id: animationBottomShow
         target: rectlistwarninfo
         properties:  "height"
-        to: 180
+        to: 160
         duration: 800
         easing.type: Easing.OutCubic    //设置运动轨迹
     }
@@ -667,14 +657,30 @@ Rectangle {
         onSfullScreenChange:{
 
             if(isFull){
+
+                rectlistwarninfo.preHeight = rectlistwarninfo.height
+                rectlistpersoninfo.preWidth = rectlistpersoninfo.width
+                rectlistDevice.preWidth = rectlistDevice.width
                 animationBottomHide.start();
                 animationRightHide.start();
                 animationLeftHide.start();
                 gridViewVideo.curSelectIndex = -1
             }else{
-//                animationBottomShow.start();
-//                animationRightShow.start();
-//                animationLeftShow.start();
+
+                if(rectlistwarninfo.preHeight > 0){
+                    animationBottomShow.start();
+                }
+
+                if(rectlistpersoninfo.preWidth > 0){
+                    animationRightShow.start();
+                }
+                if(rectlistDevice.preWidth > 0){
+                    animationLeftShow.start();
+                }
+
+                //                animationBottomShow.start();
+                //                animationRightShow.start();
+                //                animationLeftShow.start();
             }
         }
     }

@@ -16,14 +16,15 @@ CONFIG += c++11
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Refer to the documentation for the
 # deprecated API to know how to port your code away from it.
-DEFINES += QT_DEPRECATED_WARNINGS
+DEFINES += QT_DEPRECATED_WARNINGS WINDOWS ARCH_WINDOWS DPS_API_EXPORTS
+
+DISTFILES += \
+    thirdLib/p2p_dps/NDT_API_PPCS64.def
 
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
-
 
 RESOURCES += qml.qrc
 
@@ -55,7 +56,6 @@ SOURCES += \
     protocol/mysearch1.cpp \
     protocol/tcpworker.cpp \
     recordVideo/captureScreen/writeh264.cpp \
-    qmlcplus/warnmodeldata.cpp \
     qmlcplus/warnmodel.cpp \
     application.cpp \
     qmlcplus/replaydatesearch.cpp \
@@ -69,12 +69,18 @@ SOURCES += \
     qmlcplus/facedatamodel.cpp \
     playAudio/mydevice.cpp \
     playAudio/playaudio.cpp \
-#    deivceconnectionmanager.cpp \
     protocol/p2pworker.cpp \
     protocol/p2pprotrol.cpp \
     qmlcplus/devicemodeldata.cpp \
-
-
+    protocol/warndps.cpp \
+    thirdSrc/p2p_dps/Src/base64.cpp \
+    thirdSrc/p2p_dps/Src/cJSON.cpp \
+    thirdSrc/p2p_dps/Src/Debug_Log.cpp \
+    thirdSrc/p2p_dps/Src/StringEncDec.cpp \
+    thirdSrc/p2p_dps/Src/stTime.cpp \
+    thirdSrc/p2p_dps/Src/WiPN_API.cpp \
+    thirdSrc/p2p_dps/Src/WiPN_Common.cpp \
+    thirdSrc/p2p_dps/Src/WiPN_WebAPI.cpp
 
 HEADERS += \
     playVideo/XVideo.h \
@@ -91,9 +97,7 @@ HEADERS += \
     protocol/chttpapidevice.h \
     protocol/mysearch1.h \
     protocol/tcpworker.h \
-    util/common.h \
     recordVideo/captureScreen/writeh264.h \
-    qmlcplus/warnmodeldata.h \
     qmlcplus/warnmodel.h \
     application.h \
     qmlcplus/replaydatesearch.h \
@@ -112,18 +116,30 @@ HEADERS += \
     qmlcplus/facedatamodel.h \
     playAudio/mydevice.h \
     playAudio/playaudio.h \
-#    deivceconnectionmanager.h \
     protocol/p2pworker.h \
     protocol/protocal_pkg.h \
     protocol/p2pprotrol.h \
     qmlcplus/devicemodeldata.h \
-
-
-
+    protocol/warndps.h \
+    util/common.h \
+    thirdSrc/p2p_dps/include/base64.h \
+    thirdSrc/p2p_dps/include/cJSON.h \
+    thirdSrc/p2p_dps/include/Debug_Log.h \
+    thirdSrc/p2p_dps/include/DPS_API.h \
+    thirdSrc/p2p_dps/include/NDT_API.h \
+    thirdSrc/p2p_dps/include/NDT_Error.h \
+    thirdSrc/p2p_dps/include/NDT_Type.h \
+    thirdSrc/p2p_dps/include/SPS_API.h \
+    thirdSrc/p2p_dps/include/StringEncDec.h \
+    thirdSrc/p2p_dps/include/stTime.h \
+    thirdSrc/p2p_dps/include/WiPN_API.h \
+    thirdSrc/p2p_dps/include/WiPN_Common.h \
+    thirdSrc/p2p_dps/include/WiPN_WebAPI.h
 
 INCLUDEPATH += $$PWD/avi
 INCLUDEPATH += $$PWD/protocol
 INCLUDEPATH += $$PWD/playVideo
+INCLUDEPATH += $$PWD/playAudio
 INCLUDEPATH += $$PWD/render
 INCLUDEPATH += $$PWD/thirdSrc
 INCLUDEPATH += $$PWD/thirdSrc/ffmpeg
@@ -131,7 +147,6 @@ INCLUDEPATH += $$PWD/thirdSrc/avi
 INCLUDEPATH += $$PWD/recordVideo/captureScreen
 INCLUDEPATH += $$PWD/util
 INCLUDEPATH += $$PWD/qmlcplus
-INCLUDEPATH += $$PWD/playAudio
 
 
 INCLUDEPATH += $$PWD/thirdLib/ffmpeg64/include
@@ -144,8 +159,20 @@ LIBS += $$PWD/thirdLib/ffmpeg64/lib/avcodec.lib \
         $$PWD/thirdLib/ffmpeg64/lib/swresample.lib \
         $$PWD/thirdLib/ffmpeg64/lib/swscale.lib
 
+
 #P2P 库
-LIBS+= -L $$PWD/thirdLib/p2p_ppcs/ -l PPCS_API
-INCLUDEPATH += $$PWD/thirdLib/p2p_ppcs/include \
-               $$PWD/P2P/
+#LIBS+= -L $$PWD/thirdLib/p2p_ppcs/ -l PPCS_API
+LIBS+= $$PWD/thirdLib/p2p_ppcs/PPCS_API.lib
+INCLUDEPATH += $$PWD/thirdLib/p2p_ppcs/include
+
+#P2P 推送
+INCLUDEPATH += $$PWD/thirdSrc/p2p_dps/include
+LIBS += $$PWD/thirdLib/p2p_dps/DPS_API64.lib \
+        $$PWD/thirdLib/p2p_dps/NDT_API_PPCS64.lib \
+        $$PWD/thirdLib/p2p_dps/SPS_API64.lib
+
+LIBS += -lWs2_32
+
+
+
 

@@ -46,9 +46,10 @@ signals:
     void signal_endRecord();
     void signal_setRecordingFilePath(QString str);
     //
-    void signal_p2pReplyData(QString name,QVariant map);
+    void signal_p2pReplyData(QString name,QVariantMap map);
 
     void signal_sendH264(QString name ,QVariant img,long long pts);
+    void signal_sendWarnImg(QVariantMap map,QByteArray arrImg);
     void signal_sendPcmALaw(QString name ,char* PcmALawArr,int arrLen,long long pts);
 
     void signal_sendReplayH264(QString name ,QVariant img,long long pts);
@@ -65,6 +66,7 @@ signals:
     void signal_deviceParameterSet(QString name,int parameterType,QVariantMap parMap);
 
     void signal_reconnectP2pDev(QString deviceDid,QString name,QString pwd);
+
 public slots:
 
     void slot_connectDev(QString deviceDid,QString name,QString pwd);

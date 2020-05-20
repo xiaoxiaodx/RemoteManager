@@ -29,11 +29,14 @@ public:
     Q_INVOKABLE void funflushDevice();
     Q_INVOKABLE void funDeleteIndex(int index);
     Q_INVOKABLE void funDeleteSelect();
-    Q_INVOKABLE void funAddDevice(QString deviceID,QString name,QString account,QString pwd);
-    Q_INVOKABLE void funSendData(int index,QString cmd,QVariant map);
-    Q_INVOKABLE void funSendData1(QString name,QString cmd,QVariant map);
+    Q_INVOKABLE void funAddDevice(QString deviceID,QString name,QString channel="",QString account="admin",QString pwd="admin");
+    Q_INVOKABLE void funSendData(int index,QString cmd,QVariantMap map);
+    Q_INVOKABLE void funBatchSendData(QVariantMap map);
+    Q_INVOKABLE void funSendData1(QString channel,QString cmd,QVariantMap map);
     Q_INVOKABLE void funSetAllSelect(bool isSelect);//选中所有数据
     Q_INVOKABLE QVariant funGetDevice(int index);
+    Q_INVOKABLE QVariant funGetDevice(QString  channel);
+
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role ) const override;
@@ -56,11 +59,17 @@ signals:
     void signal_p2pCallbackReplayPause(QString name ,QVariant smap);
     void signal_p2pCallbackReplay(QString name ,QVariant smap);
     void signal_p2pCallbackReply(QString name ,QVariant smap);
+
+    //程序启动时，从文件更新设备信息时，应通知qml 哪些通道已经被使用
+    void signal_channelUse(QString channel);
+    //告警信息
+    void signal_sendWarnInfo(QString channle ,QString name,QVariantMap map,QByteArray arrimg);
 public slots:
     void slot_flustConnectState();
     void slot_recReplayVedio(QString name ,QVariant img,long long pts);
     void slot_recRepkyData(QString name ,QVariant smap);
     void slot_recPlayVedio(QString name ,QVariant smap);
+    void slot_sendWarnInfo(QString channle ,QString name,QVariantMap map,QByteArray arrimg);
 
 private:
 

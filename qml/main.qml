@@ -6,7 +6,8 @@ import QtQml 2.12
 import "./dialog"
 
 import DeviceModel 1.0
-
+import WarnModel 1.0
+import ScreenVideo 1.0
 Window {
 
     id: main;
@@ -57,11 +58,55 @@ Window {
         console.debug("visibly change "+visibility)
     }
 
+    ScreenVideo{
+        id:screenv
+    }
+
     DeviceModel{
         id:deviceModel
 
+        onSignal_channelUse:videoShowModel.get(channel).isBind = true;
+
+        onSignal_sendWarnInfo:{
+
+            warnmodel.funAppendWarnInfo(screenv.funGetCurPath(),channle,name,map,arrimg)
+
+           // realtimeAlarmModel.append({channle:channle,name:name,})
+        }
     }
 
+    WarnModel{
+        id:warnmodel
+        // Component.objectName: warnmodel.funFlushWarnInfo(deviceconfig.getScrennShotPath(),curDateStr);
+    }
+
+    ListModel{
+        id:realtimeAlarmModel
+
+    }
+    //16路的模型数据,channel:固定通道号（唯一）,deviceBelong:当前绑定设备的名字
+    ListModel{
+        id:videoShowModel
+        ListElement{channel:"0";isBind:false}
+        ListElement{channel:"1";isBind:false}
+        ListElement{channel:"2";isBind:false}
+        ListElement{channel:"3";isBind:false}
+
+        ListElement{channel:"4";isBind:false}
+        ListElement{channel:"5";isBind:false}
+        ListElement{channel:"6";isBind:false}
+        ListElement{channel:"7";isBind:false}
+
+        ListElement{channel:"8";isBind:false}
+        ListElement{channel:"9";isBind:false}
+        ListElement{channel:"10";isBind:false}
+        ListElement{channel:"11";isBind:false}
+
+        ListElement{channel:"12";isBind:false}
+        ListElement{channel:"13";isBind:false}
+        ListElement{channel:"14";isBind:false}
+        ListElement{channel:"15";isBind:false}
+    }
 
     MainContent{
         id:maincontent
@@ -88,7 +133,7 @@ Window {
                                curLanguage===lEnglish?"Confirm to exit ?":
                                curLanguage===lKorean?"나가시겠습니까?":
                                curLanguage===lItaly?"Uscita Dal Sistema?":
-                               curLanguage===lRussian?"Подтвердить выход?":""
+                               curLanguage===lRussian?"Подтвердить выход?":"";
             askDialog.imgSrc = "qrc:/images/icon_question.png"
             askDialog.curType = askDialog.exeClose
             askDialog.open();
@@ -119,6 +164,7 @@ Window {
             }
         }
     }
+
     property point mousePressPt: "0,0"
     MouseArea{
         id:areaLeft

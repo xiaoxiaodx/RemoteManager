@@ -56,22 +56,49 @@ Rectangle {
 
     }
 
-    function setTempPar(tempenable,tempvalue,screenshotswitch,screenshotpath,beerenable,drift,threshold){
+    function setTempPar(tempenable,tempvalue,screenshotswitch,screenshotpath,beerenable,drift,threshold,tempcontrolcaplevelMin,tempcontrolcaplevelMax,tempdriftcaplevelMin,tempdriftcaplevelMax){
         isRevicse = false
         swichWarn.checked = tempenable
-        inputTem.text = tempvalue
+        inputTem.text = tempvalue.toFixed(2)
         swichScreenShot.checked = screenshotswitch
         inputScreenShotPath.text = screenshotpath
         swichBeer.checked = beerenable
         inputTempDrift.text = drift
         inputTempMin.text = threshold
+        tempdriftcapMax = tempdriftcaplevelMax;
+        tempdriftcapMin = tempdriftcaplevelMin;
+        tempcontrolcapMin = tempcontrolcaplevelMin
+        tempcontrolcapMax = tempcontrolcaplevelMax
     }
     function updateParameterInfo(modle){
 
         if(isRevicse){
             return;
         }else{
-            model.updateTemp(isBatchSet,swichWarn.checked,inputTem.text,swichScreenShot.checked,inputScreenShotPath.text,inputTempDrift.text,inputTempMin.text);
+
+            var map = {
+                cmd:"setiradinfo",
+                switchWarn:swichWarn.checked,
+                warnTemp:inputTem.text,
+                tempdrift:inputTempDrift.text,
+                tempcontrol:inputTempMin.text
+            }
+            if(isBatchSet)
+                deviceModel.funSelectSendData("setiradinfo",map);
+            else
+                model.funP2pSendData("setiradinfo",map);
+
+
+            var map1 ={
+                cmd:"setalarmparam",
+                alarmaudiooutenabled:swichBeer.checked
+            }
+            if(isBatchSet)
+                deviceModel.funSelectSendData("setalarmparam",map1);
+            else
+                model.funP2pSendData("setalarmparam",map1);
+
+            //model.updateTemp(isBatchSet,swichWarn.checked,inputTem.text,swichScreenShot.checked,inputScreenShotPath.text,inputTempDrift.text,inputTempMin.text);
         }
     }
     Rectangle{
@@ -101,8 +128,6 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
-
-
         Text {
             id: txtSwichWarn
             text: qsTr("报警")
@@ -122,7 +147,10 @@ Rectangle {
             anchors.leftMargin: parSetFirstAlignLine
             anchors.top: line2.bottom
             anchors.topMargin: 20
-            onCheckedChanged: s_warnSwith(checked)
+            onCheckedChanged: {
+                isRevicse = true;
+                s_warnSwith(checked)
+            }
         }
         Text {
             id: txtWarnTemSet
@@ -180,7 +208,11 @@ Rectangle {
             anchors.leftMargin: parSetFirstAlignLine
             anchors.top: line2.bottom
             anchors.topMargin: 68
-            onCheckedChanged: s_screenShotSwith(checked)
+            onCheckedChanged: {
+
+                s_screenShotSwith(checked)
+                isRevicse = true;
+            }
         }
 
         Text {
@@ -219,7 +251,7 @@ Rectangle {
                 textLeftPadding:0
                 txtColor: Qt.rgba(0,0,0,0.65)
                 color: "#ffffff"
-                //onTextChanged: s_screenShotPathSet(inputScreenShotPath.text)
+                onTextChanged:isRevicse = true;
             }
             Image {
                 id: imgScreenShotPath
@@ -311,7 +343,7 @@ Rectangle {
                 isReadOnly:true
                 onTextChanged: {
                     s_temOffset(inputTempDrift.text);
-
+                    isRevicse = true;
                 }
             }
             Image {
@@ -427,7 +459,7 @@ Rectangle {
                         s_temMin("30");
                     else if(inputTempMin.text === "6")
                         s_temMin("32");
-
+                    isRevicse = true;
                 }
             }
 

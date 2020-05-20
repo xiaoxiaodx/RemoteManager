@@ -35,7 +35,7 @@ Rectangle {
     {
         isRevicse = false
         swithRtmp.checked = enable
-        cmbResolution.currentText = resolution
+        cmbResolution.currentIndex = resolution
         inputurl.text = url;
         inputaccount.text = acc
         inputpassword.text = pwd
@@ -46,7 +46,22 @@ Rectangle {
         if(isRevicse){
             return;
         }else{
-            model.updateRtmp(isBatchSet,swithRtmp.checked,cmbResolution.currentIndex,inputurl.text,inputaccount.text,inputpassword.text);
+
+            var map = {
+
+                cmd:"setrtmpinfo",
+                enable:swithRtmp.checked,
+                chn:cmbResolution.currentIndex===0?11:12,
+                streamurl:inputurl.text,
+                username:inputaccount.text,
+                password:inputpassword.text
+            };
+
+            if(isBatchSet)
+                deviceModel.funBatchSendData("setrtmpinfo",map);
+            else
+                deviceModel.funSendData1(deviceChannel,"setrtmpinfo",map);
+
         }
     }
     Text {
@@ -91,7 +106,7 @@ Rectangle {
         anchors.leftMargin: parSetFirstAlignLine
         anchors.top: line.bottom
         anchors.topMargin: 20
-        // onCheckedChanged: s_timeSwith(checked)
+         onCheckedChanged: isRevicse = true;
     }
 
 
@@ -134,7 +149,7 @@ Rectangle {
         bordColor:"#DEDFE3"
         mRadius:2
         model: resolutionModel
-        onCurrentIndexChanged: {
+        onCurrentIndexChanged: {isRevicse = true;
 
         }
     }
@@ -178,7 +193,7 @@ Rectangle {
         textLeftPadding:0
         txtColor: Qt.rgba(0,0,0,0.65)
        color: "#ffffff"
-        //onTextChanged: s_recordPathSet(inputrecordPath.text)
+        onTextChanged: isRevicse = true;
     }
 
 
@@ -209,7 +224,7 @@ Rectangle {
         textLeftPadding:0
         txtColor: Qt.rgba(0,0,0,0.65)
         color: "#ffffff"
-        //onTextChanged: s_recordPathSet(inputrecordPath.text)
+        onTextChanged: isRevicse = true;
     }
 
     Text {
@@ -239,8 +254,7 @@ Rectangle {
         textLeftPadding:0
         txtColor: Qt.rgba(0,0,0,0.65)
         color: "#ffffff"
-
-        //onTextChanged: s_recordPathSet(inputrecordPath.text)
+        onTextChanged:  isRevicse = true;
     }
 
     Connections{

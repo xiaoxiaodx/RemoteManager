@@ -55,7 +55,7 @@ typedef enum tagCMDMOD_ID_E
     ((unsigned short)( ((CMDMOD) << 8 )|(ERR_ID) ))
 
 
-
+#define CMD_PUSHIMAGE_GET DEF_APPCMD_ASCII_REQ(CMDMOD_ID_MESS,6) //0X038C
 #define CMD_VIDEO_REQ		    DEF_APPCMD_ASCII_REQ(CMDMOD_ID_VIDEO,1)   //0x0082
 #define CMD_VIDEO_TRNS		    DEF_APPCMD_HEX_REQ(CMDMOD_ID_VIDEO,2)   //0x0884
 #define CMD_VIDEO_STOP	    DEF_APPCMD_ASCII_REQ(CMDMOD_ID_VIDEO,3)   //0x0086
@@ -635,6 +635,33 @@ struct nv_switch_get_type
 #define FRAME_TYPE_I                 0x0
 #define FRAME_TYPE_P                  0x1
 #define FRAME_TYPE_NEW_I              (0x80) //add by fan 切码流时,第一个I帧
+
+
+typedef enum _E_ALARMTYPE
+{
+ ALARMTYPE_NULL = 0x00,
+ ALARMTYPE_MOTION = 1 << 0,
+ ALARMTYPE_BLIND = 1 << 1,//遮挡告警
+ ALARMTYPE_IO1 = 1 << 2,
+ ALARMTYPE_IO2 = 1 << 3,
+ ALARMTYPE_SDCARD = 1 << 4,
+ ALARMTYPE_SDCARD1 = 1 << 5,
+ ALARMTYPE_LOWBAT = 0x41,
+ ALARMTYPE_PIR = 0x42,
+ ALARMTYPE_LOWFU = 0x43,
+ ALARMTYPE_HEAT = 0x50, //高温告警 用于红外热感
+}E_ALARMTYPE;
+
+typedef struct _TimeYMD_T
+{
+ int year;
+ int month;
+ int day;
+ int hour;
+ int min;
+ int sec;
+}TimeYMD_T;
+
 typedef struct tagvideoframeheader
 {
     int frame_type;
@@ -643,6 +670,14 @@ typedef struct tagvideoframeheader
     int frame_len;
     int fts; /* hhmmss */
 }video_frame_header;
+
+
+typedef struct _PushAlarmMsg_T{
+ E_ALARMTYPE alarmType;
+ TimeYMD_T time;
+ float alarmTemperature;
+ int videoDataLen;
+}PushAlarmMsg_T;
 
 struct video_req_type
 {

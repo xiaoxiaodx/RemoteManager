@@ -36,7 +36,7 @@ Rectangle {
         isRevicse = false
         swithNtpEnable.checked = ntpenable
         inputurl.text = url
-        cmbtimezone.currentIndex = zone
+        //cmbtimezone.currentIndex = zone
         swithSummerEnable.checked = summertimeenable
     }
 
@@ -45,7 +45,28 @@ Rectangle {
         if(isRevicse){
             return;
         }else{
-            model.updateTime(isBatchSet,swithNtpEnable.checked,inputurl.text,cmbtimezone.currentIndex,swithSummerEnable.checked);
+            var map = {
+
+                cmd:"setntpparam",
+                ntpenabled:swithNtpEnable.checked,
+                ntpser:inputurl.text,
+            };
+             //model.funP2pSendData("setntpparam",map);
+            if(isBatchSet)
+                deviceModel.funBatchSendData("setntpparam",map);
+            else
+                deviceModel.funSendData1(deviceChannel,"setntpparam",map);
+
+            var map1 = {
+                cmd:"setcurrenttime",
+                timezone:cmbtimezone.currentIndex
+            };
+
+            if(isBatchSet)
+                deviceModel.funSelectSendData("setcurrenttime",map);
+            else
+                model.funP2pSendData("setcurrenttime",map1);
+            //model.updateTime(isBatchSet,swithNtpEnable.checked,inputurl.text,cmbtimezone.currentIndex,swithSummerEnable.checked);
         }
     }
 
@@ -124,7 +145,7 @@ Rectangle {
         textLeftPadding:0
         txtColor: Qt.rgba(0,0,0,0.65)
        color: "#ffffff"
-        //onTextChanged: s_recordPathSet(inputrecordPath.text)
+        onTextChanged:isRevicse = true;
     }
 
     Text {
@@ -181,7 +202,7 @@ Rectangle {
         mRadius:2
         model: timezoneModel
         onCurrentIndexChanged: {
-
+            isRevicse = true;
         }
     }
 
@@ -225,7 +246,7 @@ Rectangle {
         anchors.leftMargin: parSetFirstAlignLine
         anchors.top: line2.bottom
         anchors.topMargin: 20
-
+        onCheckedChanged: isRevicse = true;
     }
 
     Connections{

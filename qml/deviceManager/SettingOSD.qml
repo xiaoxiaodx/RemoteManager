@@ -16,6 +16,7 @@ Rectangle {
 
     color: "#ffffff"
 
+
    property bool isRevicse: false//是否有修改
 
     Settings {
@@ -40,7 +41,16 @@ Rectangle {
         if(isRevicse){
             return;
         }else{
-            model.updateOsd(isBatchSet,swithShow.checked,swithTime.checked,inputDeviceName.text)
+
+            var map = {
+                cmd:"setosdparam",
+                swithNameShow:swithShow.checked,
+                swithTimeShow:swithTime.checked
+            }
+            if(isBatchSet)
+                deviceModel.funBatchSendData("setosdparam",map);
+            else
+                deviceModel.funSendData1(deviceChannel,"setosdparam",map);
         }
     }
 
@@ -85,7 +95,7 @@ Rectangle {
         anchors.leftMargin: parSetFirstAlignLine
         anchors.top: line.bottom
         anchors.topMargin: 20
-       // onCheckedChanged: s_timeSwith(checked)
+        onCheckedChanged: isRevicse = true;
     }
 
     Text {
@@ -126,7 +136,7 @@ Rectangle {
         anchors.leftMargin: parSetFirstAlignLine
         anchors.top: line1.bottom
         anchors.topMargin: 20
-       // onCheckedChanged: s_timeSwith(checked)
+        onCheckedChanged:isRevicse = true;
     }
 
     Text {
@@ -149,15 +159,13 @@ Rectangle {
         anchors.leftMargin: 104
         anchors.top: line1.bottom
         anchors.topMargin: 58
-
-        //text:screenv.funGetCurPath()
         font.pixelSize: fontSize
         placeholderText: ""
         isNeedDoubleClickEdit: false
         textLeftPadding:0
         txtColor: fontColor
         color: "#ffffff"
-        //onTextChanged: s_recordPathSet(inputrecordPath.text)
+        onTextChanged: isRevicse = true;
     }
 
 

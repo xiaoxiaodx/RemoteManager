@@ -100,7 +100,6 @@
         <file>qml/deviceManager/SettingRTMP.qml</file>
         <file>qml/deviceManager/SettingTime.qml</file>
         <file>qml/deviceManager/SettingTemp.qml</file>
-        <file>qml/deviceManager/SettingVideo.qml</file>
         <file>qml/simpleControl/SimpleCheckedButton.qml</file>
         <file>images/systemset/select.png</file>
         <file>images/systemset/unselect.png</file>

@@ -10,6 +10,9 @@
 #include "devicemodel.h"
 #include "application.h"
 #include "facedatamodel.h"
+
+
+#include "warndps.h"
 int main(int argc, char *argv[])
 {
 
@@ -21,17 +24,17 @@ int main(int argc, char *argv[])
     app.setFont(font);
     app.setOrganizationName("GaoZhi"); //1
     app.setOrganizationDomain("gaozhi.com"); //2
-    app.setApplicationName("DoubleLight"); //3
+    app.setApplicationName("remotemanager"); //3
 
     QQmlApplicationEngine engine;
     //    QmlLanguage qmlLanguage(app, engine);
     //    engine.rootContext()->setContextProperty("qmlLanguage", &qmlLanguage);
-
-
     //    QTranslator translator;
     //    translator.load("en_US.qm");
     //    app.installTranslator(&translator);
 
+//    WarnDps warndps;
+//    warndps.initDps();
 
     qmlRegisterType<XVideo>("XVideo", 1, 0, "XVideo");
     qmlRegisterType<ScreenVideo>("ScreenVideo", 1, 0, "ScreenVideo");

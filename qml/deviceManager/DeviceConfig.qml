@@ -9,8 +9,6 @@ import "../simpleControl"
 
 Popup {
     id: root
-
-
     modal: true
     focus: true
     //设置窗口关闭方式为按“Esc”键关闭
@@ -22,9 +20,9 @@ Popup {
     property int fontPixSize: 14
     property color fontColor: "#606266"
     property color bgColor: "#ffffff"
+    property string deviceChannel: "-1"
 
-    //property alias titlename: titletxt.text
-
+    property int curSelectIndex: 0
     Rectangle {
         id: rect
         anchors.fill: parent
@@ -49,18 +47,26 @@ Popup {
                 text: {
 
                     if(isBatchSet){
-                        switch(1){
-                        case 1:
-                            "设备批量配置";
+                        switch(curLanguage){
+                        case lChinese:
+                            "批量配置";
                             break;
                         }
 
                     }else{
-                        "设配配置"
+
+                        switch(curLanguage){
+                        case lChinese:
+                            "设配配置(通道:"+deviceChannel+")"
+                            break;
+                        case lEnglish:
+
+                            break;
+                        }
 
                     }
 
-                    }
+                }
                 color: "white"
             }
 
@@ -93,8 +99,8 @@ Popup {
                 ListElement { name: "RTMP设置"}
                 ListElement { name: "时间设置"}
                 ListElement { name: "温度设置"}
-                ListElement { name: "图像设置"}
             }
+
             Rectangle{
                 id:leftList
                 width: 180
@@ -107,12 +113,12 @@ Popup {
                     anchors.left: parent.left
                     anchors.top: parent.top
                     anchors.topMargin: 20
-                    property int curSelectIndex: 0
+
                     model: leftlistmodel
                     delegate: Rectangle{
                         width: parent.width
                         height: 34
-                        color: leftListv.curSelectIndex === index?"#FFFFFF":"#EEF3FA"
+                        color: curSelectIndex === index?"#FFFFFF":"#EEF3FA"
                         Text {
                             id: itemtext
                             anchors.left: parent.left
@@ -125,28 +131,73 @@ Popup {
 
                         MouseArea{
                             anchors.fill: parent
-                            onClicked:  leftListv.curSelectIndex = index
+                            onClicked:  {
+
+                                curSelectIndex = index
+
+                                console.debug("curSelectIndex   "+curSelectIndex)
+
+                                var deviceInfo = deviceModel.funGetDevice(deviceChannel);
+
+                                switch(index){
+                                case 0:
+                                    console.debug("settingosd:"+deviceInfo.osdTimeShowSwitch+"    "+deviceInfo.osdNameShowSwitch+"    "+deviceInfo.osdName)
+                                    settingosd.setOSD(deviceInfo.osdTimeShowSwitch,deviceInfo.osdNameShowSwitch,deviceInfo.osdName);
+                                    break;
+                                case 1:
+                                    console.debug("settingrecord:"+deviceInfo.recordType+"    "+deviceInfo.recordResolution+"    "+deviceInfo.recordPath+"    "+deviceInfo.recordStartT+"    "+deviceInfo.recordEndT+"    "+deviceInfo.recordWeeklyDate)
+                                    settingrecord.setRecord(deviceInfo.recordType,deviceInfo.recordResolution,deviceInfo.recordPath,deviceInfo.recordStartT,deviceInfo.recordEndT,deviceInfo.recordWeeklyDate)
+                                    break;
+                                case 2:
+                                    console.debug("settingrtmp:"+deviceInfo.rtmpSwitch+"    "+deviceInfo.recordResolution+"    "+deviceInfo.rtmpUrl+"    "+deviceInfo.rtmpUser+"    "+deviceInfo.rtmpPassword)
+                                    settingrtmp.setRtmp(deviceInfo.rtmpSwitch,deviceInfo.recordResolution,deviceInfo.rtmpUrl,deviceInfo.rtmpUser,deviceInfo.rtmpPassword)
+                                    break;
+                                case 3:
+                                    console.debug("settingtime:"+deviceInfo.timeNtpSwtich+"    "+deviceInfo.timeNtpUrl+"    "+deviceInfo.timeZone+"    "+deviceInfo.timeSummerSwitch)
+                                    settingtime.settimePar(deviceInfo.timeNtpSwtich,deviceInfo.timeNtpUrl,deviceInfo.timeZone,deviceInfo.timeSummerSwitch)
+                                    break;
+                                case 4:
+                                    console.debug("setTempPar:"+deviceInfo.tempWarnSwitch+"    "+deviceInfo.tempWarnValue+"    "+deviceInfo.tempScreenShot+"    "+deviceInfo.tempScreenShotPath+"    "+deviceInfo.tempBeerSwitch+"    "+deviceInfo.tempDrift+"    "+deviceInfo.tempControlLevel)
+                                    settingtemp.setTempPar(deviceInfo.tempWarnSwitch,deviceInfo.tempWarnValue,deviceInfo.tempScreenShot,deviceInfo.tempScreenShotPath,deviceInfo.tempBeerSwitch,deviceInfo.tempDrift,deviceInfo.tempControlLevel
+                                                           ,deviceInfo.tempdriftcaplevelMin,deviceInfo.tempdriftcaplevelMax,deviceInfo.tempcontrolcaplevelMin,deviceInfo.tempcontrolcaplevelMax)
+                                    break;
+                                case 5:
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
             }
 
-            SwipeView{
-                id:deviceconfigswipeview
+            Rectangle{
                 anchors.left: leftList.right
                 anchors.top: parent.bottom
                 width: parent.width - leftList.width
                 height: parent.height
-                currentIndex:leftListv.curSelectIndex+1
-                interactive:false
-                orientation: Qt.Vertical;
-                SettingOSD{id:settingosd}
-                SettingRecord{id:settingrecord}
-                SettingRTMP{id:settingrtmp}
-                SettingTime{id:settingtime;color: "#ffffff"}
-                SettingTemp{id:settingtemp;color: "#ffffff"}
-                SettingVideo{id:settingvideo;color: "#ffffff"}
+
+                SwipeView{
+                    id:deviceconfigswipeview
+                    anchors.fill: parent
+                    currentIndex:curSelectIndex+1
+                    interactive:false
+                    onCurrentIndexChanged: {
+                        console.debug(  "currentIndex   "+currentIndex)
+                    }
+                    orientation: Qt.Vertical;
+                    SettingOSD{id:settingosd}
+                    SettingRecord{id:settingrecord}
+                    SettingRTMP{id:settingrtmp}
+                    SettingTime{id:settingtime}
+                    SettingTemp{id:settingtemp}
+                    Rectangle{
+                        id:sss
+                        color:"red";
+                    }
+                }
             }
+
+
 
 
             Rectangle{
@@ -214,28 +265,11 @@ Popup {
         }
     }
 
-    function flushParameterInfo(index){
-
-        var deviceInfo = deviceModel.funGetDevice(index);
-
-        settingosd.setOSD(deviceInfo.osdTimeShowSwitch,deviceInfo.osdNameShowSwitch,deviceInfo.osdName)
-
-        settingrecord.setRecord(deviceInfo.recordType,deviceInfo.recordResolution,deviceInfo.recordPath,deviceInfo.recordStartT,deviceInfo.recordEndT,deviceInfo.recordWeeklyDate)
-
-        settingrtmp.setRtmp(deviceInfo.rtmpSwitch,deviceInfo.recordResolution,deviceInfo.rtmpUrl,deviceInfo.rtmpUser,deviceInfo.rtmpPassword)
-
-        settingtemp.setTempPar(deviceInfo.tempWarnSwitch,deviceInfo.tempWarnValue,deviceInfo.tempScreenShot,deviceInfo.tempScreenShotPath,deviceInfo.tempBeerSwitch,deviceInfo.tempDrift,deviceInfo.tempControlLevel)
-
-        settingtime.settimePar(deviceInfo.timeNtpSwtich,deviceInfo.timeNtpUrl,deviceInfo.timeZone,deviceInfo.timeSummerSwitch)
-    }
 
     function updateParameterInfo(index){
 
-        console.debug("************ "+index)
 
         var deviceInfo = deviceModel.funGetDevice(index);
-
-
 
         settingosd.updateParameterInfo(deviceInfo)
         settingrecord.updateParameterInfo(deviceInfo)

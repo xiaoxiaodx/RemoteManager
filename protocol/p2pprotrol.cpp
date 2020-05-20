@@ -97,13 +97,13 @@ QByteArray P2pProtrol::makeJsonPacket(QString cmd,QVariant msgContent)
         QJsonObject jObjectData ;
         jObjectData.insert("presetid",msgContent.toMap().value("presetid").toString());
 
-         jObject.insert("msgid",msgContent.toMap().value("name").toString());
+        jObject.insert("msgid",msgContent.toMap().value("name").toString());
         jObject.insert("data",jObjectData);
 
     }else if (cmd.compare("removeptzpreset")==0) {
         QJsonObject jObjectData ;
         jObjectData.insert("presetid",msgContent.toMap().value("presetid").toString());
-         jObject.insert("msgid",msgContent.toMap().value("name").toString());
+        jObject.insert("msgid",msgContent.toMap().value("name").toString());
         jObject.insert("data",jObjectData);
 
     }else if (cmd.compare("getrecordinginfo")==0) {//msgid当时间来使用
@@ -114,6 +114,102 @@ QByteArray P2pProtrol::makeJsonPacket(QString cmd,QVariant msgContent)
 
         jObject.insert("msgid",msgContent.toMap().value("msgid").toString());
         jObject.insert("data",jObjectData);
+    }else if(cmd.compare("setosdparam") == 0){
+
+        QJsonObject jObjectData ;
+
+        bool isShowName = msgContent.toMap().value("swithNameShow").toBool();
+        bool isShowTime = msgContent.toMap().value("swithTimeShow").toBool();
+
+
+        QJsonObject jobjectName;
+        jobjectName.insert("enabled",isShowName?1:0);
+        if(msgContent.toMap().contains("osdname")){
+            jobjectName.insert("text",msgContent.toMap().value("osdname").toString());
+        }
+        QJsonObject jobjectTime;
+        jobjectTime.insert("enabled",isShowTime?1:0);
+
+        jObjectData.insert("channeltitle",jobjectName);
+        jObjectData.insert("time",jobjectTime);
+
+
+
+        jObject.insert("data",jObjectData);
+
+    }else if(cmd.compare("setrecordparam")==0){
+
+
+    }else if(cmd.compare("setrtmpinfo")==0){
+
+        QJsonObject jObjectData ;
+        bool enable = msgContent.toMap().value("enable").toBool();
+        int resolution = msgContent.toMap().value("chn").toInt();
+        QString uri = msgContent.toMap().value("streamurl").toString();
+        QString username = msgContent.toMap().value("username").toString();
+        QString password = msgContent.toMap().value("password").toString();
+
+        jObjectData.insert("streamurl",uri);
+        jObjectData.insert("username",username);
+        jObjectData.insert("password",password);
+        jObjectData.insert("chn",resolution);
+        jObjectData.insert("enable",enable?1:0);
+
+        jObject.insert("data",jObjectData);
+
+    }else if(cmd.compare("setntpparam") == 0){
+
+        QJsonObject jObjectData ;
+        bool enable = msgContent.toMap().value("ntpenabled").toBool();
+        QString ntpser = msgContent.toMap().value("ntpser").toString();
+
+        jObjectData.insert("ntpenabled",enable?1:0);
+        jObjectData.insert("ntpser",ntpser);
+
+        jObject.insert("data",jObjectData);
+
+    }else if(cmd.compare("setcurrenttime") == 0){
+
+        QJsonObject jObjectData ;
+        int timezone = msgContent.toMap().value("timezone").toInt();
+
+
+        //jObjectData.insert("QJsonObject",);
+
+
+        jObject.insert("data",jObjectData);
+
+    }else if(cmd.compare("setiradinfo") == 0){
+
+        QJsonObject jObjectData ;
+        bool isWarn = msgContent.toMap().value("switchWarn").toBool();
+        double warnTemp = msgContent.toMap().value("warnTemp").toDouble();
+        int tempdrift = msgContent.toMap().value("tempdrift").toInt();
+        int tempcontrol = msgContent.toMap().value("tempcontrol").toInt();
+        QJsonObject jobjectalarmparam;
+        jobjectalarmparam.insert("enabled",isWarn?1:0);
+        jobjectalarmparam.insert("alarmtemp",warnTemp);
+
+        QJsonObject jobjectctrlparam;
+        jobjectctrlparam.insert("tempdrift",tempdrift);
+        jobjectctrlparam.insert("tempcontrol",tempcontrol);
+
+
+        jObjectData.insert("alarmparam",jobjectalarmparam);
+        jObjectData.insert("ctrlparam",jobjectctrlparam);
+
+
+        jObject.insert("data",jObjectData);
+
+    }else if(cmd.compare("setalarmparam") == 0){
+
+        QJsonObject jObjectData ;
+        bool alarmaudiooutenabled = msgContent.toMap().value("alarmaudiooutenabled").toBool();
+
+        jObjectData.insert("alarmaudiooutenabled",alarmaudiooutenabled?1:0);
+
+        jObject.insert("data",jObjectData);
+
     }
     QJsonDocument jsDoc(jObject);
 
@@ -186,9 +282,7 @@ QMap<QString,QVariant> P2pProtrol::unJsonPacket(QByteArray &arr)
 
         QJsonObject jObjectData1 = jObjectData.value("presets").toObject();
 
-
         QJsonArray jarr = jObjectData1.value("preset").toArray();
-
 
         QVariantList vlist ;
         for (int i=0;i<jarr.size();i++) {
@@ -198,12 +292,10 @@ QMap<QString,QVariant> P2pProtrol::unJsonPacket(QByteArray &arr)
             QString presetname = jvalue.toObject().value("presetname").toString();
             QString presetid = jvalue.toObject().value("presetid").toString();
 
-
             QJsonObject jobjectPos = jvalue.toObject().value("position").toObject();
             int x = jobjectPos.value("x").toInt();
             int y = jobjectPos.value("y").toInt();
             int z = jobjectPos.value("z").toInt();
-
 
             QVariantMap preset;
             preset.insert("presetname",presetname);
@@ -213,15 +305,13 @@ QMap<QString,QVariant> P2pProtrol::unJsonPacket(QByteArray &arr)
             preset.insert("y",z);
 
             vlist.append(preset);
-
-
         }
         map.insert("presets",vlist);
 
 
     }else if(cmd.compare("gotoptzpreset")==0){
 
-         map.insert("name",jsDoc.object().value("msgid"));
+        map.insert("name",jsDoc.object().value("msgid"));
 
     }else if(cmd.compare("removeptzpreset")==0){
 
@@ -241,7 +331,6 @@ QMap<QString,QVariant> P2pProtrol::unJsonPacket(QByteArray &arr)
 
             for(int i=0;i<dataStr.length();i++)
                 listRecord.append(dataStr.at(i));
-
 
             map.insert("data",listRecord);
         }else if (jObjectData.contains("dayInfo")) {
@@ -266,7 +355,175 @@ QMap<QString,QVariant> P2pProtrol::unJsonPacket(QByteArray &arr)
         }
         map.insert("time",jsDoc.object().value("msgid").toString());
 
+    }else if(cmd.compare("getosdparam") == 0){
+        QJsonObject jObjectData = jsDoc.object().value("data").toObject();
+        if(jObjectData.value("channeltitle").toObject().value("enabled").toInt() > 0)
+            map.insert("osdNameShowSwitch",true);
+        else
+            map.insert("osdNameShowSwitch",false);
+
+
+        if(jObjectData.value("time").toObject().value("enabled").toInt() > 0)
+            map.insert("osdTimeShowSwitch",true);
+        else
+            map.insert("osdTimeShowSwitch",false);
+
+        map.insert("osdName",jObjectData.value("channeltitle").toObject().value("text").toString());
+
+    }else if(cmd.compare("getrecordparam") == 0){
+
+        QJsonObject jObjectData = jsDoc.object().value("data").toObject();
+
+
+
+        map.insert("recordStartT",jObjectData.value("time").toObject().value("timesection").toObject().value("starttime").toString());
+        map.insert("recordEndT",jObjectData.value("time").toObject().value("timesection").toObject().value("endtime").toString());
+
+        map.insert("recordResolution",jObjectData.value("clarity").toInt());
+
+        if(jObjectData.value("time").toObject().value("alldayenabled").toInt() > 0){
+            map.insert("recordType",2);
+        }else {
+            map.insert("recordType",0);
+        }
+
+        if(jObjectData.value("time").toObject().value("alldayenabled").toInt() > 0){
+            map.insert("recordWeeklyDate","1111111");
+        }else {
+            int cycle = jObjectData.value("time").toObject().value("timesection").toObject().value("cycle").toInt();
+
+            int zhou1 = cycle & 0x00000001;
+            int zhou2 = cycle & 0x00000002;
+            int zhou3 = cycle & 0x00000004;
+            int zhou4 = cycle & 0x00000008;
+            int zhou5 = cycle & 0x00000010;
+            int zhou6 = cycle & 0x00000020;
+            int zhou7 = cycle & 0x00000040;
+            QString string = "";
+            if(zhou1>0)
+                string.append("1");
+            else
+                string.append("0");
+
+            if(zhou2>0)
+                string.append("1");
+            else
+                string.append("0");
+            if(zhou3>0)
+                string.append("1");
+            else
+                string.append("0");
+            if(zhou4>0)
+                string.append("1");
+            else
+                string.append("0");
+            if(zhou5>0)
+                string.append("1");
+            else
+                string.append("0");
+            if(zhou6>0)
+                string.append("1");
+            else
+                string.append("0");
+            if(zhou7>0)
+                string.append("1");
+            else
+                string.append("0");
+
+            map.insert("recordWeeklyDate",string);
+            qDebug()<<" 星期:"<<string;
+        }
+
+
+    }else if(cmd.compare("getalarmparam") == 0){
+        QJsonObject jObjectData = jsDoc.object().value("data").toObject();
+        if(jObjectData.value("alarmrecordenabled").toInt()>0){
+            map.insert("recordType",1);
+        }
+
+    }else if(cmd.compare("getntpparam") == 0){
+
+        QJsonObject jObjectData = jsDoc.object().value("data").toObject();
+
+        if(jObjectData.value("ntpenabled").toInt() > 0)
+            map.insert("timeNtpSwtich",true);
+        else
+            map.insert("timeNtpSwtich",false);
+        map.insert("timeNtpUrl",jObjectData.value("ntpser").toString());
+    }else if(cmd.compare("getcurrenttime") == 0){
+        QJsonObject jObjectData = jsDoc.object().value("data").toObject();
+
+        map.insert("timeZone",jObjectData.value("timezone").toString());
+
+
+    }else if(cmd.compare("getrtmpinfo") == 0){
+
+        QJsonObject jObjectData = jsDoc.object().value("data").toObject();
+
+        if(jObjectData.value("abrenable").toInt() > 0 )
+            map.insert("rtmpSwitch",true);
+        else
+            map.insert("rtmpSwitch",false);
+
+        map.insert("rtmpUrl",jObjectData.value("servaddr").toString()+jObjectData.value("streamurl").toString());
+        map.insert("rtmpUser",jObjectData.value("username").toString());
+        map.insert("rtmpPassword",jObjectData.value("password").toString());
+        map.insert("rtmpResolution",jObjectData.value("chn").toInt());
+
+    }else if(cmd.compare("getiradinfo") == 0){
+
+        QJsonObject jObjectData = jsDoc.object().value("data").toObject();
+        if(jObjectData.value("alarmparam").toObject().value("enable").toInt() > 0)
+            map.insert("tempWarnSwitch",true);
+        else
+            map.insert("tempWarnSwitch",false);
+
+        map.insert("tempWarnValue",jObjectData.value("alarmparam").toObject().value("alarmtemp").toDouble());
+
+        map.insert("tempdriftcaplevelMin",jObjectData.value("ctrlparamlevel").toObject().value("tempdriftcaplevel").toObject().value("min").toInt());
+        map.insert("tempdriftcaplevelMax",jObjectData.value("ctrlparamlevel").toObject().value("tempdriftcaplevel").toObject().value("max").toInt());
+        map.insert("tempcontrolcaplevelMin",jObjectData.value("ctrlparamlevel").toObject().value("tempcontrolcaplevel").toObject().value("min").toInt());
+        map.insert("tempcontrolcaplevelMax",jObjectData.value("ctrlparamlevel").toObject().value("tempcontrolcaplevel").toObject().value("max").toInt());
+        map.insert("tempDrift",jObjectData.value("ctrlparam").toObject().value("tempdrift").toInt());
+        map.insert("tempControlLevel",jObjectData.value("ctrlparam").toObject().value("tempcontrol").toInt());
+    }else if(cmd.compare("setosdparam") == 0){
+
+    }else if(cmd.compare("setosdparam") == 0){
+
     }
 
     return map;
 }
+
+///******参数设置的属性*******/
+////OSD
+//QML_PROPERTY(bool,osdIsRevise);
+//QML_PROPERTY(bool,osdTimeShowSwitch)
+//QML_PROPERTY(bool,osdNameShowSwitch)
+//QML_PROPERTY(QString,osdName)
+////录像
+//QML_PROPERTY(QString,recordType)// 0 关闭,1 告警录像,2 全部录像
+//QML_PROPERTY(int,recordResolution)
+//QML_PROPERTY(QString,recordPath)
+//QML_PROPERTY(QString,recordStartT)
+//QML_PROPERTY(QString,recordEndT)
+//QML_PROPERTY(QString,recordWeeklyDate)//0 代表 全选， 1-7代表周1-周日
+////rtmp
+//QML_PROPERTY(bool,rtmpSwitch)
+//QML_PROPERTY(QString,rtmpResolution)
+//QML_PROPERTY(QString,rtmpUrl)
+//QML_PROPERTY(QString,rtmpUser)
+//QML_PROPERTY(QString,rtmpPassword)
+////时间设置
+//QML_PROPERTY(bool,timeNtpSwtich)
+//QML_PROPERTY(QString,timeNtpUrl)
+//QML_PROPERTY(QString,timeZone)
+//QML_PROPERTY(bool,timeSummerSwitch)
+////温度设置
+//QML_PROPERTY(bool,tempWarnSwitch)
+//QML_PROPERTY(float,tempWarnValue)
+//QML_PROPERTY(bool,tempScreenShot)
+//QML_PROPERTY(QString,tempScreenShotPath)
+//QML_PROPERTY(bool,tempBeerSwitch)
+//QML_PROPERTY(float,tempDrift)
+//QML_PROPERTY(float,tempControlLevel)

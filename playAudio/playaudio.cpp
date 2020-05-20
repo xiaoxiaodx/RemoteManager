@@ -2,14 +2,10 @@
 
 PlayAudio::PlayAudio(QObject *parent) : QObject(parent)
 {
-
-
     initVariable();
     //    audioFile = new QFile("playAudio.pcm");
     //    if (!audioFile->open(QIODevice::ReadOnly  |QIODevice::WriteOnly))
     //        return;
-
-
 }
 
 
@@ -30,7 +26,6 @@ void PlayAudio::initVariable()
 
 void PlayAudio::slot_GetOneAudioFrame(unsigned char*buff,int len,long pts)
 {
-
 
     if(abortDataLen > 0){
         abortDataLen--;
@@ -61,6 +56,7 @@ void PlayAudio::slot_audioStateChange(QAudio::State state)
         //audioOutput->start(streamOut);
     }
 }
+
 void PlayAudio::slot_preparePlayAudio(int samplerate,int prenum,int bitwidth,int soundmode,long pts)
 {
     preparePlayAudio(samplerate,1,16);

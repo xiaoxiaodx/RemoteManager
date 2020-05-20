@@ -3,13 +3,9 @@
 #include <QTimer>
 #include <QTime>
 #include <QCoreApplication>
-
 #include <fcntl.h>
-
 #include "chttpapidevice.h"
-
 #include <debuglog.h>
-
 
 CHttpApiDevice::CHttpApiDevice(QString devid, QString ip, unsigned short port, QString usr, QString pas)
 {
@@ -23,7 +19,6 @@ CHttpApiDevice::CHttpApiDevice(QString devid, QString ip, unsigned short port, Q
 
     g_tcpsocket = NULL;
     timeHttpSocket = NULL;
-
     //timeoutCnt = new QTimer;
 }
 

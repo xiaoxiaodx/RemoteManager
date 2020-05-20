@@ -54,32 +54,46 @@ Rectangle {
         txttimeStart.text = startT
         txttimeEnd.text = endT
 
-        switch(weekly){
-        case 0:
-            weeklyAllSelect.checked = true;
-            break;
-        case 1:
+        cmbResolution.currentIndex = resolution
+
+
+
+        if(weekly[0] === "1")
             checkMonday.checked = true;
-            break;
-        case 2:
+        else
+            checkMonday.checked = false;
+        if(weekly[1] === "1")
+            checkMonday.checked = true;
+        else
+            checkMonday.checked = false;
+
+        if(weekly[2] === "1")
             checkTusday.checked = true;
-            break;
-        case 3:
-            checkWensday.checked = true;
-            break;
-        case 4:
+        else
+            checkTusday.checked = false;
+
+        if(weekly[3] === "1")
             checkTursday.checked = true;
-            break;
-        case 5:
+        else
+            checkTursday.checked = false;
+
+        if(weekly[4] === "1")
             checkFriday.checked = true;
-            break;
-        case 6:
+        else
+            checkFriday.checked = false;
+
+        if(weekly[5] === "1")
             checkSatday.checked = true;
-            break;
-        case 7:
+        else
+            checkSatday.checked = false;
+
+        if(weekly[6] === "1")
             checkSunday.checked = true;
-            break;
-        }
+        else
+            checkSunday.checked = false;
+
+
+
     }
 
     function updateParameterInfo(model){
@@ -93,7 +107,7 @@ Rectangle {
             if(checkWarnVideo.checked)
                 videoType = 1
             if(checkRecordFullDay.checked)
-               videoType = 2
+                videoType = 2
 
             var weeklySelect = -1;
             if(weeklyAllSelect.checked)
@@ -112,7 +126,26 @@ Rectangle {
                 weeklySelect = 6
             if(checkSunday.checked)
                 weeklySelect = 7
-            model.updateRecord(isBatchSet,videoType,cmbResolution.currentIndex,txttimeStart.text,txttimeEnd.text,weeklySelect)
+
+            //model.updateRecord(isBatchSet,videoType,cmbResolution.currentIndex,txttimeStart.text,txttimeEnd.text,weeklySelect)
+
+
+
+
+            var startt = txttimeStart.text
+            var endt = txttimeEnd.text
+            var map = {
+                cmd:"setrecordparam",
+                clarity:cmbResolution.currentIndex,
+                starttime:startt.replace(":",""),
+                endtime:endt.replace(":",""),
+            }
+
+            if(isBatchSet)
+                deviceModel.funBatchSendData("setrecordparam",map);
+            else
+                deviceModel.funSendData1(deviceIndex,"setrecordparam",map);
+
         }
     }
 
@@ -154,6 +187,7 @@ Rectangle {
         anchors.top: line.bottom
         anchors.topMargin: 20
         text: "录像关闭"
+        onCheckedChanged: isRevicse = true;
     }
 
     SimpleCheckedButton{
@@ -169,6 +203,7 @@ Rectangle {
         anchors.leftMargin: 30
         anchors.verticalCenter: checkRecordClose.verticalCenter
         text: "告警录像"
+        onCheckedChanged: isRevicse = true;
     }
 
     SimpleCheckedButton{
@@ -184,6 +219,7 @@ Rectangle {
         anchors.leftMargin: 30
         anchors.verticalCenter: checkRecordClose.verticalCenter
         text: "全天录像"
+        onCheckedChanged: isRevicse = true;
     }
 
     Text {
@@ -199,8 +235,9 @@ Rectangle {
 
     ListModel{
         id:resolutionModel
-        ListElement{showStr:"1920*1080"}
-        ListElement{showStr:"640*320"}
+        ListElement{showStr:"高清"}
+        ListElement{showStr:"标清"}
+        ListElement{showStr:"流畅"}
     }
 
     MyComBox{
@@ -225,9 +262,8 @@ Rectangle {
         bordColor:"#DEDFE3"
         mRadius:2
         model: resolutionModel
-        onCurrentIndexChanged: {
+        onCurrentIndexChanged:isRevicse = true;
 
-        }
     }
 
     Text {
@@ -267,7 +303,7 @@ Rectangle {
             textLeftPadding:0
             txtColor: fontColor
             color: "#ffffff"
-            //onTextChanged: s_recordPathSet(inputrecordPath.text)
+            onTextChanged: isRevicse = true;
         }
         Image {
             id: imgrecordPath
@@ -339,6 +375,7 @@ Rectangle {
             font.pixelSize: fontSize
             color: fontColor
             text: qsTr("00:00:00")
+            onTextChanged: isRevicse = true;
         }
 
         Image {
@@ -392,6 +429,7 @@ Rectangle {
             font.pixelSize: fontSize
             color: fontColor
             text: qsTr("00:00:00")
+            onTextChanged: isRevicse = true;
         }
 
         Image {
@@ -460,6 +498,7 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: "全选"
+        onCheckedChanged: isRevicse = true;
     }
 
     SimpleCheckedButton{
@@ -474,6 +513,7 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: "周日"
+        onCheckedChanged: isRevicse = true;
     }
 
     SimpleCheckedButton{
@@ -488,6 +528,7 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: "周一"
+        onCheckedChanged: isRevicse = true;
     }
 
     SimpleCheckedButton{
@@ -502,6 +543,7 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: "周二"
+        onCheckedChanged: isRevicse = true;
     }
 
     SimpleCheckedButton{
@@ -516,6 +558,7 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: "周三"
+        onCheckedChanged: isRevicse = true;
     }
 
     SimpleCheckedButton{
@@ -530,6 +573,7 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: "周四"
+        onCheckedChanged: isRevicse = true;
     }
 
     SimpleCheckedButton{
@@ -544,6 +588,7 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: "周五"
+        onCheckedChanged: isRevicse = true;
     }
 
     SimpleCheckedButton{
@@ -558,6 +603,7 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: "周六"
+        onCheckedChanged: isRevicse = true;
     }
 
     Connections{

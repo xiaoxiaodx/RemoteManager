@@ -41,14 +41,14 @@ void P2pWorker::p2pinit()
     if(ret >=0)
         isP2pInitSucc = true;
 
-    qDebug()<<"PPCS_Initialize() ret = "<<ret;
+   // qDebug()<<"PPCS_Initialize() ret = "<<ret;
     st_PPCS_NetInfo NetInfo;
     ret = PPCS_NetworkDetect(&NetInfo, 0);
-    qDebug()<<"PPCS_NetworkDetect() ret = "<<ret;
-    qDebug()<<"-------------- NetInfo: -------------------";
-    qDebug()<<"Internet Reachable:     "<<((NetInfo.bFlagInternet == 1) ? "YES":"NO");
-    qDebug()<<"P2P Server IP resolved :"<<((NetInfo.bFlagHostResolved == 1) ? "YES":"NO");
-    qDebug()<<"P2P Server Hello Ack   : "<<((NetInfo.bFlagServerHello == 1) ? "YES":"NO");
+//    qDebug()<<"PPCS_NetworkDetect() ret = "<<ret;
+//    qDebug()<<"-------------- NetInfo: -------------------";
+//    qDebug()<<"Internet Reachable:     "<<((NetInfo.bFlagInternet == 1) ? "YES":"NO");
+//    qDebug()<<"P2P Server IP resolved :"<<((NetInfo.bFlagHostResolved == 1) ? "YES":"NO");
+//    qDebug()<<"P2P Server Hello Ack   : "<<((NetInfo.bFlagServerHello == 1) ? "YES":"NO");
 
     char nat_type[64];
     memset(nat_type,0x0,sizeof(nat_type));
@@ -62,9 +62,9 @@ void P2pWorker::p2pinit()
         strncpy(nat_type,"unknown",sizeof(nat_type));
         break;
     }
-    qDebug()<<"NAT Type	: "<<nat_type;
-    qDebug()<<"My LAN IP	: "<<NetInfo.MyLanIP;
-    qDebug()<<"My WAN IP	: "<<NetInfo.MyWanIP;
+//    qDebug()<<"NAT Type	: "<<nat_type;
+//    qDebug()<<"My LAN IP	: "<<NetInfo.MyLanIP;
+//    qDebug()<<"My WAN IP	: "<<NetInfo.MyWanIP;
 }
 
 void P2pWorker::stopWoring()
@@ -155,10 +155,14 @@ void P2pWorker::slot_startLoopRead()
                 }else if (ERROR_PPCS_SESSION_CLOSED_REMOTE == ret){
 
                     qDebug()<<"***************  "<<"远程关闭"<<ret;
+                    isWorking = false;
                     emit signal_p2pConnectState(m_name,0,m_did,m_account,m_password);
+                    break;
                 }else{
                     qDebug()<<"***************  "<<"P2P异常"<<ret;
+                    isWorking = false;
                     emit signal_p2pConnectState(m_name,0,m_did,m_account,m_password);
+                    break;
                 }
             }else {
                 char buff[1024*1024];
@@ -168,14 +172,16 @@ void P2pWorker::slot_startLoopRead()
                 if(ERROR_PPCS_SUCCESSFUL == ret){
                     // qDebug()<<"通道"<<i<<" 有"<<readSize<<"个数据：";
 
-
                     if(i == 1){
                         this->processUnPkg(buff,(int)readSize);
 
-                    }else if(i==0){
+                    }else if(i==0){//命令通道
+                        this->processUnPkg1(buff,(int)readSize);
+                    }else if(i ==2){
+                        //qDebug()<<"通道*** "<<i<<" 有"<<readSize<<"个数据："<<endl;
                         this->processUnPkg1(buff,(int)readSize);
                     }
-                    //qDebug()<<"通道*** "<<i<<" 有"<<readSize<<"个数据："<<endl;
+
                 }
             }
         }
@@ -357,6 +363,8 @@ void P2pWorker::processUnPkg(char *buff,int len)
 
         if(readDataBuffStream.length() >= needLen){
 
+
+            QVariantMap map;
             if(m_cmd == CMD_USR_KEY){
 
                 QByteArray arr ;
@@ -397,14 +405,10 @@ void P2pWorker::processUnPkg(char *buff,int len)
                     qDebug()<<"找到 CMD_LOGIN  内容:"<<returnStr;
 
                     if(returnStr.contains("error")){
-
                         emit signal_loginState(0);
-
                     }else
                         emit signal_loginState(1);
-
                 }
-
             }else if(m_cmd == CMD_VIDEO_TRNS){
 
                 QByteArray arr;
@@ -476,32 +480,30 @@ void P2pWorker::processUnPkg(char *buff,int len)
 
             }else if(m_cmd == CMD_REC_STOP){
 
-                QVariantMap map;
                 map.insert("cmd","replay stop");
                 emit signal_p2pReplyData(m_name,map);
             }else if(m_cmd == CMD_REC_PAUSE){
 
 
-                QVariantMap map;
                 map.insert("cmd","replay pause");
                 emit signal_p2pReplyData(m_name,map);
             }else if(m_cmd == CMD_REC_CONTINUE){
 
-                QVariantMap map;
                 map.insert("cmd","replay continue");
+
                 emit signal_p2pReplyData(m_name,map);
             }else if(m_cmd == CMD_NEW_PROTROL){
 
                 QByteArray arr ;
                 arr.append(readDataBuffStream.data(),needLen);
-                QVariantMap map = p2pProtrol.unJsonPacket(arr);
+                map = p2pProtrol.unJsonPacket(arr);
+                //qDebug()<<"新协议:"<<m_cmd;
 
-                qDebug()<<"新协议:"<<m_cmd;
-
-                emit signal_p2pReplyData(m_name,map);
 
             }else
                 qDebug()<<"未知命令111:"<<m_cmd;
+
+
 
             readDataBuffStream.remove(0,needLen);
             resetStramParseVariant();
@@ -586,6 +588,9 @@ void P2pWorker::processUnPkg1(char *buff,int len)
         }
 
         if(readDataBuffCmd.length() >= cmdneedLen){
+
+
+            QVariantMap callbackmap;
 
             if(mCmd_cmd == CMD_USR_KEY){
 
@@ -698,22 +703,48 @@ void P2pWorker::processUnPkg1(char *buff,int len)
                 //QThread::msleep(2);
                 //emit signal_sendReplayPcmALaw(m_name,arr.data(), arr.length(),1000);
 
+            }else if(mCmd_cmd == CMD_PUSHIMAGE_GET){
+                QByteArray arr ;
+                arr.append(readDataBuffCmd.data(),cmdneedLen);
+
+                PushAlarmMsg_T *alarmMsg = (PushAlarmMsg_T*)(readDataBuffCmd.data());
+               //  qDebug()<<" PushAlarmMsg_T  float:"<<sizeof(float);
+//                qDebug()<<" PushAlarmMsg_T  "<<alarmMsg->alarmTemperature<<"    "<<alarmMsg->alarmType;
+//                qDebug()<<" PushAlarmMsg_T  "<<cmdneedLen<<"    "<<alarmMsg->videoDataLen;
+//                qDebug()<<" PushAlarmMsg_T  "<<alarmMsg->time.year<<"    "<<alarmMsg->time.month<<" "<< alarmMsg->time.hour;
+
+//                int img1 = 0x000000ff & readDataBuffCmd.at(36);
+//                int img2 = 0x000000ff & readDataBuffCmd.at(37);
+
+
+                QDateTime datetime;
+                QDate date;
+                QTime time;
+                date.setDate(alarmMsg->time.year,alarmMsg->time.month,alarmMsg->time.day);
+                time.setHMS(alarmMsg->time.hour,alarmMsg->time.min,alarmMsg->time.sec);
+                datetime.setDate(date);
+                datetime.setTime(time);
+                QVariantMap map;
+                map.insert("datetime",datetime);
+                map.insert("alarmType",alarmMsg->alarmType);
+                map.insert("alarmTemperature",alarmMsg->alarmTemperature);
+
+                QByteArray arrimg = readDataBuffCmd.mid(36,alarmMsg->videoDataLen);
+                emit signal_sendWarnImg(map,arrimg);
+
             }else if(mCmd_cmd == CMD_REC_STOP){
 
-                QVariantMap map;
-                map.insert("cmd","replay stop");
-                emit signal_p2pReplyData(m_name,map);
+                callbackmap.insert("cmd","replay stop");
+                emit signal_p2pReplyData(m_name,callbackmap);
             }else if(mCmd_cmd == CMD_REC_PAUSE){
 
-
-                QVariantMap map;
-                map.insert("cmd","replay pause");
-                emit signal_p2pReplyData(m_name,map);
+                callbackmap.insert("cmd","replay pause");
+                emit signal_p2pReplyData(m_name,callbackmap);
             }else if(mCmd_cmd == CMD_REC_CONTINUE){
 
-                QVariantMap map;
-                map.insert("cmd","replay continue");
-                emit signal_p2pReplyData(m_name,map);
+
+                callbackmap.insert("cmd","replay continue");
+                emit signal_p2pReplyData(m_name,callbackmap);
             }else if(mCmd_cmd == CMD_NEW_PROTROL){
 
                 QByteArray arr ;
@@ -722,14 +753,18 @@ void P2pWorker::processUnPkg1(char *buff,int len)
 
                 qDebug()<<"新协议:"<<mCmd_cmd;
 
-                emit signal_p2pReplyData(m_name,map);
+                emit signal_p2pReplyData(map.value("cmd").toString(),map);
 
             }else if(mCmd_cmd == CMD_GET_VIDEO_INFO){
-                qDebug()<<"新协议:"<<mCmd_cmd;
+                qDebug()<<"新协议:CMD_GET_VIDEO_INFO";
             }else if(mCmd_cmd == CMD_VIDEO_REQ){
-                qDebug()<<"新协议:"<<mCmd_cmd;
-            }
-            qDebug()<<"未知命令1:"<<mCmd_cmd;
+                    callbackmap.insert("cmd","getVedio");
+                 emit signal_p2pReplyData(m_name,callbackmap);
+            }else if(mCmd_cmd == CMD_VIDEO_STOP){
+                qDebug()<<"新协议:CMD_VIDEO_STOP";
+
+            }else
+                qDebug()<<"未知命令1:"<<mCmd_cmd;
 
             readDataBuffCmd.remove(0,cmdneedLen);
             resetCmdParseVariant();

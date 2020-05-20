@@ -24,8 +24,6 @@ void DeviceModel::funflushDevice()
         QString strBuff(arr);
         QStringList listBuff = strBuff.split("\n");
 
-
-
         for(int i=0;i<listBuff.size();i++){
 
             QString lineDataStr = listBuff.at(i);
@@ -35,14 +33,14 @@ void DeviceModel::funflushDevice()
 
             QStringList datemodelStr = lineDataStr.split(" ");
 
-            if(datemodelStr.length() == 3){
-                funAddDevice(datemodelStr[0],datemodelStr[1],"admin","admin");
+            if(datemodelStr.length() == 4){
+                emit signal_channelUse(datemodelStr[2]);
+                funAddDevice(datemodelStr[0],datemodelStr[1],datemodelStr[2],"admin","admin");
             }
         }
 
         file.close();
     }
-
 }
 
 DeviceModel::~DeviceModel()
@@ -52,10 +50,13 @@ DeviceModel::~DeviceModel()
 
         for(int i=0;i<m_listDevice.size();i++){
 
-            DeviceModelData *modeldate = m_listDevice.at(0);
-            QString imgInfoStr = modeldate->deviceId()+" "+modeldate->deviceName()+" "+modeldate->recordSavePath();
+            DeviceModelData *modeldate = m_listDevice.at(i);
+
+            QString imgInfoStr = modeldate->deviceId()+" "+modeldate->deviceName()+" "+modeldate->deviceChannel()+" "+modeldate->recordSavePath();
+            //qDebug()<<"imgInfoStr   " <<imgInfoStr;
             QTextStream out(&file);
             out <<imgInfoStr << "\n";
+
         }
         file.close();
     }
@@ -73,20 +74,27 @@ void DeviceModel::funSetAllSelect(bool isSelect)
 }
 
 
-void DeviceModel::funAddDevice(QString deviceID,QString name,QString account,QString pwd)
+void DeviceModel::funAddDevice(QString deviceID,QString name,QString channel,QString account,QString pwd)
 {
 
     qDebug()<<      "funAddDevice   "<<m_isAllSelect<<" "<<m_recordPath;
 
     beginInsertRows(QModelIndex(),m_listDevice.size(),m_listDevice.size());
-    DeviceModelData *modeldata = new DeviceModelData(m_isAllSelect,deviceID,name,-1,m_recordPath,0);
+    DeviceModelData *modeldata = new DeviceModelData(m_isAllSelect,deviceID,name,channel,m_recordPath,0);
     connect(modeldata,&DeviceModelData::signal_flushConnectState,this,&DeviceModel::slot_flustConnectState);
     connect(modeldata,&DeviceModelData::signal_recReplayVedio,this,&DeviceModel::slot_recReplayVedio);
     connect(modeldata,&DeviceModelData::signal_recPlayVedio,this,&DeviceModel::slot_recPlayVedio);
     connect(modeldata,&DeviceModelData::signal_p2pReplyData,this,&DeviceModel::slot_recRepkyData);
+    connect(modeldata,&DeviceModelData::signal_sendWarnInfo,this,&DeviceModel::slot_sendWarnInfo);
+
     modeldata->createP2pThread(deviceID,account,pwd);
     m_listDevice.append(modeldata);
     endInsertRows();
+}
+
+void DeviceModel::slot_sendWarnInfo(QString channle ,QString name,QVariantMap map,QByteArray arrimg)
+{
+    emit signal_sendWarnInfo(channle,name ,map, arrimg);
 }
 
 void DeviceModel::slot_recPlayVedio(QString name ,QVariant img)
@@ -103,7 +111,7 @@ void DeviceModel::slot_recRepkyData(QString name ,QVariant smap)
     emit signal_p2pCallbackReply(name,smap);
 }
 
-void DeviceModel::funSendData(int index,QString cmd,QVariant map)
+void DeviceModel::funSendData(int index,QString cmd,QVariantMap map)
 {
     if(index >= m_listDevice.size())
         return;
@@ -112,13 +120,26 @@ void DeviceModel::funSendData(int index,QString cmd,QVariant map)
         modeldata->funP2pSendData(cmd,map);
 }
 
-void DeviceModel::funSendData1(QString name,QString cmd,QVariant map)
+void DeviceModel::funBatchSendData(QVariantMap map){
+
+    for (int i=0;i<m_listDevice.size();i++) {
+
+        if(m_listDevice.at(i)->isSelect()){
+            DeviceModelData *date = m_listDevice.takeAt(i);
+            date->funP2pSendData("",map);
+        }
+    }
+}
+
+
+
+void DeviceModel::funSendData1(QString channel,QString cmd,QVariantMap map)
 {
 
-    qDebug()<<"funSendData1 "<<name;
+    qDebug()<<"funSendData1 "<<channel;
     for (int i=0;i<m_listDevice.size();i++) {
         DeviceModelData *modeldata = m_listDevice.at(i);
-        if(modeldata != nullptr && modeldata->deviceName().compare(name)==0){
+        if(modeldata != nullptr && modeldata->deviceChannel().compare(channel)==0){
             modeldata->funP2pSendData(cmd,map);
             break;
         }
@@ -133,6 +154,20 @@ void DeviceModel::slot_flustConnectState()
     beginResetModel();
     endResetModel();
 }
+
+QVariant DeviceModel::funGetDevice(QString channel)
+{
+
+    for (int i= 0;i<m_listDevice.size() ;i++) {
+        DeviceModelData *modeldata = m_listDevice.at(i);
+        if(modeldata->deviceChannel().compare(channel)==0){
+
+            return QVariant::fromValue(modeldata);
+        }
+    }
+
+}
+
 
 QVariant DeviceModel::funGetDevice(int index)
 {
@@ -222,7 +257,7 @@ bool DeviceModel::setData(const QModelIndex &index, const QVariant &value, int r
         else if(role == DEVICEID)
             modelData->setdeviceId(value.toString());
         else if(role == DEVICECHANNEL)
-            modelData->setdeviceChannel(value.toInt());
+            modelData->setdeviceChannel(value.toString());
         else if(role == RECORDSAVEPATH)
             modelData->setrecordSavePath(value.toString());
         else if(role == NETSTATE)

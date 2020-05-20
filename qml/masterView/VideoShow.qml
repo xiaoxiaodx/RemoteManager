@@ -19,7 +19,7 @@ Rectangle {
 
     property string shotScrennFilePath: ""
     property string recordingFilePath: ""
-    property string belongDeviceName: ""
+    property string belongDevice: ""
 
 //    border.color: mIsSelected?"#409EFF":"#00000000"
 //    border.width: 2
@@ -71,7 +71,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: 5
         anchors.top: parent.top
-        text: belongDeviceName
+        text: belongDevice
     }
 
     Image {
@@ -218,11 +218,10 @@ Rectangle {
     Connections{
         target: deviceModel
         onSignal_p2pCallbackVideoData:{
-           // console.debug("***************  "+name + "  "+belongDeviceName)
-            if(belongDeviceName === name)
+            //console.debug("***************  "+name + "  "+belongDeviceName)
+            if(belongDevice === name)
                 video.funSendVideoData(h264Arr)
         }
-
     }
 
 

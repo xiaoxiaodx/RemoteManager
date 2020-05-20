@@ -7,7 +7,8 @@ Rectangle {
     property int checkedHeaderLeftMargin: 22
     property int deviceIDHeaderLeftMargin: 46
     property int deviceNameHeaderLeftMargin: 244
-    property int recordPathHeaderLeftMargin: 419
+     property int deviceChnHeaderLeftMargin: 350
+    property int recordPathHeaderLeftMargin: 450 //419
     property int stateHeaderLeftMargin: 793
     property int doHeaderLeftMargin: 969
     property int fontSize: 14
@@ -133,12 +134,7 @@ Rectangle {
                 anchors.fill: parent
 
                 onClicked: {
-                    //deviceModel.funtest();
-
-                    deviceconfig.isBatchSet = true
-
-
-                    deviceconfig.open()
+                    openDeviceConfig(true,"-1");
                 }
                 onPressed: rectBatchSet.color = "#B3E19D"
                 onReleased: rectBatchSet.color = "#71C648"
@@ -328,6 +324,18 @@ Rectangle {
                 font.bold: curLanguage===lKorean
                 text: qsTr("名称")
             }
+
+            Text {
+                id: txtChn
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: parent.left
+                anchors.leftMargin: deviceChnHeaderLeftMargin
+                font.pixelSize: fontSize
+                color: "#333333"
+                font.bold: curLanguage===lKorean
+                text: qsTr("通道")
+            }
+
             Text {
                 id: txtRecordPath
 
@@ -371,7 +379,11 @@ Rectangle {
             z:0
             ScrollBar.vertical: ScrollBar {size:10}
 
-            Component.onCompleted: deviceModel.funflushDevice();
+            Component.onCompleted: {
+
+                deviceModel.funflushDevice();
+
+            }
             delegate: Rectangle{
                 property bool enter: false
                 width: parent.width
@@ -415,6 +427,15 @@ Rectangle {
                     anchors.leftMargin: deviceNameHeaderLeftMargin
                     font.pixelSize: fontSize
                     text: model.deviceName;
+                }
+
+                Text {
+                    id: deviceChn
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: deviceChnHeaderLeftMargin
+                    font.pixelSize: fontSize
+                    text: model.deviceChannel;
                 }
 
                 Text {
@@ -554,11 +575,9 @@ Rectangle {
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            deviceconfig.isBatchSet = false
-                            deviceconfig.open()
-                            setDevicePar(model);
-                            // deviceModel.recordSavePath = "11111111";
-                            //recordSavePath
+
+                            openDeviceConfig(false,model.deviceChannel)
+
                         }
                     }
                 }
@@ -578,11 +597,16 @@ Rectangle {
         }
     }
 
-    DeviceConfig{
-        id:deviceconfig
-        width: 800
-        height: 600
-        anchors.centerIn: parent
+
+
+    function openDeviceConfig(isBatchSet,channel){
+        deviceconfig.isBatchSet = isBatchSet
+        deviceconfig.deviceChannel = channel
+        //deviceconfig.flushParameterInfo(channel);
+
+        var deviceInfo = deviceModel.funGetDevice(channel);
+        deviceInfo.fungetInitPar();
+        deviceconfig.open()
     }
 
     function setDevicePar(model){
@@ -601,7 +625,6 @@ Rectangle {
         }
     }
 
-
     Connections{
         target: main
         onS_setLanguage:setLanguage(typeL);
@@ -619,7 +642,6 @@ Rectangle {
             txtRecordPath.text = "Storage path"
             txtState.text = "Network status"
             txtDo.text = "Operate"
-
             netstateModel.get(0).showStr = "Online"
             netstateModel.get(1).showStr = "Offline"
             break;

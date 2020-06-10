@@ -20,7 +20,7 @@
 #include "ffmpegcodec.h"
 //#include "avirecord.h"
 
-
+class DeviceModelData;
 class ImageInfo1{
 
 public:
@@ -38,17 +38,15 @@ public:
     Q_INVOKABLE void funSendAudioData(char *buff,int len);
 
 
-
-
     explicit XVideoReplay();
     ~XVideoReplay();
 
 signals:
-
+    void signal_timeDate(quint64 pts);
 
 public slots:
-
-
+    void slot_recReolayImg(QImage *img,quint64 pts);
+    void slot_recReplayH264(QString name ,QVariant img,long long pts);
 protected:
     QSGNode* updatePaintNode(QSGNode *old, UpdatePaintNodeData *);
 private:
@@ -85,5 +83,9 @@ private:
     quint64 preAudioTime;
     static int testIdIndex;
     int testID;
+
+
+
+    DeviceModelData *modeldata1 = nullptr;
 };
 #endif // XVideoReplayREPLAY_H

@@ -65,14 +65,14 @@ Rectangle {
         swichBeer.checked = beerenable
         inputTempDrift.text = drift
         inputTempMin.text = threshold
-        tempdriftcapMax = tempdriftcaplevelMax;
-        tempdriftcapMin = tempdriftcaplevelMin;
-        tempcontrolcapMin = tempcontrolcaplevelMin
-        tempcontrolcapMax = tempcontrolcaplevelMax
+        tempcontrolcapMax  = tempdriftcaplevelMax;
+        tempcontrolcapMin = tempdriftcaplevelMin;
+        tempdriftcapMin = tempcontrolcaplevelMin
+        tempdriftcapMax = tempcontrolcaplevelMax
     }
-    function updateParameterInfo(modle){
+    function updateParameterInfo(){
 
-        if(isRevicse){
+        if(!isRevicse){
             return;
         }else{
 
@@ -84,9 +84,9 @@ Rectangle {
                 tempcontrol:inputTempMin.text
             }
             if(isBatchSet)
-                deviceModel.funSelectSendData("setiradinfo",map);
+                deviceModel.funBatchSendData("setiradinfo",map);
             else
-                model.funP2pSendData("setiradinfo",map);
+                deviceModel.funSendData1(deviceChannel,"setiradinfo",map);
 
 
             var map1 ={
@@ -94,9 +94,9 @@ Rectangle {
                 alarmaudiooutenabled:swichBeer.checked
             }
             if(isBatchSet)
-                deviceModel.funSelectSendData("setalarmparam",map1);
+                deviceModel.funBatchSendData("setalarmparam",map1);
             else
-                model.funP2pSendData("setalarmparam",map1);
+                deviceModel.funSendData1(deviceChannel,"setalarmparam",map1);
 
             //model.updateTemp(isBatchSet,swichWarn.checked,inputTem.text,swichScreenShot.checked,inputScreenShotPath.text,inputTempDrift.text,inputTempMin.text);
         }
@@ -112,7 +112,7 @@ Rectangle {
             id: txtparset
             font.pixelSize: 14
             color: fontColor
-            text: qsTr("参数设置")
+            text: mylanguage.ParaSet
             anchors.leftMargin: 20
             anchors.bottom: line2.top
             anchors.left: line2.left
@@ -130,7 +130,7 @@ Rectangle {
 
         Text {
             id: txtSwichWarn
-            text: qsTr("报警")
+            text: mylanguage.Alarm
             font.pixelSize: fontSize
             color: fontColor
             anchors.right: swichWarn.left
@@ -154,7 +154,7 @@ Rectangle {
         }
         Text {
             id: txtWarnTemSet
-            text: qsTr("温度设置")
+            text: mylanguage.AlarmTempSet
             color: fontColor
             font.pixelSize: fontSize
             anchors.right: inputTem.left
@@ -193,7 +193,7 @@ Rectangle {
 
         Text {
             id: txtSwichScreenShot
-            text: qsTr("抓拍开关")
+            text: mylanguage.Snapshot
             font.pixelSize: fontSize
             color: fontColor
             anchors.right: swichScreenShot.left
@@ -217,7 +217,7 @@ Rectangle {
 
         Text {
             id: txtScreenShotPath
-            text: qsTr("存储路径")
+            text:mylanguage.SnapshotPath
             font.pixelSize: fontSize
             color: fontColor
             anchors.right: rectScreenShotPath.left
@@ -282,7 +282,7 @@ Rectangle {
 
         Text {
             id: txtSwichBeer
-            text: qsTr("蜂鸣开关")
+            text: mylanguage.Beer
             font.pixelSize: fontSize
             color: fontColor
             anchors.right: swichBeer.left
@@ -304,7 +304,7 @@ Rectangle {
 
         Text {
             id: txtTempDrift
-            text: qsTr("温漂设置")
+            text: mylanguage.TempDriftSet
             color: fontColor
             font.pixelSize: fontSize
             anchors.right: rectTempDrift.left
@@ -408,7 +408,7 @@ Rectangle {
         ////////////
         Text {
             id: txtTempMin
-            text: qsTr("温度控制阀")
+            text: mylanguage.TempControlValue
             color: fontColor
             font.pixelSize: fontSize
             anchors.right: rectTempMin.left
@@ -750,37 +750,4 @@ Rectangle {
 
 
 
-    Connections{
-        target: main
-        onS_setLanguage:setLanguage(typeL);
-    }
-
-    function setLanguage(type){
-
-        switch(type){
-        case lEnglish:
-
-            txtScreenShotPath.text = "Storage Path"
-            txtWarnTemSet.text = "Alarm Temperature"
-            txtparset.text = "Parameter Settings"
-            txtSwichBeer.text = "Buzzer"
-            txtSwichScreenShot.text = "Snapshot"
-            txtSwichWarn.text = "Alarm"
-            txtTempMin.text = "Temperature control valve"
-            txtTempDrift.text = "Temperature drift setting"
-            break;
-        case lChinese:
-
-            txtScreenShotPath.text = "抓拍存储路径"
-            txtWarnTemSet.text = "告警温度设置"
-            txtparset.text = "参数设置"
-            txtSwichBeer.text = "蜂鸣开关"
-            txtSwichScreenShot.text = "抓拍开关"
-            txtSwichWarn.text = "报警开关"
-            txtTempMin.text = "温度控制阀"
-            txtTempDrift.text = "温漂设置"
-            break;
-
-        }
-    }
 }

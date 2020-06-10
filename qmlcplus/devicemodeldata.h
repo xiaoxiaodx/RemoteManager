@@ -7,6 +7,9 @@
 #include <QTimer>
 
 class P2pWorker;
+
+#include "XVideo.h"
+#include "xvideoreplay.h"
 class DeviceModelData : public QObject
 {
 
@@ -14,13 +17,31 @@ class DeviceModelData : public QObject
 
 
 public:
-    explicit DeviceModelData(const bool &isSelect,const QString &deviceId,const QString &deviceName,QString deviceChannel,QString recordSavePath,int netState,bool isLogin = false,QObject *parent=nullptr):
+    explicit DeviceModelData(QObject* objplay,QObject *objreplay,const bool &isSelect,const QString &deviceId,const QString &deviceName,QString deviceChannel,QString recordSavePath,int netState,bool isLogin = false,QObject *parent=nullptr):
         QObject(parent),m_isSelect(isSelect),
         m_deviceId(deviceId),m_deviceName(deviceName),m_deviceChannel(deviceChannel),
-        m_recordSavePath(recordSavePath),m_netState(netState),m_isLogin(isLogin){}
+        m_recordSavePath(recordSavePath),m_netState(netState),m_isLogin(isLogin){
+
+
+        playVideo = dynamic_cast<XVideo*>(objplay);
+        replayVideo= dynamic_cast<XVideoReplay *>(objreplay);
+    }
+    ~DeviceModelData();
+    enum PlayStates{
+        STOP = 0,
+        PLAY,
+        PAUSE,
+        FORSEPAUSE,
+        SWITCH,//回放和实时 切换状态
+    };
+
+    PlayStates playState = STOP;
+    PlayStates replayState = STOP;
+
 
     Q_INVOKABLE void funP2pSendData(QString cmd,QVariantMap map);
     Q_INVOKABLE void fungetInitPar();
+
     QML_PROPERTY(bool,isSelect)
     QML_PROPERTY(QString,deviceId)
     QML_PROPERTY(QString,deviceName)
@@ -31,7 +52,7 @@ public:
 
     /******参数设置的属性*******/
     //OSD
-    QML_PROPERTY(bool,osdIsRevise);
+    QML_PROPERTY(bool,osdIsRevise)
     QML_PROPERTY(bool,osdTimeShowSwitch)
     QML_PROPERTY(bool,osdNameShowSwitch)
     QML_PROPERTY(QString,osdName)
@@ -66,12 +87,12 @@ public:
     QML_PROPERTY(int,tempcontrolcaplevelMax)    //13
     QML_PROPERTY(int,tempcontrolcaplevelMin)  // 1
 
-   // QML_PROPERTY(float,tempControlLevel)
-
-    //
 public:
-
+    QThread *m_p2pThread = nullptr;
+    P2pWorker *p2pWorker = nullptr;
     void createP2pThread(QString deviceDid,QString name,QString pwd);
+
+    QString getDeviceIdefiy();
 signals:
     void signal_flushConnectState();
     void signal_connectP2pDev(QString deviceDid,QString name,QString pwd);
@@ -82,11 +103,12 @@ signals:
     void signal_sendWarnInfo(QString channle ,QString name,QVariantMap map,QByteArray arrimg);
 public slots:
     void slot_recH264(QString name ,QVariant img,long long pts);
+    void slot_recImg(QImage *img,quint64 pts);
     void slot_recPcmALaw(QString name ,char* PcmALawArr,int arrLen,long long pts);
     void slot_reConnectP2pDev(QString deviceDid,QString name,QString pwd);
     void slot_connectState(QString name,int a,QString did,QString acc,QString pwd);
     void slot_recReplayH264(QString name ,QVariant img,long long pts);
-
+    void slot_recReplayImg(QImage *img,quint64 pts);
     void slot_sendWarnImg(QVariantMap map,QByteArray arrimg);
 
     void slot_p2pReplyData(QString name,QVariantMap map);
@@ -101,20 +123,14 @@ private:
     void updatePar(QVariantMap map);
     void removeAlreadySend(QString cmd,QString msgid1);
 
-
-    QThread *m_p2pThread = nullptr;
-    P2pWorker *p2pWorker = nullptr;
-
-
     QTimer SendTimer,subscriptionTimer;
-    int sendertimerInter = 300;
+    int sendertimerInter = 100;
     QList<QVariantMap> listMsg;
     QMap<QString,QVariant> warnPushMap;
     //WarnTcpServer *warnTcpServer = nullptr;
 
-
-
-
+    XVideo *playVideo = nullptr;
+    XVideoReplay *replayVideo = nullptr;
 };
 
 #endif // DEVICEMODELDATA_H

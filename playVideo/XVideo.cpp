@@ -79,12 +79,39 @@ QSGNode* XVideo::updatePaintNode(QSGNode *old, UpdatePaintNodeData *data)
     //实时更新纹理而不使用老的纹理 是因为老的纹理的宽高未发生变化
 }
 
+
+void XVideo::recImg(QImage *tmpImg)
+{
+    if (tmpImg != nullptr && (!tmpImg->isNull()))
+    {
+
+        ImageInfo imgInfo;
+        imgInfo.pImg = tmpImg;
+        //imgInfo.time = time;
+
+        // qDebug()<<QString(__FUNCTION__) + "    "+QString::number(__LINE__) ;
+        if(listImgInfo.size() < minBuffLen){
+
+            listImgInfo.append(imgInfo);
+            update();
+        }else
+            delete tmpImg;
+    }else{
+        qDebug()<<" XVideo funSendVideoData "<<"没有图片信息";
+
+    }
+}
+
+void XVideo::slot_sendH264(QString name ,QVariant img,long long pts)
+{
+    funSendVideoData(img);
+}
+
 void XVideo::funSendVideoData(QVariant buff1)
 {
 
     //qDebug()<<" XVideo funSendVideoData";
     QImage *tmpImg = buff1.value<QImage*>();
-
 
     if (tmpImg != nullptr && (!tmpImg->isNull()))
     {
@@ -117,6 +144,8 @@ void XVideo::funSendAudioData(char *buff,int len)
 XVideo::~XVideo()
 {
 
+
+    //qDebug()<<" XVideo  析构";
     ////    if(playAudioThread != nullptr)
     ////        playAudioThread->quit();
 

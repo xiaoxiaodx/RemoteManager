@@ -10,9 +10,8 @@
 #include "devicemodel.h"
 #include "application.h"
 #include "facedatamodel.h"
+#include "mylanguage.h"
 
-
-#include "warndps.h"
 int main(int argc, char *argv[])
 {
 
@@ -33,8 +32,7 @@ int main(int argc, char *argv[])
     //    translator.load("en_US.qm");
     //    app.installTranslator(&translator);
 
-//    WarnDps warndps;
-//    warndps.initDps();
+
 
     qmlRegisterType<XVideo>("XVideo", 1, 0, "XVideo");
     qmlRegisterType<ScreenVideo>("ScreenVideo", 1, 0, "ScreenVideo");
@@ -45,6 +43,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<WarnModel>("WarnModel", 1, 0, "WarnModel");
     qmlRegisterType<DeviceModel>("DeviceModel", 1, 0, "DeviceModel");
     qmlRegisterType<FaceDateModel>("FaceDateModel", 1, 0, "FaceDateModel");
+    qmlRegisterType<MyLanguage>("MyLanguage", 1, 0, "MyLanguage");
 
     engine.load(QUrl(QStringLiteral("qrc:/qml/main.qml")));
 

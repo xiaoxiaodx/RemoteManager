@@ -63,7 +63,7 @@ Rectangle {
             anchors.topMargin: 35
             font.pixelSize: 18
             z:2
-            text: qsTr("日志列表")
+            text: mylanguage.LogList
         }
 
         Rectangle{
@@ -93,7 +93,7 @@ Rectangle {
                 anchors.leftMargin: 9
                 anchors.verticalCenter: parent.verticalCenter
                 color: "#ffffff"
-                text: qsTr("批量删除")
+                text: mylanguage.BatchDelete
             }
             MouseArea{
                 anchors.fill: parent
@@ -105,11 +105,7 @@ Rectangle {
                     else
                         askDialog.width = 427
                     askDialog.height = 176
-                    askDialog.askStr = curLanguage=== lChinese?"确认要删除所选信息吗？":
-                                       curLanguage===lEnglish?"Confirm to delete?":
-                                       curLanguage===lKorean?"삭제하시겠습니까?":
-                                       curLanguage===lItaly?"Cancella Tutta la Selezione?":
-                                       curLanguage===lRussian?"Вы уверены, что хотите удалить информацию?":"";
+                    askDialog.askStr = mylanguage.AskMsgDelete
                     askDialog.imgSrc = "qrc:/images/ico_warn.png"
                     askDialog.curType = askDialog.warnInfoMutipleDelete
                     askDialog.open();
@@ -254,8 +250,7 @@ Rectangle {
                 anchors.leftMargin: warnTimeHeaderLeftMargin
                 font.pixelSize: fontSize
                 color: "#333333"
-                font.bold: curLanguage===lKorean
-                text: qsTr("告警时间")
+                text: mylanguage.WarnTime
             }
             Text {
                 id: txtWarnTemp
@@ -265,7 +260,7 @@ Rectangle {
                 font.pixelSize: fontSize
                 color: "#333333"
                 font.bold: curLanguage===lKorean
-                text: qsTr("告警温度")
+                text: mylanguage.WarnTemp
             }
             Text {
                 id: warnImg
@@ -275,7 +270,7 @@ Rectangle {
                 font.pixelSize: fontSize
                 font.bold: curLanguage===lKorean
                 color: "#333333"
-                text: qsTr("抓拍图片")
+                text: mylanguage.WarnSnapshot
             }
             Text {
                 id: txtDo
@@ -285,7 +280,7 @@ Rectangle {
                 font.pixelSize: fontSize
                 font.bold: curLanguage===lKorean
                 color: "#333333"
-                text: qsTr("操作")
+                text: mylanguage.Operating
             }
         }
         ListView{
@@ -368,31 +363,21 @@ Rectangle {
                 }
 
 
-                Text {
+                Image {
                     id: deletetxt
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: deleteHeaderLeftMargin
-                    font.pixelSize: fontSize
-                    color: "#3B84F6"
-                    text:curLanguage === lChinese?"删除":
-                         curLanguage === lEnglish?"Remove":
-                         curLanguage === lKorean?"삭제":
-                         curLanguage === lItaly?"Cancella":
-                         curLanguage === lRussian?"Удалить":""
+                    width: 15
+                    height: 15
+                    source:"qrc:/images/datamanager/delete.png"
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            if(curLanguage === lRussian)
-                                askDialog.width = 500
-                            else
-                                askDialog.width = 427
+
+                            askDialog.width = 427
                             askDialog.height = 176
-                            askDialog.askStr = curLanguage=== lChinese?"确认删除信息吗？":
-                                               curLanguage===lEnglish?"Confirm to delete?":
-                                               curLanguage===lKorean?"삭제 정보를 확인합니까?":
-                                               curLanguage === lItaly?"Cancello L’Informazione?":
-                                               curLanguage === lRussian?"Вы уверены, что хотите удалить информацию?":""
+                            askDialog.askStr = mylanguage.AskMsgDelete
                             askDialog.imgSrc = "qrc:/images/ico_warn.png"
                             askDialog.curType = askDialog.warnInfoSingleDelete
                             askDialog.open();
@@ -519,59 +504,5 @@ Rectangle {
     }
 
 
-    Connections{
-        target: main
-        onS_setLanguage:setLanguage(typeL);
-    }
 
-    function setLanguage(type){
-
-        switch(type){
-        case lEnglish:
-            textitle.text = "Log list";
-            txtBatchDelete.text = "Batch Remove"
-            txtDo.text = "Operation"
-            txtWarnTime.text = "Alarm Time"
-            txtWarnTemp.text = "Alarm Temperature"
-            warnImg.text = "Snapshots"
-            //deletetxt.text = "Remove"
-            break;
-        case lKorean:
-            textitle.text = "로그정보";
-            txtBatchDelete.text = "전체삭제"
-            txtDo.text = "설정"
-            txtWarnTime.text = "알람시간"
-            txtWarnTemp.text = "알람온도"
-            warnImg.text = "화면저장"
-            //deletetxt.text = "삭제"
-            break;
-        case lItaly:
-            textitle.text = "Elenco eventi";
-            txtBatchDelete.text = "Cancella tutti eventi"
-            txtDo.text = "Operazione"
-            txtWarnTime.text = "Ora Allarme"
-            txtWarnTemp.text = "Temperatura Allarme"
-            warnImg.text = "Istantanea"
-            //deletetxt.text = "Cancella"
-            break;
-        case lChinese:
-            textitle.text = "日志列表";
-            txtBatchDelete.text = "批量删除"
-            txtDo.text = "操作"
-            txtWarnTime.text = "告警时间"
-            txtWarnTemp.text = "告警温度"
-            warnImg.text = "抓拍图片"
-            //deletetxt.text = "删除"
-            break;
-        case lRussian:
-            textitle.text = "Список журналов";
-            txtBatchDelete.text = "Очистить все события"
-            txtDo.text = "Операция"
-            txtWarnTime.text = "Время"
-            txtWarnTemp.text = "Температура"
-            warnImg.text = "Снимок"
-            //deletetxt.text = "删除"
-            break;
-        }
-    }
 }

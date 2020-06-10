@@ -149,5 +149,9 @@
         <file>images/fullScreen.png</file>
         <file>images/fullScreen_p.png</file>
         <file>images/login.png</file>
+        <file>qml/QmlWatingBusy.qml</file>
+        <file>qml/dialog/MesseageDialog.qml</file>
+        <file>images/playback/play_pause.png</file>
+        <file>images/playback/play_pause_h.png</file>
     </qresource>
 </RCC>

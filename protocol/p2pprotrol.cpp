@@ -111,8 +111,7 @@ QByteArray P2pProtrol::makeJsonPacket(QString cmd,QVariant msgContent)
         QJsonObject jObjectData ;
         jObjectData.insert("method",msgContent.toMap().value("method").toInt());
         jObjectData.insert("time",msgContent.toMap().value("time").toString());
-
-        jObject.insert("msgid",msgContent.toMap().value("msgid").toString());
+        jObject.insert("msgid",msgContent.toMap().value("time").toString());
         jObject.insert("data",jObjectData);
     }else if(cmd.compare("setosdparam") == 0){
 
@@ -133,13 +132,26 @@ QByteArray P2pProtrol::makeJsonPacket(QString cmd,QVariant msgContent)
         jObjectData.insert("channeltitle",jobjectName);
         jObjectData.insert("time",jobjectTime);
 
-
-
         jObject.insert("data",jObjectData);
 
     }else if(cmd.compare("setrecordparam")==0){
+        QJsonObject jObjectData ;
+        QJsonObject jObjectTime ;
+        QJsonObject jObjectTimesection;
+        jObjectTimesection.insert("cycle",msgContent.toMap().value("cycle").toInt());
+        QString starttime = msgContent.toMap().value("starttime").toString();
+        QString endtime = msgContent.toMap().value("endtime").toString();
+        starttime.replace(":","");
+        endtime.replace(":","");
+        jObjectTimesection.insert("starttime",starttime);
+        jObjectTimesection.insert("endtime",endtime);
+        jObjectTime.insert("alldayenabled",msgContent.toMap().value("alldayenabled").toInt());
+        jObjectTime.insert("timesection",jObjectTimesection);
 
+        jObjectData.insert("clarity",msgContent.toMap().value("clarity").toInt());
+        jObjectData.insert("time",jObjectTime);
 
+        jObject.insert("data",jObjectData);
     }else if(cmd.compare("setrtmpinfo")==0){
 
         QJsonObject jObjectData ;
@@ -204,17 +216,25 @@ QByteArray P2pProtrol::makeJsonPacket(QString cmd,QVariant msgContent)
     }else if(cmd.compare("setalarmparam") == 0){
 
         QJsonObject jObjectData ;
-        bool alarmaudiooutenabled = msgContent.toMap().value("alarmaudiooutenabled").toBool();
 
-        jObjectData.insert("alarmaudiooutenabled",alarmaudiooutenabled?1:0);
+        if(msgContent.toMap().contains("alarmaudiooutenabled")){
 
+            bool alarmaudiooutenabled = msgContent.toMap().value("alarmaudiooutenabled").toBool();
+
+            jObjectData.insert("alarmaudiooutenabled",alarmaudiooutenabled?1:0);
+        }
+        if(msgContent.toMap().contains("alarmrecordenabled")){
+
+            jObjectData.insert("alarmrecordenabled",msgContent.toMap().value("alarmrecordenabled").toInt());
+
+        }
         jObject.insert("data",jObjectData);
 
     }
     QJsonDocument jsDoc(jObject);
 
 
-    //qDebug()<<"makeJsonPacket:"<<jsDoc;
+    qDebug()<<"makeJsonPacket:"<<jsDoc;
     return jsDoc.toJson();
 }
 QMap<QString,QVariant> P2pProtrol::unJsonPacket(QByteArray &arr)
@@ -376,8 +396,8 @@ QMap<QString,QVariant> P2pProtrol::unJsonPacket(QByteArray &arr)
 
 
 
-        map.insert("recordStartT",jObjectData.value("time").toObject().value("timesection").toObject().value("starttime").toString());
-        map.insert("recordEndT",jObjectData.value("time").toObject().value("timesection").toObject().value("endtime").toString());
+        map.insert("recordStartT",jObjectData.value("time").toObject().value("timesection").toObject().value("starttime").toString().insert(4,":").insert(2,":"));
+        map.insert("recordEndT",jObjectData.value("time").toObject().value("timesection").toObject().value("endtime").toString().insert(4,":").insert(2,":"));
 
         map.insert("recordResolution",jObjectData.value("clarity").toInt());
 

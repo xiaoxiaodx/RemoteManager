@@ -21,8 +21,6 @@ public:
     QML_PROPERTY(QString,faceimportTime)
 };
 
-
-
 class FaceDateModel : public QAbstractListModel
 {
     Q_OBJECT

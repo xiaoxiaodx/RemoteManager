@@ -7,7 +7,7 @@ Popup {
     id: root
     x: parent.width/2 - root.width/2
     y: parent.height/2 - root.height/2
-    property alias askStr: txt.text
+    property alias msgStr: txt.text
 //    width: 380
 //    height: 253
     modal: true
@@ -16,7 +16,7 @@ Popup {
     closePolicy: Popup.OnEscape
     //设置窗口的背景控件，不设置的话Popup的边框会显示出来
     background: rect
-
+    dim:false
     property int curType: -1;
 
     //signal s_deviceIDstr(var name,var strID,var strAccoount,var strPassword)
@@ -24,14 +24,11 @@ Popup {
     signal s_showToast(var str1)
     signal s_CurTypeMsg(var type);
 
-    property string imgSrc:""
     property int exeClose: 0
     property int warnInfoSingleDelete: 1
     property int warnInfoMutipleDelete: 2
     property int deviceInfoSingleDelete: 3
     property int deviceInfoMutipleDelete: 4
-    property int replayChannelChange: 5
-
 
     Rectangle {
         id: rect
@@ -46,10 +43,10 @@ Popup {
             width: 22
             height: 22
             anchors.left: parent.left
-            anchors.leftMargin: 40
+            anchors.leftMargin: 20
             anchors.top: parent.top
-            anchors.topMargin: 40
-            source: imgSrc//"qrc:/images/icon_question.png"
+            anchors.topMargin: 20
+            source: "qrc:/images/icon_question.png"
         }
 
         Text {
@@ -67,8 +64,8 @@ Popup {
             border.color: "#3B84F6"
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            anchors.rightMargin: 40
-            anchors.bottomMargin: 40
+            anchors.rightMargin: 20
+            anchors.bottomMargin: 20
             Text {
                 id: txtEnsure
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -82,37 +79,7 @@ Popup {
                 anchors.fill: parent
                 onClicked: {
 
-                    if(curType > -1){
-                        s_CurTypeMsg(curType)
-                    }
-                    root.close()
-                }
-            }
-        }
-
-        Rectangle{
-            id:btnCancel
-            width: txtCancel.width + 24
-            height: 34
-            anchors.bottom: btnEnsure.bottom
-            anchors.right: btnEnsure.left
-            anchors.rightMargin: 16
-            border.width: 1
-            border.color: "#909399"
-            Text {
-                id: txtCancel
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                elide: Text.ElideMiddle
-                font.pixelSize: 14
-                color: "#909399"
-                text: qsTr("取消")
-            }
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
-
-                    root.close()
+                    close();
                 }
             }
         }
@@ -136,23 +103,23 @@ Popup {
     function setLanguage(type){
         switch(type){
         case lEnglish:
-            txtCancel.text = "Cancel"
+
             txtEnsure.text = "Confirm "
             break;
         case lKorean:
-            txtCancel.text = "취소"
+
             txtEnsure.text = "확인"
             break;
         case lItaly:
-            txtCancel.text = "Annullato"
+
             txtEnsure.text = "Confermare"
             break;
         case lChinese:
-            txtCancel.text = "取消"
+
             txtEnsure.text = "确定"
             break;
         case lRussian:
-            txtCancel.text = "Отмена"
+
             txtEnsure.text = "Подтвердить"
             break;
         }

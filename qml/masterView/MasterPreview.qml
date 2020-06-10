@@ -6,6 +6,7 @@ import QtGraphicalEffects 1.12
 Rectangle {
 
 
+    objectName: "masterpreview"
 
     Settings{
         id:settings
@@ -21,6 +22,7 @@ Rectangle {
 
     Rectangle{
         id:rectlistDevice
+        objectName: "rectlistDevice"
         x:0
         y:0
         width: 300
@@ -51,7 +53,7 @@ Rectangle {
                 anchors.left: deviceImg.right
                 anchors.leftMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
-                text: qsTr("设备列表")
+                text: mylanguage.DeviceList
             }
 
             Image {
@@ -90,7 +92,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     color: "#ffffff"
                     font.pixelSize: 12
-                    text: qsTr("添加")
+                    text: mylanguage.Add
                 }
                 MouseArea{
                     anchors.fill: parent
@@ -147,8 +149,11 @@ Rectangle {
                     anchors.fill: parent
                     propagateComposedEvents: true
                     onDoubleClicked: {
-                        var map = {cmd:"getVedio"};
-                        deviceModel.funSendData1(deviceChannel,"getVedio",map)
+
+
+                            var map = {cmd:"getVedio"};
+                            deviceModel.funSendData1(model.deviceChannel,"getVedio",map)
+
                     }
                     onClicked: {
 
@@ -178,7 +183,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: 10
                 anchors.verticalCenter: parent.verticalCenter
-                text: qsTr("告警记录")
+                text: mylanguage.AlarmRecord
             }
             Image {
                 id: imgtitle
@@ -365,16 +370,18 @@ Rectangle {
         height: parent.height - rectlistwarninfo.height
 
 
-
+        objectName: "videoContent"
         Rectangle{
             id:rectVideo
             width: parent.width
             height: videoContent.height - videoMutilWindow.height
             GridView {
                 id:gridViewVideo
+                objectName: "gridViewVideo"
                 anchors.fill: parent
                 model: videoShowModel
                 interactive: false
+                cacheBuffer:1920*50
                 cellWidth: (rectVideo.width)/numberWindow
                 cellHeight: (rectVideo.height)/numberWindow
                 property int curSelectIndex: -1
@@ -382,6 +389,7 @@ Rectangle {
                 property int beforeMaxNumW: 0
                 property bool isMax: false
                 focus: true
+
                 delegate: Rectangle{
                     id:delegateRect
                     width: gridViewVideo.cellWidth
@@ -391,7 +399,6 @@ Rectangle {
                     border.color: gridViewVideo.curSelectIndex===index?"#5697FB":"#131415"
                     VideoShow{
                         id:videoshow
-
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                         width: parent.width-2
@@ -401,7 +408,7 @@ Rectangle {
                         onClick: gridViewVideo.curSelectIndex = index
 
                         onDoubleClick: {
-                            console.debug("onDoubleClick    " +gridViewVideo.isMax)
+                            console.debug("onDoubleClick    " +belongDevice)
                             if(mW1.checked)
                                 return;
                             if(!gridViewVideo.isMax)
@@ -410,6 +417,7 @@ Rectangle {
                                 gridViewVideo.restoreW()
 
                         }
+
                     }
                 }
                 function maxW(posIndex){
@@ -654,6 +662,7 @@ Rectangle {
 
     Connections{
         target: main
+
         onSfullScreenChange:{
 
             if(isFull){
@@ -685,22 +694,5 @@ Rectangle {
         }
     }
 
-
-    function setLanguage(type){
-
-        switch(type){
-        case lEnglish:
-            txttitle.text = "Alarm record";
-            devicelisttxt.text = "Device list"
-            txtAdd.text = "Add"
-            break;
-
-        case lChinese:
-            txttitle.text = "告警记录";
-            devicelisttxt.text = "设备列表"
-            txtAdd.text = "添加"
-            break;
-        }
-    }
 
 }

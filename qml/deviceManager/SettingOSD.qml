@@ -36,21 +36,29 @@ Rectangle {
         inputDeviceName.text = deivcenname
     }
 
-    function updateParameterInfo(model){
+    function updateParameterInfo(){
 
-        if(isRevicse){
+        console.debug("updateParameterInfo  "+isRevicse)
+        if(!isRevicse){
             return;
         }else{
 
-            var map = {
-                cmd:"setosdparam",
-                swithNameShow:swithShow.checked,
-                swithTimeShow:swithTime.checked
-            }
-            if(isBatchSet)
+            if(isBatchSet){
+                var map = {
+                    cmd:"setosdparam",
+                    swithNameShow:swithShow.checked,
+                    swithTimeShow:swithTime.checked,
+                }
                 deviceModel.funBatchSendData("setosdparam",map);
-            else
-                deviceModel.funSendData1(deviceChannel,"setosdparam",map);
+            }else{
+                var map1 = {
+                    cmd:"setosdparam",
+                    swithNameShow:swithShow.checked,
+                    swithTimeShow:swithTime.checked,
+                    osdname:inputDeviceName.text
+                }
+                deviceModel.funSendData1(deviceChannel,"setosdparam",map1);
+            }
         }
     }
 
@@ -63,7 +71,7 @@ Rectangle {
         anchors.bottomMargin: 10
         font.pixelSize: fontPixSize
         color: fontColor
-        text: qsTr("时间")
+        text: mylanguage.Time
     }
 
 
@@ -79,7 +87,7 @@ Rectangle {
 
     Text {
         id: labelSwitchTime
-        text: qsTr("开关")
+        text: mylanguage.Switch
         font.pixelSize: fontSize
         color: fontColor
         anchors.right: swithTime.left
@@ -106,7 +114,7 @@ Rectangle {
         anchors.bottomMargin: 10
         font.pixelSize: fontPixSize
         color: fontColor
-        text: qsTr("名称")
+        text: mylanguage.Name
     }
     Rectangle{
         id:line1
@@ -120,7 +128,7 @@ Rectangle {
 
     Text {
         id: labelSwitchShow
-        text: qsTr("显示")
+        text: mylanguage.Show
         font.pixelSize: fontSize
         color: fontColor
         anchors.right: swithTime.left
@@ -141,7 +149,7 @@ Rectangle {
 
     Text {
         id: labelDeviceChannel
-        text: qsTr("")
+        text: "ch "+deviceChannel
         visible:!isBatchSet
         font.pixelSize: fontSize
         color: fontColor
@@ -149,6 +157,9 @@ Rectangle {
         anchors.rightMargin: 20
         anchors.verticalCenter: inputDeviceName.verticalCenter
     }
+
+
+
 
     LineEdit {
         id: inputDeviceName
@@ -159,35 +170,18 @@ Rectangle {
         anchors.leftMargin: 104
         anchors.top: line1.bottom
         anchors.topMargin: 58
+        border.width: 1
+        border.color: "#DCDFE6"
+        radius: 1
         font.pixelSize: fontSize
         placeholderText: ""
         isNeedDoubleClickEdit: false
         textLeftPadding:0
-        txtColor: fontColor
+        txtColor: Qt.rgba(0,0,0,0.65)
         color: "#ffffff"
         onTextChanged: isRevicse = true;
     }
 
 
-    Connections{
-        target: main
-        onS_setLanguage:setLanguage(typeL);
-    }
 
-    function setLanguage(type){
-        switch(type){
-        case lEnglish:
-            timetxt.text = "Time"
-            labelSwitchTime.text = "Switch"
-            nametxt.text = "Name"
-            labelSwitchShow.text = "Visible"
-            break;
-        case lChinese:
-            timetxt.text = "时间"
-            labelSwitchTime.text = "开关"
-            nametxt.text = "名字"
-            labelSwitchShow.text = "显示"
-            break;
-        }
-    }
 }

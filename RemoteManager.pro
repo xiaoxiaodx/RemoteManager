@@ -18,8 +18,7 @@ CONFIG += c++11
 # deprecated API to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS WINDOWS ARCH_WINDOWS DPS_API_EXPORTS
 
-DISTFILES += \
-    thirdLib/p2p_dps/NDT_API_PPCS64.def
+DISTFILES +=
 
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -72,15 +71,7 @@ SOURCES += \
     protocol/p2pworker.cpp \
     protocol/p2pprotrol.cpp \
     qmlcplus/devicemodeldata.cpp \
-    protocol/warndps.cpp \
-    thirdSrc/p2p_dps/Src/base64.cpp \
-    thirdSrc/p2p_dps/Src/cJSON.cpp \
-    thirdSrc/p2p_dps/Src/Debug_Log.cpp \
-    thirdSrc/p2p_dps/Src/StringEncDec.cpp \
-    thirdSrc/p2p_dps/Src/stTime.cpp \
-    thirdSrc/p2p_dps/Src/WiPN_API.cpp \
-    thirdSrc/p2p_dps/Src/WiPN_Common.cpp \
-    thirdSrc/p2p_dps/Src/WiPN_WebAPI.cpp
+    qmlcplus/mylanguage.cpp
 
 HEADERS += \
     playVideo/XVideo.h \
@@ -120,21 +111,9 @@ HEADERS += \
     protocol/protocal_pkg.h \
     protocol/p2pprotrol.h \
     qmlcplus/devicemodeldata.h \
-    protocol/warndps.h \
     util/common.h \
-    thirdSrc/p2p_dps/include/base64.h \
-    thirdSrc/p2p_dps/include/cJSON.h \
-    thirdSrc/p2p_dps/include/Debug_Log.h \
-    thirdSrc/p2p_dps/include/DPS_API.h \
-    thirdSrc/p2p_dps/include/NDT_API.h \
-    thirdSrc/p2p_dps/include/NDT_Error.h \
-    thirdSrc/p2p_dps/include/NDT_Type.h \
-    thirdSrc/p2p_dps/include/SPS_API.h \
-    thirdSrc/p2p_dps/include/StringEncDec.h \
-    thirdSrc/p2p_dps/include/stTime.h \
-    thirdSrc/p2p_dps/include/WiPN_API.h \
-    thirdSrc/p2p_dps/include/WiPN_Common.h \
-    thirdSrc/p2p_dps/include/WiPN_WebAPI.h
+    qmlcplus/mylanguage.h
+
 
 INCLUDEPATH += $$PWD/avi
 INCLUDEPATH += $$PWD/protocol
@@ -165,13 +144,9 @@ LIBS += $$PWD/thirdLib/ffmpeg64/lib/avcodec.lib \
 LIBS+= $$PWD/thirdLib/p2p_ppcs/PPCS_API.lib
 INCLUDEPATH += $$PWD/thirdLib/p2p_ppcs/include
 
-#P2P 推送
-INCLUDEPATH += $$PWD/thirdSrc/p2p_dps/include
-LIBS += $$PWD/thirdLib/p2p_dps/DPS_API64.lib \
-        $$PWD/thirdLib/p2p_dps/NDT_API_PPCS64.lib \
-        $$PWD/thirdLib/p2p_dps/SPS_API64.lib
 
-LIBS += -lWs2_32
+
+#LIBS += -lWs2_32
 
 
 

@@ -21,6 +21,7 @@ extern "C"{
 #define serverKeyLen 16
 #define appKeyLen 32
 
+#include <QImage>
 class P2pWorker : public QObject
 {
     Q_OBJECT
@@ -48,10 +49,12 @@ signals:
     //
     void signal_p2pReplyData(QString name,QVariantMap map);
 
+    void signal_sendImg(QImage *img,quint64 pts);
     void signal_sendH264(QString name ,QVariant img,long long pts);
     void signal_sendWarnImg(QVariantMap map,QByteArray arrImg);
     void signal_sendPcmALaw(QString name ,char* PcmALawArr,int arrLen,long long pts);
 
+    void signal_sendReplayImg(QImage *img,quint64 pts);
     void signal_sendReplayH264(QString name ,QVariant img,long long pts);
     void signal_sendReplayPcmALaw(QString name,char* PcmALawArr,int arrLen,long long pts);
 
@@ -71,7 +74,6 @@ public slots:
 
     void slot_connectDev(QString deviceDid,QString name,QString pwd);
     void slot_startLoopRead();
-
 private:
 
     void p2pinit();

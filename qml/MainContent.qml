@@ -53,6 +53,9 @@ Rectangle {
     signal dragPosChange(var mx,var my);
     color: "#252525"
 
+
+
+
     HomeMenu{
         id:homeMenu
         property bool isDoubleClick: false
@@ -161,19 +164,10 @@ Rectangle {
         height: 274
         onS_addDevice: {
 
-            var channel = -1;
-            for(var i=0;i<videoShowModel.count;i++){
-                if(!videoShowModel.get(i).isBind){
-                    channel = videoShowModel.get(i).channel;
-                    videoShowModel.get(i).isBind = true
-                    break;
-                }
+            if(!deviceModel.funAddDevice(devcieID,devicename,"admin","admin")){
+                ;//提示通道已满
             }
 
-            if(channel >-1)
-                deviceModel.funAddDevice(devcieID,devicename,channel,"admin","admin")
-            else
-                ;//提示通道已满
         }
     }
 

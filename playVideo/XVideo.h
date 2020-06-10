@@ -35,6 +35,7 @@ public:
     Q_INVOKABLE void funSendVideoData(QVariant buff);
     Q_INVOKABLE void funSendAudioData(char *buff,int len);
 
+
     explicit XVideo();
     ~XVideo();
 
@@ -43,18 +44,15 @@ signals:
 
 public slots:
 
-
+    void slot_sendH264(QString name ,QVariant img,long long pts);
+    void recImg(QImage *img);
 protected:
     QSGNode* updatePaintNode(QSGNode *old, UpdatePaintNodeData *);
 private:
 
-
-
     void writeDebugfile(QString filename,QString funname,int lineCount,QString strContent);
 
-
     FfmpegCodec *pffmpegCodec;
-
 
     PlayAudio *playAudio;
     QThread *playAudioThread;
@@ -77,6 +75,7 @@ private:
     bool isAudioFirstPlay;
     bool isFirstData;
 
+    bool isConnectVideo = false;
     quint64 preAudioTime;
     static int testIdIndex;
     int testID;

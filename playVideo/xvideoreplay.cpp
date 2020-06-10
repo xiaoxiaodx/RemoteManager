@@ -82,7 +82,7 @@ QSGNode* XVideoReplay::updatePaintNode(QSGNode *old, UpdatePaintNodeData *data)
 void XVideoReplay::funSendVideoData(QVariant buff1)
 {
 
-    qDebug()<<" XVideoReplay funSendVideoData";
+    // qDebug()<<" XVideoReplay funSendVideoData";
     QImage *tmpImg = buff1.value<QImage*>();
 
 
@@ -107,11 +107,43 @@ void XVideoReplay::funSendVideoData(QVariant buff1)
 }
 
 
+void XVideoReplay::slot_recReolayImg(QImage *tmpImg,quint64 pts)
+{
+
+    if (tmpImg != nullptr && (!tmpImg->isNull()))
+    {
+
+        ImageInfo1 imgInfo;
+        imgInfo.pImg = tmpImg;
+        //imgInfo.time = time;
+
+        // qDebug()<<QString(__FUNCTION__) + "    "+QString::number(__LINE__) ;
+        if(listImgInfo.size() < minBuffLen){
+
+            listImgInfo.append(imgInfo);
+
+            update();
+            emit signal_timeDate(pts);
+        }else
+            delete tmpImg;
+    }else{
+        qDebug()<<" XVideoReplay funSendVideoData "<<"没有图片信息";
+
+    }
+
+}
+void XVideoReplay::slot_recReplayH264(QString name ,QVariant img,long long pts)
+{
+    qDebug()<<"Dsadsad4";
+    funSendVideoData(img);
+}
+
 void XVideoReplay::funSendAudioData(char *buff,int len)
 {
 
 
 }
+
 
 
 XVideoReplay::~XVideoReplay()

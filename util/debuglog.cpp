@@ -1,5 +1,5 @@
 #include "debuglog.h"
-
+#include <QFile>
 DebugLog* DebugLog::Log = NULL;
 
 DebugLog::DebugLog(QObject *parent) : QObject(parent)

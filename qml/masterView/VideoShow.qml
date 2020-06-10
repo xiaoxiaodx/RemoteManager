@@ -21,8 +21,8 @@ Rectangle {
     property string recordingFilePath: ""
     property string belongDevice: ""
 
-//    border.color: mIsSelected?"#409EFF":"#00000000"
-//    border.width: 2
+    //    border.color: mIsSelected?"#409EFF":"#00000000"
+    //    border.width: 2
     color: "black"
     onMIsCreateConenectChanged: {
         console.debug("onMXVideoIsCreateTcpConnectChanged   "+ mIsCreateConenect)
@@ -49,8 +49,9 @@ Rectangle {
     XVideo{
         id:video
         //anchors.fill: parent
-       // anchors.margins: 2
+        // anchors.margins: 2
 
+        objectName: "channel"+belongDevice
         width:(mPlayRect.width*0.75>mPlayRect.height?mPlayRect.height*1.333:mPlayRect.width)
         height: (mPlayRect.width*0.75>mPlayRect.height?mPlayRect.height:mPlayRect.width*0.75)
 
@@ -61,13 +62,17 @@ Rectangle {
         property bool mXVideoRecordVedio: mIsRecordVedio
         property bool mXVideoIsCreateTcpConnect: mIsCreateConenect
 
+        Component.onCompleted: {
+            console.debug("**************   "+objectName)//不加入这行代码，程序异常崩溃
+            deviceModel.funSavePlayVideo(video)
+        }
     }
 
     Text {
         id: txtbelongDeviceName
         font.pixelSize: 12
         font.family: "Microsoft Yahei"
-        color: "red"
+        color: "white"
         anchors.left: parent.left
         anchors.leftMargin: 5
         anchors.top: parent.top
@@ -87,24 +92,10 @@ Rectangle {
 
             onClicked: {
 
-                screenBlack.visible = true;
-                if(belongDeviceName==="")
-                    showToast("no device specified ")
-                else{
-                    var nameNum = 0;
-                    for(var i=0;i<listDeviceDataModel.count;i++){
-                        if(belongDeviceName === listDeviceDataModel.get(i).deviceName)
-                            nameNum ++;
-                    }
-
-                    if(nameNum > 1)
-                        listDeviceDataModel.get(modelDataCurrentIndex).deviceName = ""
-                    else{
-                        var map;
-                        devicemanagerment.funP2pSendData(belongDeviceName,"stopVideo",map);
-                        listDeviceDataModel.get(modelDataCurrentIndex).deviceName = ""
-                    }
+                var map ={
+                    cmd:"stopVideo"
                 }
+                deviceModel.funSendData1(belongDevice,"stopVideo",map);
             }
         }
     }
@@ -118,30 +109,28 @@ Rectangle {
         width: parent.width-2
         color:"#88000000"
         visible:mIsSelected
-//            opacity: 0
+        //            opacity: 0
 
-//            states: [
-//                State {
-//                    name: "show"; PropertyChanges { target: rectRecord; opacity: 1 }
-//                },
-//                State {
-//                    name: "hide"; PropertyChanges { target: rectRecord;  opacity: 0 }
-//                }]
-
-//            transitions: Transition {
-//                PropertyAnimation  {properties: "opacity"; duration: 600; easing.type: Easing.Linear  }
-//            }
-
-//            MouseArea{
-//                anchors.fill: parent
-//                hoverEnabled: true
-//                enabled: true
-//                preventStealing:true
-//                propagateComposedEvents:true
-//                onEntered:if(mIsSelected)rectRecord.state = "show"
-//                onExited:if(mIsSelected)rectRecord.state = "hide"
-//                onDoubleClicked: ;
-//            }
+        //            states: [
+        //                State {
+        //                    name: "show"; PropertyChanges { target: rectRecord; opacity: 1 }
+        //                },
+        //                State {
+        //                    name: "hide"; PropertyChanges { target: rectRecord;  opacity: 0 }
+        //                }]
+        //            transitions: Transition {
+        //                PropertyAnimation  {properties: "opacity"; duration: 600; easing.type: Easing.Linear  }
+        //            }
+        //            MouseArea{
+        //                anchors.fill: parent
+        //                hoverEnabled: true
+        //                enabled: true
+        //                preventStealing:true
+        //                propagateComposedEvents:true
+        //                onEntered:if(mIsSelected)rectRecord.state = "show"
+        //                onExited:if(mIsSelected)rectRecord.state = "hide"
+        //                onDoubleClicked: ;
+        //            }
 
         Image{
             id:btnRecordVideo
@@ -191,12 +180,12 @@ Rectangle {
         }
     }
 
-//        Rectangle{
-//            id:screenBlack
-//            anchors.fill: parent
-//            visible:true
-//            color: "#3A3D41"
-//        }
+    Rectangle{
+        id:screenBlack
+        anchors.fill: parent
+        visible:true
+        color: "#202020"
+    }
 
     Rectangle{
         id:screenShotMask
@@ -215,15 +204,31 @@ Rectangle {
         }
     }
 
+
+
     Connections{
         target: deviceModel
         onSignal_p2pCallbackVideoData:{
-            //console.debug("***************  "+name + "  "+belongDeviceName)
+            console.debug("***************  "+name + "  "+belongDevice)
             if(belongDevice === name)
                 video.funSendVideoData(h264Arr)
         }
+        onSignal_p2pCallbackReply:{
+
+            if(name === belongDevice){
+                if(smap.cmd === "getVedio"){
+                    screenBlack.visible = false
+
+                }else if(smap.cmd === "stopVideo"){
+                    screenBlack.visible = true
+                }
+            }
+        }
     }
 
+    function playvideo(img){
+        video.funSendVideoData(img)
+    }
 
     function recordBtnClickFun(isrecord){
 

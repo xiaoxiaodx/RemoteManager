@@ -35,7 +35,7 @@ Popup {
             anchors.topMargin: 20
             font.pixelSize: 16
             color: "#303133"
-            text: "添加设备"
+            text: mylanguage.DeviceAdd
         }
 
         Image{
@@ -55,7 +55,7 @@ Popup {
             anchors.right: inputDeviceName.left
             anchors.rightMargin: 6
             anchors.verticalCenter: inputDeviceName.verticalCenter
-            text: qsTr("设备名称")
+            text: mylanguage.DeviceName
         }
 
         LineEdit {
@@ -86,7 +86,7 @@ Popup {
             anchors.right: inputDeviceID.left
             anchors.rightMargin: 6
             anchors.verticalCenter: inputDeviceID.verticalCenter
-            text: qsTr("设备ID")
+            text: qsTr("DID")
         }
 
         LineEdit {
@@ -126,7 +126,7 @@ Popup {
                 elide: Text.ElideMiddle
                 font.pixelSize: 12
                 color: "#0486FE"
-                text: qsTr("确定")
+                text: mylanguage.AskMsgEnsure
             }
             MouseArea{
                 anchors.fill: parent
@@ -154,7 +154,7 @@ Popup {
                 elide: Text.ElideMiddle
                 font.pixelSize: 12
                 color: "#909399"
-                text: qsTr("取消")
+                text: mylanguage.AskMsgCancel
             }
             MouseArea{
                 anchors.fill: parent
@@ -176,34 +176,5 @@ Popup {
     }
 
 
-    Connections{
-        target: main
-        onS_setLanguage:setLanguage(typeL);
-    }
-
-    function setLanguage(type){
-        switch(type){
-        case lEnglish:
-            txtCancel.text = "Cancel"
-            txtEnsure.text = "Confirm "
-            break;
-        case lKorean:
-            txtCancel.text = "취소"
-            txtEnsure.text = "확인"
-            break;
-        case lItaly:
-            txtCancel.text = "Annullato"
-            txtEnsure.text = "Confermare"
-            break;
-        case lChinese:
-            txtCancel.text = "取消"
-            txtEnsure.text = "确定"
-            break;
-        case lRussian:
-            txtCancel.text = "Отмена"
-            txtEnsure.text = "Подтвердить"
-            break;
-        }
-    }
 }
 

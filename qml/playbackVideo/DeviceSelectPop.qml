@@ -14,6 +14,8 @@ Popup {
     background: rect
     dim:false
     property alias mmodel: listv.model
+
+    property string curText: ""
     signal s_txtChange(var txt);
     Rectangle{
         id:rect
@@ -30,7 +32,7 @@ Popup {
                 color: "#909399"
                 height: 20
                 Text {
-                    text: model.deviceName
+                    text: model.deviceChannel
                     font.pixelSize: 12
                     color: "#ffffff"
                     anchors.verticalCenter: parent.verticalCenter
@@ -41,7 +43,8 @@ Popup {
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
-                        s_txtChange(model.deviceName)
+                        curText = model.deviceChannel
+                        s_txtChange(model.deviceChannel)
                         //txtDeviceSelect.text = model.deviceName
                         deviceSelectPop.close();
                     }

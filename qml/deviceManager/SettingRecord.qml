@@ -63,14 +63,14 @@ Rectangle {
         else
             checkMonday.checked = false;
         if(weekly[1] === "1")
-            checkMonday.checked = true;
-        else
-            checkMonday.checked = false;
-
-        if(weekly[2] === "1")
             checkTusday.checked = true;
         else
             checkTusday.checked = false;
+
+        if(weekly[2] === "1")
+            checkWensday.checked = true;
+        else
+            checkWensday.checked = false;
 
         if(weekly[3] === "1")
             checkTursday.checked = true;
@@ -96,55 +96,71 @@ Rectangle {
 
     }
 
-    function updateParameterInfo(model){
+    function updateParameterInfo(){
 
-        if(isRevicse){
+        if(!isRevicse){
             return;
         }else{
             var videoType = -1;
-            if(checkRecordClose.checked)
+            if(checkRecordClose.checked){
                 videoType = 0
-            if(checkWarnVideo.checked)
-                videoType = 1
-            if(checkRecordFullDay.checked)
-                videoType = 2
+            }
 
-            var weeklySelect = -1;
-            if(weeklyAllSelect.checked)
-                weeklySelect = 0
+            if(checkWarnVideo.checked){
+                videoType = 1
+                var mapsa = {
+                    cmd:"setalarmparam",
+                    alarmrecordenabled:1
+                }
+
+                if(isBatchSet)
+                    deviceModel.funBatchSendData("setalarmparam",mapsa);
+                else
+                    deviceModel.funSendData1(deviceChannel,"setalarmparam",mapsa);
+            }
+            if(checkRecordFullDay.checked){
+                videoType = 2
+            }
+
+
+
+            var weekly = 0;
             if(checkMonday.checked)
-                weeklySelect = 1
+               weekly += 1;
             if(checkTusday.checked)
-                weeklySelect = 2
+                weekly += 2;
             if(checkWensday.checked)
-                weeklySelect = 3
+                weekly += 4;
             if(checkTursday.checked)
-                weeklySelect = 4
+                weekly += 8;
             if(checkFriday.checked)
-                weeklySelect = 5
+                weekly += 16;
             if(checkSatday.checked)
-                weeklySelect = 6
+               weekly += 32;
             if(checkSunday.checked)
-                weeklySelect = 7
+                weekly += 64;
 
             //model.updateRecord(isBatchSet,videoType,cmbResolution.currentIndex,txttimeStart.text,txttimeEnd.text,weeklySelect)
 
-
-
-
             var startt = txttimeStart.text
             var endt = txttimeEnd.text
-            var map = {
+            var maprp = {
                 cmd:"setrecordparam",
                 clarity:cmbResolution.currentIndex,
-                starttime:startt.replace(":",""),
-                endtime:endt.replace(":",""),
+                starttime:startt,
+                endtime:endt,
+                alldayenabled:0,
+                cycle:weekly
             }
 
+            if(videoType === 2)
+                maprp.alldayenabled = 1;
+
+
             if(isBatchSet)
-                deviceModel.funBatchSendData("setrecordparam",map);
+                deviceModel.funBatchSendData("setrecordparam",maprp);
             else
-                deviceModel.funSendData1(deviceIndex,"setrecordparam",map);
+                deviceModel.funSendData1(deviceChannel,"setrecordparam",maprp);
 
         }
     }
@@ -157,7 +173,7 @@ Rectangle {
         anchors.bottomMargin: 10
         font.pixelSize: 14
         color: fontColor
-        text: qsTr("设置")
+        text: mylanguage.Set
     }
 
 
@@ -186,7 +202,7 @@ Rectangle {
         anchors.leftMargin: 20
         anchors.top: line.bottom
         anchors.topMargin: 20
-        text: "录像关闭"
+        text: mylanguage.VideoClose
         onCheckedChanged: isRevicse = true;
     }
 
@@ -202,7 +218,7 @@ Rectangle {
         anchors.left: checkRecordClose.right
         anchors.leftMargin: 30
         anchors.verticalCenter: checkRecordClose.verticalCenter
-        text: "告警录像"
+        text: mylanguage.VideoAlarm
         onCheckedChanged: isRevicse = true;
     }
 
@@ -218,13 +234,13 @@ Rectangle {
         anchors.left: checkWarnVideo.right
         anchors.leftMargin: 30
         anchors.verticalCenter: checkRecordClose.verticalCenter
-        text: "全天录像"
+        text: mylanguage.VideoFull
         onCheckedChanged: isRevicse = true;
     }
 
     Text {
         id: labelResolution
-        text: qsTr("分辨率")
+        text: mylanguage.Quality
         font.pixelSize: fontSize
         color: fontColor
         anchors.left: line.left
@@ -268,7 +284,7 @@ Rectangle {
 
     Text {
         id: labelRecordPath
-        text: qsTr("存储路径")
+        text: mylanguage.RecordPath
         font.pixelSize: fontSize
         color: fontColor
         anchors.right: rectrecordPath.left
@@ -339,7 +355,7 @@ Rectangle {
         anchors.bottomMargin: 10
         font.pixelSize: 14
         color: fontColor
-        text: qsTr("录像时间")
+        text: mylanguage.RecordTime
     }
 
     Rectangle{
@@ -447,8 +463,8 @@ Rectangle {
             onPressed: {
                 selecttimeEnd.open()
             }
-            onEntered: timeRectEnd.source = "qrc:/images/warnmanager/time.png"
-            onReleased: timeRectEnd.source = "qrc:/images/warnmanager/time.png"
+            onEntered: imgtimeEnd.source = "qrc:/images/warnmanager/time.png"
+            onReleased: imgtimeEnd.source = "qrc:/images/warnmanager/time.png"
         }
     }
 
@@ -497,7 +513,7 @@ Rectangle {
         imgW: 12
         txtFont.pixelSize: fontSize
         txtColor: fontColor
-        text: "全选"
+        text: mylanguage.AllSelect
         onCheckedChanged: isRevicse = true;
     }
 
@@ -512,7 +528,7 @@ Rectangle {
         imgW: 12
         txtFont.pixelSize: fontSize
         txtColor: fontColor
-        text: "周日"
+        text: mylanguage.Sun
         onCheckedChanged: isRevicse = true;
     }
 
@@ -527,7 +543,7 @@ Rectangle {
         imgW: 12
         txtFont.pixelSize: fontSize
         txtColor: fontColor
-        text: "周一"
+        text: mylanguage.Mon
         onCheckedChanged: isRevicse = true;
     }
 
@@ -542,7 +558,7 @@ Rectangle {
         imgW: 12
         txtFont.pixelSize: fontSize
         txtColor: fontColor
-        text: "周二"
+        text: mylanguage.Tue
         onCheckedChanged: isRevicse = true;
     }
 
@@ -557,7 +573,7 @@ Rectangle {
         imgW: 12
         txtFont.pixelSize: fontSize
         txtColor: fontColor
-        text: "周三"
+        text: mylanguage.Wed
         onCheckedChanged: isRevicse = true;
     }
 
@@ -572,7 +588,7 @@ Rectangle {
         imgW: 12
         txtFont.pixelSize: fontSize
         txtColor: fontColor
-        text: "周四"
+        text: mylanguage.Thu
         onCheckedChanged: isRevicse = true;
     }
 
@@ -587,7 +603,7 @@ Rectangle {
         imgW: 12
         txtFont.pixelSize: fontSize
         txtColor: fontColor
-        text: "周五"
+        text: mylanguage.Fri
         onCheckedChanged: isRevicse = true;
     }
 
@@ -602,60 +618,9 @@ Rectangle {
         imgW: 12
         txtFont.pixelSize: fontSize
         txtColor: fontColor
-        text: "周六"
+        text: mylanguage.Sat
         onCheckedChanged: isRevicse = true;
     }
 
-    Connections{
-        target: main
-        onS_setLanguage:setLanguage(typeL);
-    }
 
-    function setLanguage(type){
-        switch(type){
-        case lEnglish:
-
-            settxt.text = "Set"
-
-            checkRecordFullDay.text = "All"
-            checkWarnVideo.text = "Alarm"
-            checkRecordClose.text ="Disable"
-
-            checkMonday.text = "Monday"
-            checkTusday.text = "Tuesday"
-            checkWensday.text = "Wednesday"
-            checkTursday.text = "Thursday"
-            checkFriday.text = "Friday"
-            checkSatday.text = "Saturday"
-            checkSunday.text = "Sunday"
-            weeklyAllSelect.text = "All"
-
-            labelRecordPath.text = "Storage path"
-            recordTimetext.text = "Record time"
-            labelResolution.text = "Resolution"
-            break;
-        case lChinese:
-            settxt.text = "设置"
-
-            checkRecordFullDay.text = "全天录像"
-            checkWarnVideo.text = "告警录像"
-            checkRecordClose.text ="录像关闭"
-
-            checkMonday.text = "周一"
-            checkTusday.text = "周二"
-            checkWensday.text = "周三"
-            checkTursday.text = "周四"
-            checkFriday.text = "周五"
-            checkSatday.text = "周六"
-            checkSunday.text = "周日"
-            weeklyAllSelect.text = "全选"
-
-            labelRecordPath.text = "存储路径"
-            recordTimetext.text = "录像时间"
-            labelResolution.text = "分辨率"
-
-
-            break;
-        }
-    }
 }

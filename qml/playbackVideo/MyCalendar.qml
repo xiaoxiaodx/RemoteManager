@@ -40,9 +40,9 @@ Popup {
                 return "#ffffff"
 
             if(calendarEventModel.get(dayNum).type==="1")
-                return "#3A3D41";
+                return "#89A0FF";
             else if(calendarEventModel.get(dayNum).type==="2")
-                return "#f64054"
+                return "#FF6149"
             else //if(calendarEventModel.get(dayNum).type==="0")
                 return "#ffffff"
 
@@ -89,7 +89,11 @@ Popup {
                             onClicked: {
                                 control.showPreviousYear()
 
-                                s_yearChange(""+the_calendar.visibleYear + (the_calendar.visibleMonth+1)+"00000000")
+
+                                var mouthStr = "";
+                                if(the_calendar.visibleMonth+1<10)
+                                    mouthStr = "0"+(the_calendar.visibleMonth+1)
+                                s_mouthChange(""+the_calendar.visibleYear + mouthStr+"00000000")
                             }
                         }
                     }
@@ -108,7 +112,11 @@ Popup {
                             anchors.fill: parent
                             onClicked: {
                                 control.showNextYear()
-                                s_yearChange(""+the_calendar.visibleYear + (the_calendar.visibleMonth+1)+"00000000")
+
+                                var mouthStr = "";
+                                if(the_calendar.visibleMonth+1<10)
+                                    mouthStr = "0"+(the_calendar.visibleMonth+1)
+                                s_mouthChange(""+the_calendar.visibleYear + mouthStr+"00000000")
                             }
                         }
                     }
@@ -127,7 +135,11 @@ Popup {
                             anchors.fill: parent
                             onClicked: {
                                 control.showPreviousMonth()
-                                s_mouthChange(""+the_calendar.visibleYear + (the_calendar.visibleMonth+1)+"00000000")
+
+                                var mouthStr = "";
+                                if(the_calendar.visibleMonth+1<10)
+                                    mouthStr = "0"+(the_calendar.visibleMonth+1)
+                                s_mouthChange(""+the_calendar.visibleYear + mouthStr+"00000000")
                             }
                         }
                     }
@@ -146,7 +158,10 @@ Popup {
                             anchors.fill: parent
                             onClicked: {
                                 control.showNextMonth()
-                                s_mouthChange(""+the_calendar.visibleYear + (the_calendar.visibleMonth+1)+"00000000")
+                                var mouthStr = "";
+                                if(the_calendar.visibleMonth+1<10)
+                                    mouthStr = "0"+(the_calendar.visibleMonth+1)
+                                s_mouthChange(""+the_calendar.visibleYear + mouthStr+"00000000")
                             }
                         }
                     }
@@ -213,8 +228,10 @@ Popup {
                     //                       : (styleData.visibleMonth && styleData.valid
                     //                          ?Qt.rgba(6/255,45/255,51/255,1)
                     //                          : Qt.rgba(3/255,28/255,35/255,1));
-                    color: styleData.selected?"#8AB8FF":((styleData.visibleMonth && styleData.valid)?(calendarEventModel.getDateEvent(styleData.date)):bgColor)
+                    color:((styleData.visibleMonth && styleData.valid)?(calendarEventModel.getDateEvent(styleData.date)):bgColor)
                     //color: styleData.selected?"#8AB8FF":bgColor//(styleData.visibleMonth && styleData.valid)?(calendarEventModel.getDateEvent(styleData.date)):bgColor
+                    border.width: 2
+                    border.color: styleData.selected?"#8AB8FF":"#00000000"
                     radius: 2
                     Label {
                         text: styleData.date.getDate()
@@ -224,7 +241,7 @@ Popup {
                         //                    color: styleData.valid
                         //                           ?Qt.rgba(197/255,1,1,1)
                         //                           : Qt.rgba(16/255,100/255,100/255,1)
-                        color: styleData.today?"#3B84F6":(((styleData.visibleMonth && styleData.valid)?(styleData.selected?"#ffffff":fontColor):Qt.rgba(0,0,0,0.25)))
+                        color: styleData.today?"#3B84F6":(((styleData.visibleMonth && styleData.valid)?(styleData.selected?"#000000":fontColor):Qt.rgba(0,0,0,0.25)))
                         //color:styleData.visibleDay?"red":"white"
                     }
                 }

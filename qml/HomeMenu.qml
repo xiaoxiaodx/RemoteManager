@@ -46,15 +46,15 @@ Rectangle {
             textSelectColor:"white"
             txtLeftMargin:7
             textSize:18
-            Component.onCompleted: {
-                tabbarBtn.barModel.append({txtStr:qsTr("主预览")})
-                tabbarBtn.barModel.append({txtStr:qsTr("录像回放")})
-                tabbarBtn.barModel.append({txtStr:qsTr("设备管理")})
-                tabbarBtn.barModel.append({txtStr:qsTr("告警管理")})
-                tabbarBtn.barModel.append({txtStr:qsTr("数据管理")})
-                tabbarBtn.barModel.append({txtStr:qsTr("关于")})
-                setLanguage(curLanguage)
-            }
+//            Component.onCompleted: {
+//                tabbarBtn.barModel.append({txtStr:mylanguage.Masterview})
+//                tabbarBtn.barModel.append({txtStr:mylanguage.VideoPlayback})
+//                tabbarBtn.barModel.append({txtStr:mylanguage.DeviceManagement})
+//                tabbarBtn.barModel.append({txtStr:mylanguage.AlarmManagement})
+//                //                tabbarBtn.barModel.append({txtStr:qsTr("数据管理")})
+//                //                tabbarBtn.barModel.append({txtStr:qsTr("关于")})
+
+//            }
         }
 
         MouseArea{
@@ -84,6 +84,16 @@ Rectangle {
         }
     }
 
+    Connections{
+        target: mylanguage
+        onSignal_updateLan:{
+            tabbarBtn.barModel.clear();
+            tabbarBtn.barModel.append({txtStr:mylanguage.Masterview})
+            tabbarBtn.barModel.append({txtStr:mylanguage.VideoPlayback})
+            tabbarBtn.barModel.append({txtStr:mylanguage.DeviceManagement})
+            tabbarBtn.barModel.append({txtStr:mylanguage.AlarmManagement})
+        }
+    }
 
     Row{
         id:windowMenu
@@ -143,24 +153,13 @@ Rectangle {
                 itemLeftMargin:-12
                 itemTopMargin:0
                 currentIndex:1
-                model: ListModel{
-                    ListElement{showStr:"简体中文"}
-                    ListElement{showStr:"English"}
-//                    ListElement{showStr:"Italian"}
-//                    ListElement{showStr:"Korean"}
-//                    ListElement{showStr:"Russian"}
-//                    ListElement{showStr:"Lithuanian"}
-                }
+                model: languageModel
 
-                //{["showStr":"简体中文" "showStr":"English","Italian","Korean"]}
                 onCurrentIndexChanged:{
-                    console.debug("**********************" + cmb.currentIndex)
-                    curLanguage = cmb.currentIndex
-                    main.s_setLanguage(curLanguage);
+                    mylanguage.updateLanguage(cmb.currentIndex);
                 }
 
-                Component.onCompleted: {
-                }
+
             }
         }
 
@@ -199,35 +198,8 @@ Rectangle {
     }
 
 
-    Connections{
-        target: main
-        onS_setLanguage:setLanguage(typeL);
-    }
 
-    function setLanguage(type){
 
-        var index = 0;
-        switch(type){
-        case lEnglish:
-            tabbarBtn.barModel.get(index++).txtStr =  "Main Preview"
-            tabbarBtn.barModel.get(index++).txtStr =  "Record"
-            tabbarBtn.barModel.get(index++).txtStr =  "Device management"
-            tabbarBtn.barModel.get(index++).txtStr =  "Alarm Management"
-            tabbarBtn.barModel.get(index++).txtStr =  "Data Management"
-            tabbarBtn.barModel.get(index++).txtStr =  "About"
-            break;
-        case lChinese:
-            tabbarBtn.barModel.get(index++).txtStr =  "主预览"
-            tabbarBtn.barModel.get(index++).txtStr =  "录像回放"
-            tabbarBtn.barModel.get(index++).txtStr =  "设备管理"
-            tabbarBtn.barModel.get(index++).txtStr =  "告警管理"
-            tabbarBtn.barModel.get(index++).txtStr =  "数据管理"
-            tabbarBtn.barModel.get(index++).txtStr =  "关于"
-
-            break;
-
-        }
-    }
 
 
 }

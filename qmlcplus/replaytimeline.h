@@ -20,6 +20,10 @@ public:
     Q_INVOKABLE void setTimeWarn(QVariant timeInfo);
     Q_INVOKABLE int getIndicatorTime();
     Q_INVOKABLE void updateDate(QString relativePath,QString date);
+    Q_INVOKABLE void indicatorTimeUpdate(long long pts);
+    Q_INVOKABLE void replaytimeSlowOrFast(int sec);
+
+    Q_INVOKABLE void resetParameter();
     void init();
     void setDate(QDate date);
 
@@ -70,6 +74,9 @@ private:
     QRectF rectFIndicator;
     bool isIndicatorPress = false;
     QPoint pressPt;
+
+    long long prePts = 0;
+    bool ptsUpdateFirst = false;
 };
 
 #endif // REPLAYTIMELINE_H

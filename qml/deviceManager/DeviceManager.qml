@@ -7,7 +7,7 @@ Rectangle {
     property int checkedHeaderLeftMargin: 22
     property int deviceIDHeaderLeftMargin: 46
     property int deviceNameHeaderLeftMargin: 244
-     property int deviceChnHeaderLeftMargin: 350
+    property int deviceChnHeaderLeftMargin: 350
     property int recordPathHeaderLeftMargin: 450 //419
     property int stateHeaderLeftMargin: 793
     property int doHeaderLeftMargin: 969
@@ -75,7 +75,7 @@ Rectangle {
                 anchors.leftMargin: 9
                 anchors.verticalCenter: parent.verticalCenter
                 color: "#ffffff"
-                text: qsTr("批量删除")
+                text: mylanguage.BatchDelete
             }
             MouseArea{
                 anchors.fill: parent
@@ -87,11 +87,7 @@ Rectangle {
                     else
                         askDialog.width = 427
                     askDialog.height = 176
-                    askDialog.askStr = curLanguage=== lChinese?"确认要删除所选设备吗？":
-                                                                curLanguage===lEnglish?"Confirm to delete?":
-                                                                                        curLanguage===lKorean?"삭제하시겠습니까?":
-                                                                                                               curLanguage===lItaly?"Cancella Tutta la Selezione?":
-                                                                                                                                     curLanguage===lRussian?"Вы уверены, что хотите удалить информацию?":""
+                    askDialog.askStr = mylanguage.AskMsgDelete
                     askDialog.imgSrc = "qrc:/images/ico_warn.png"
                     askDialog.curType = askDialog.deviceInfoMutipleDelete
                     askDialog.open();
@@ -128,7 +124,7 @@ Rectangle {
                 anchors.leftMargin: 9
                 anchors.verticalCenter: parent.verticalCenter
                 color: "#ffffff"
-                text: qsTr("批量设置")
+                text: mylanguage.BatchSetting
             }
             MouseArea{
                 anchors.fill: parent
@@ -168,7 +164,7 @@ Rectangle {
                 anchors.leftMargin: 9
                 anchors.verticalCenter: parent.verticalCenter
                 color: "#ffffff"
-                text: qsTr("添加设备")
+                text: mylanguage.DeviceAdd
             }
             MouseArea{
                 anchors.fill: parent
@@ -218,12 +214,7 @@ Rectangle {
                 border.width: 0
                 //text:screenv.funGetCurPath()
                 font.pixelSize: fontSize
-                placeholderText: switch(curLanguage){
-                                 case lChinese:
-                                     "输入关键词";break;
-                                 case lEnglish:
-                                     "Enter the keyword";break;
-                                 }
+                placeholderText: mylanguage.InputKeyWord
                 placeholderTxtColor: "#909399"
                 isNeedDoubleClickEdit: false
                 textLeftPadding:0
@@ -312,7 +303,7 @@ Rectangle {
                 font.pixelSize: fontSize
                 color: "#333333"
                 font.bold: curLanguage===lKorean
-                text: qsTr("设备编码")
+                text: mylanguage.DeviceDid
             }
             Text {
                 id: txtName
@@ -322,7 +313,7 @@ Rectangle {
                 font.pixelSize: fontSize
                 color: "#333333"
                 font.bold: curLanguage===lKorean
-                text: qsTr("名称")
+                text: mylanguage.DeviceName
             }
 
             Text {
@@ -333,7 +324,7 @@ Rectangle {
                 font.pixelSize: fontSize
                 color: "#333333"
                 font.bold: curLanguage===lKorean
-                text: qsTr("通道")
+                text: mylanguage.DeviceChannel
             }
 
             Text {
@@ -345,7 +336,7 @@ Rectangle {
                 font.pixelSize: fontSize
                 font.bold: curLanguage===lKorean
                 color: "#333333"
-                text: qsTr("录像存储地址")
+                text: mylanguage.DeviceVideoSavePath
             }
             Text {
                 id: txtState
@@ -355,7 +346,7 @@ Rectangle {
                 font.pixelSize: fontSize
                 font.bold: curLanguage===lKorean
                 color: "#333333"
-                text: qsTr("网络状态")
+                text: mylanguage.DeviceNetState
             }
 
             Text {
@@ -366,7 +357,7 @@ Rectangle {
                 font.pixelSize: fontSize
                 font.bold: curLanguage===lKorean
                 color: "#333333"
-                text: qsTr("操作")
+                text: mylanguage.Operating
             }
         }
         ListView{
@@ -380,9 +371,7 @@ Rectangle {
             ScrollBar.vertical: ScrollBar {size:10}
 
             Component.onCompleted: {
-
-                deviceModel.funflushDevice();
-
+                deviceModel.funDelayflushDevice(masterpreview,playVideo);
             }
             delegate: Rectangle{
                 property bool enter: false
@@ -465,48 +454,29 @@ Rectangle {
                     color: model.netState?"#67C23A":"#FF4141"
                     text: {
                         if(model.netState){
-                            switch(curLanguage){
-                            case lEnglish:
-                                "Online";
-                                break;
-                            case lChinese:
-                                "在线";
-                                break;
-                            }
+                            mylanguage.DeviceOnLine
                         }else{
-                            switch(curLanguage){
-                            case lEnglish:
-                                "Offline";
-                                break;
-                            case lChinese:
-                                "离线";
-                                break;
-                            }
-
+                            mylanguage.DeviceOffLine
                         }
                     }
                 }
 
 
-                Text {
-                    id: deletetxt
+                Image {
+                    id: imgDelete
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: doHeaderLeftMargin
-                    font.pixelSize: fontSize
-                    color: "#0486FE"
-                    text:switch(curLanguage){
-                         case lChinese:
-                             "删除";
-                             break;
-                         case lEnglish:
-                             "Remove"
-                             break;
-                         }
+
+                    width: 15
+                    height: 15
+                    source: "qrc:/images/datamanager/delete.png"
 
 
                     MouseArea{
                         anchors.fill: parent
+                        onPressed: imgDelete.source = "qrc:/images/datamanager/delete_p.png"
+                        onReleased: imgDelete.source = "qrc:/images/datamanager/delete.png"
                         onClicked: {
                             if(curLanguage === lRussian)
                                 askDialog.width = 500
@@ -541,37 +511,26 @@ Rectangle {
                         }
                     }
                 }
+
                 Rectangle{
                     id:spilitlinerect
                     width: 1
                     height: 12
-                    anchors.left: deletetxt.right
+                    anchors.left: imgDelete.right
                     anchors.leftMargin: 6
                     anchors.verticalCenter: parent.verticalCenter
                     color: "#0486FE"
                 }
 
 
-                Text {
-                    id: setText
+                Image {
+                    id: imgRevise
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: spilitlinerect.right
                     anchors.leftMargin: 6
-                    font.pixelSize: fontSize
-                    color: "#0486FE"
-                    text: {
-
-                        switch(curLanguage){
-                        case lEnglish:
-                            "Set";
-                            break;
-                        case lChinese:
-                            "设置";
-                            break;
-                        }
-
-
-                    }
+                    width: 15
+                    height: 15
+                    source: "qrc:/images/datamanager/revise.png"
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
@@ -579,6 +538,8 @@ Rectangle {
                             openDeviceConfig(false,model.deviceChannel)
 
                         }
+                        onPressed: imgRevise.source = "qrc:/images/datamanager/revise_p.png"
+                        onReleased: imgRevise.source = "qrc:/images/datamanager/revise.png"
                     }
                 }
 
@@ -592,6 +553,7 @@ Rectangle {
                         deviceList.currentIndex = index;
                         mouse.accepted = false
                     }
+
                 }
             }
         }
@@ -600,13 +562,32 @@ Rectangle {
 
 
     function openDeviceConfig(isBatchSet,channel){
-        deviceconfig.isBatchSet = isBatchSet
-        deviceconfig.deviceChannel = channel
-        //deviceconfig.flushParameterInfo(channel);
+
 
         var deviceInfo = deviceModel.funGetDevice(channel);
+
+
+
+        deviceconfig.isBatchSet = isBatchSet;
+        deviceconfig.deviceChannel = channel;
+
         deviceInfo.fungetInitPar();
-        deviceconfig.open()
+        busyWait.open();
+        delaytimer.start();
+    }
+
+
+    Timer{
+        id:delaytimer;
+        interval: 800;
+        repeat: false;
+        triggeredOnStart: false;
+        onTriggered: {
+
+
+            busyWait.close();
+            deviceconfig.open()
+        }
     }
 
     function setDevicePar(model){
@@ -625,38 +606,5 @@ Rectangle {
         }
     }
 
-    Connections{
-        target: main
-        onS_setLanguage:setLanguage(typeL);
-    }
 
-    function setLanguage(type){
-
-        switch(type){
-        case lEnglish:
-            txtBatchDelete.text = "Batch Remove";
-            txtBatchSet.text = "Set in batches";
-            txtDeviceAdd.text = "Add"
-            txtDeviceID.text = "Device ID"
-            txtName.text = "Name"
-            txtRecordPath.text = "Storage path"
-            txtState.text = "Network status"
-            txtDo.text = "Operate"
-            netstateModel.get(0).showStr = "Online"
-            netstateModel.get(1).showStr = "Offline"
-            break;
-        case lChinese:
-            txtBatchDelete.text = "批量删除";
-            txtBatchSet.text = "批量设置";
-            txtDeviceAdd.text = "设备添加"
-            txtDeviceID.text = "设备编码"
-            txtName.text = "名称"
-            txtRecordPath.text = "录像存储地址"
-            txtState.text = "网络状态"
-            txtDo.text = "操作"
-            netstateModel.get(0).showStr = "在线"
-            netstateModel.get(1).showStr = "离线"
-            break;
-        }
-    }
 }

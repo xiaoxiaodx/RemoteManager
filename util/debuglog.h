@@ -2,8 +2,9 @@
 #define DEBUGLOG_H
 
 #include <QObject>
-#include <QFile>
+
 #include <QMutex>
+class QFile;
 class DebugLog : public QObject
 {
     Q_OBJECT

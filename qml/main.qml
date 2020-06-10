@@ -7,6 +7,7 @@ import "./dialog"
 
 import DeviceModel 1.0
 import WarnModel 1.0
+import MyLanguage 1.0
 import ScreenVideo 1.0
 Window {
 
@@ -30,7 +31,6 @@ Window {
     signal sfullScreenChange(bool isFull);
     //onIsLockerChanged: lockerCHange(isLocker)
 
-
     onIsFullScreenChanged: {
         sfullScreenChange(isFullScreen)
     }
@@ -50,6 +50,7 @@ Window {
 
     signal s_setLanguage(var typeL);
 
+    signal s_playvideo(var channel ,var h264Arr,var pts)
 
 
     Component.onCompleted: s_setLanguage(curLanguage)
@@ -62,17 +63,41 @@ Window {
         id:screenv
     }
 
+    ListModel{
+        id:languageModel
+    }
+
+    MyLanguage{
+        id:mylanguage
+        Component.onCompleted: {
+
+            var listlan = getLanMenu();
+            console.debug("listlan  "+listlan.length)
+            console.debug("listlan  "+listlan[0])
+
+            for(var i=0;i<listlan.length;i++)
+                languageModel.append({"showStr":listlan[i]})
+        }
+    }
+
     DeviceModel{
         id:deviceModel
 
-        onSignal_channelUse:videoShowModel.get(channel).isBind = true;
+        //onSignal_channelUse:videoShowModel.get(channel).isBind = true;
 
         onSignal_sendWarnInfo:{
 
             warnmodel.funAppendWarnInfo(screenv.funGetCurPath(),channle,name,map,arrimg)
 
-           // realtimeAlarmModel.append({channle:channle,name:name,})
+            // realtimeAlarmModel.append({channle:channle,name:name,})
         }
+
+//        onSignal_p2pCallbackVideoData: {
+
+//            s_playvideo(name,h264Arr,pts);
+//            console.debug("**********onSignal_p2pCallbackVideoData*************")
+
+//        }
     }
 
     WarnModel{
@@ -113,9 +138,10 @@ Window {
         width: parent.width
         height: parent.height
         visible: true//isMainContent?true:false
+
         onWinMin: {
-//            if(main.visibility === 4)
-//                isSpecilState = true;
+            //            if(main.visibility === 4)
+            //                isSpecilState = true;
             main.visibility = "Minimized"
         }
 
@@ -130,14 +156,14 @@ Window {
             askDialog.width = 427
             askDialog.height = 176
             askDialog.askStr = curLanguage=== lChinese?"确认退出系统吗？":
-                               curLanguage===lEnglish?"Confirm to exit ?":
-                               curLanguage===lKorean?"나가시겠습니까?":
-                               curLanguage===lItaly?"Uscita Dal Sistema?":
-                               curLanguage===lRussian?"Подтвердить выход?":"";
+                                                        curLanguage===lEnglish?"Confirm to exit ?":
+                                                                                curLanguage===lKorean?"나가시겠습니까?":
+                                                                                                       curLanguage===lItaly?"Uscita Dal Sistema?":
+                                                                                                                             curLanguage===lRussian?"Подтвердить выход?":"";
             askDialog.imgSrc = "qrc:/images/icon_question.png"
             askDialog.curType = askDialog.exeClose
             askDialog.open();
-          //  Qt.quit();
+            //  Qt.quit();
         }
         onDragPosChange:main.setDlgPoint(mx,my);
 
@@ -281,7 +307,18 @@ Window {
             if(askDialog.exeClose === type)
                 Qt.quit();
         }
+    }
 
+    MesseageDialog{
+        id:msgDialog
+
+    }
+
+    QmlWatingBusy{
+        id:busyWait
+        anchors.centerIn: parent
+        width: 100
+        height: 100
     }
 
     Loader{
@@ -299,7 +336,7 @@ Window {
         QmlToast{
             txtStr:toastStr
             backColor: "transparent"
-            txtColor:"#ffffff"
+            txtColor:"#FF4141"
             maxWid:main.width/2
         }
     }

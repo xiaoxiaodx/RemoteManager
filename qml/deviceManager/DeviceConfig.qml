@@ -47,24 +47,18 @@ Popup {
                 text: {
 
                     if(isBatchSet){
-                        switch(curLanguage){
-                        case lChinese:
-                            "批量配置";
-                            break;
-                        }
+
+                        mylanguage.BatchSetting
 
                     }else{
 
-                        switch(curLanguage){
-                        case lChinese:
-                            "设配配置(通道:"+deviceChannel+")"
-                            break;
-                        case lEnglish:
 
-                            break;
-                        }
+                        mylanguage.Set+"(ch:"+deviceChannel+")"
+
 
                     }
+
+
 
                 }
                 color: "white"
@@ -94,11 +88,15 @@ Popup {
             color: bgColor
             ListModel{
                 id:leftlistmodel
-                ListElement { name: "OSD设置"}
-                ListElement { name: "录像设置"}
-                ListElement { name: "RTMP设置"}
-                ListElement { name: "时间设置"}
-                ListElement { name: "温度设置"}
+
+                Component.onCompleted: {
+                    leftlistmodel.append({name:mylanguage.OsdSet})
+                    leftlistmodel.append({name:mylanguage.RecordSet})
+                    leftlistmodel.append({name:mylanguage.RtmpSet})
+                    leftlistmodel.append({name:mylanguage.Time})
+                    leftlistmodel.append({name:mylanguage.TempSet})
+                }
+
             }
 
             Rectangle{
@@ -119,7 +117,7 @@ Popup {
                         width: parent.width
                         height: 34
                         color: curSelectIndex === index?"#FFFFFF":"#EEF3FA"
-                        Text {
+                        Text{
                             id: itemtext
                             anchors.left: parent.left
                             anchors.leftMargin: 10
@@ -250,7 +248,7 @@ Popup {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        updateParameterInfo(leftListv.curSelectIndex);
+                        updateParameterInfo(deviceChannel);
                         root.close()
                     }
                 }
@@ -266,16 +264,30 @@ Popup {
     }
 
 
-    function updateParameterInfo(index){
+    function updateParameterInfo(channel){
 
 
-        var deviceInfo = deviceModel.funGetDevice(index);
+        console.debug("*************** "+channel)
+        settingosd.updateParameterInfo()
+        settingrecord.updateParameterInfo()
+        settingrtmp.updateParameterInfo()
+        settingtemp.updateParameterInfo()
+        settingtime.updateParameterInfo()
 
-        settingosd.updateParameterInfo(deviceInfo)
-        settingrecord.updateParameterInfo(deviceInfo)
-        settingrtmp.updateParameterInfo(deviceInfo)
-        settingtemp.updateParameterInfo(deviceInfo)
-        settingtime.updateParameterInfo(deviceInfo)
+
+    }
+
+
+    Connections{
+        target: mylanguage
+        onSignal_updateLan:{
+            leftlistmodel.clear()
+            leftlistmodel.append({name:mylanguage.OsdSet})
+            leftlistmodel.append({name:mylanguage.RecordSet})
+            leftlistmodel.append({name:mylanguage.RtmpSet})
+            leftlistmodel.append({name:mylanguage.Time})
+            leftlistmodel.append({name:mylanguage.TempSet})
+        }
     }
 }
 

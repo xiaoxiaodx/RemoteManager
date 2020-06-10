@@ -1,4 +1,4 @@
-#ifndef DEVICEMODEL_H
+﻿#ifndef DEVICEMODEL_H
 #define DEVICEMODEL_H
 
 #include <QObject>
@@ -25,17 +25,23 @@ public:
         RECORDSAVEPATH,
         NETSTATE,
     };
+    Q_INVOKABLE void funSavePlayVideo(QObject *playbj);
+    Q_INVOKABLE void funSaveReplayVideo(QObject *replayobj);
 
-    Q_INVOKABLE void funflushDevice();
+    Q_INVOKABLE void funDelayflushDevice(QObject *masterviewobj,QObject *replayobj);
+    Q_INVOKABLE void funflushDevice(QObject *masterviewobj,QObject *replayobj);
     Q_INVOKABLE void funDeleteIndex(int index);
     Q_INVOKABLE void funDeleteSelect();
-    Q_INVOKABLE void funAddDevice(QString deviceID,QString name,QString channel="",QString account="admin",QString pwd="admin");
+    Q_INVOKABLE bool funAddDevice(QString deviceID,QString name,QString account="admin",QString pwd="admin");
     Q_INVOKABLE void funSendData(int index,QString cmd,QVariantMap map);
     Q_INVOKABLE void funBatchSendData(QVariantMap map);
     Q_INVOKABLE void funSendData1(QString channel,QString cmd,QVariantMap map);
     Q_INVOKABLE void funSetAllSelect(bool isSelect);//选中所有数据
     Q_INVOKABLE QVariant funGetDevice(int index);
     Q_INVOKABLE QVariant funGetDevice(QString  channel);
+
+    Q_INVOKABLE void funSwitchPage(int page);
+
 
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -45,13 +51,12 @@ public:
     Qt::ItemFlags flags(const QModelIndex& index) const override;
     virtual QHash<int, QByteArray> roleNames() const override;
 
-
 signals:
     //回调
     void signal_p2pConnectCallback(bool isSucc,QString name,QString did,QString acc,QString pwd,QString errStr);
-    void signal_p2pCallbackVideoData(QString name ,QVariant h264Arr);
+    void signal_p2pCallbackVideoData(QString name ,QVariant h264Arr,long long pts);
     void signal_p2pCallbackAudioData(QString name ,QVariant PcmALawArr,int arrLen,long long pts);
-    void signal_p2pCallbackReplayVideoData(QString name ,QVariant h264Arr);
+    void signal_p2pCallbackReplayVideoData(QString name ,QVariant h264Arr,long long pts);
     void signal_p2pCallbackReplayAudioData(QString name ,QVariant PcmALawArr,int arrLen);
 
     //回放
@@ -68,17 +73,21 @@ public slots:
     void slot_flustConnectState();
     void slot_recReplayVedio(QString name ,QVariant img,long long pts);
     void slot_recRepkyData(QString name ,QVariant smap);
-    void slot_recPlayVedio(QString name ,QVariant smap);
+    void slot_recPlayVedio(QString name ,QVariant smap,long long pts);
     void slot_sendWarnInfo(QString channle ,QString name,QVariantMap map,QByteArray arrimg);
-
-private:
-
 
 signals:
 
-
 private:
+    QObject *findPlayObjectFromlist(QString objName);
+    QObject *findObjectAccordingName(QObject *obj,QString objNAME);
     QList<DeviceModelData*> m_listDevice;
+
+
+    QList<QObject *> listxvideoObj;
+    QObject *replayObj = nullptr;
+    QObject *replayTimeObj = nullptr;
+
 };
 
 #endif // DEVICEMODEL_H

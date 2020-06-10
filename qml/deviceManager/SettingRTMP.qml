@@ -41,9 +41,9 @@ Rectangle {
         inputpassword.text = pwd
     }
 
-    function updateParameterInfo(model){
+    function updateParameterInfo(){
 
-        if(isRevicse){
+        if(!isRevicse){
             return;
         }else{
 
@@ -72,7 +72,7 @@ Rectangle {
         anchors.bottomMargin: 10
         font.pixelSize: fontPixSize
         color: fontColor
-        text: qsTr("设置")
+        text: mylanguage.Set
     }
 
 
@@ -90,7 +90,7 @@ Rectangle {
 
     Text {
         id: labelSwitchTime
-        text: qsTr("时间开关")
+        text: mylanguage.TimeSwitch
         font.pixelSize: fontSize
         color: fontColor
         anchors.right: swithRtmp.left
@@ -112,7 +112,7 @@ Rectangle {
 
     Text {
         id: labelResolution
-        text: qsTr("分辨率")
+        text: mylanguage.Resolution
         font.pixelSize: fontSize
         color: fontColor
         anchors.right: cmbResolution.left
@@ -192,7 +192,7 @@ Rectangle {
         isNeedDoubleClickEdit: false
         textLeftPadding:0
         txtColor: Qt.rgba(0,0,0,0.65)
-       color: "#ffffff"
+        color: "#ffffff"
         onTextChanged: isRevicse = true;
     }
 
@@ -204,7 +204,7 @@ Rectangle {
         anchors.right: inputaccount.left
         anchors.rightMargin: firstAlighnlineSpace
         anchors.verticalCenter: inputaccount.verticalCenter
-        text: qsTr("用户名")
+        text: mylanguage.User
     }
 
     LineEdit {
@@ -234,7 +234,7 @@ Rectangle {
         anchors.right: inputpassword.left
         anchors.rightMargin: firstAlighnlineSpace
         anchors.verticalCenter: inputpassword.verticalCenter
-        text: qsTr("密码")
+        text: mylanguage.Password
     }
 
     LineEdit {
@@ -257,29 +257,6 @@ Rectangle {
         onTextChanged:  isRevicse = true;
     }
 
-    Connections{
-        target: main
-        onS_setLanguage:setLanguage(typeL);
-    }
 
-    function setLanguage(type){
-        switch(type){
-        case lEnglish:
-
-            settxt.text = "Set"
-            labelSwitchTime.text = "Time Switch"
-            labelResolution.text = "Resolution"
-            txtaccount.text = "Account"
-            txtpassword.text = "Password"
-            break;
-        case lChinese:
-            settxt.text = "设置"
-            labelSwitchTime.text = "时间开关"
-            labelResolution.text = "分辨率"
-            txtaccount.text = "用户名"
-            txtpassword.text = "密码"
-            break;
-        }
-    }
 
 }

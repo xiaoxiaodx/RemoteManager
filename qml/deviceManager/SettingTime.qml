@@ -40,9 +40,9 @@ Rectangle {
         swithSummerEnable.checked = summertimeenable
     }
 
-    function updateParameterInfo(model){
+    function updateParameterInfo(){
 
-        if(isRevicse){
+        if(!isRevicse){
             return;
         }else{
             var map = {
@@ -63,9 +63,9 @@ Rectangle {
             };
 
             if(isBatchSet)
-                deviceModel.funSelectSendData("setcurrenttime",map);
+                deviceModel.funBatchSendData("setcurrenttime",map);
             else
-                model.funP2pSendData("setcurrenttime",map1);
+                deviceModel.funSendData1(deviceChannel,"setcurrenttime",map1);
             //model.updateTime(isBatchSet,swithNtpEnable.checked,inputurl.text,cmbtimezone.currentIndex,swithSummerEnable.checked);
         }
     }
@@ -78,7 +78,7 @@ Rectangle {
         anchors.bottomMargin: 10
         font.pixelSize: fontPixSize
         color: fontColor
-        text: qsTr("NTP设置")
+        text: mylanguage.NtpSet
     }
 
 
@@ -96,7 +96,7 @@ Rectangle {
 
     Text {
         id: labelSwitchEnable
-        text: qsTr("使能开关")
+        text: mylanguage.Switch
         font.pixelSize: fontSize
         color: fontColor
         anchors.right: swithNtpEnable.left
@@ -112,7 +112,7 @@ Rectangle {
         anchors.leftMargin: parSetFirstAlignLine
         anchors.top: line.bottom
         anchors.topMargin: 20
-        // onCheckedChanged: s_timeSwith(checked)
+         onCheckedChanged:isRevicse = true
     }
 
 
@@ -144,13 +144,13 @@ Rectangle {
         isNeedDoubleClickEdit: false
         textLeftPadding:0
         txtColor: Qt.rgba(0,0,0,0.65)
-       color: "#ffffff"
+        color: "#ffffff"
         onTextChanged:isRevicse = true;
     }
 
     Text {
         id: labeltimezone
-        text: qsTr("时区选择")
+        text: mylanguage.TimeZoneSelect
         font.pixelSize: 14
         color: fontColor
         anchors.left: line1.left
@@ -201,15 +201,14 @@ Rectangle {
         bordColor:"#DEDFE3"
         mRadius:2
         model: timezoneModel
-        onCurrentIndexChanged: {
-            isRevicse = true;
-        }
+        onCurrentIndexChanged: isRevicse = true;
+
     }
 
 
     Text {
         id: labelSunmerSet
-        text: qsTr("夏令时设置")
+        text: mylanguage.SummerTimeSet
         font.pixelSize: 14
         color: fontColor
         anchors.left: line2.left
@@ -230,7 +229,7 @@ Rectangle {
 
     Text {
         id: labelSummerEnable
-        text: qsTr("使能开关")
+        text: mylanguage.Switch
         font.pixelSize: fontSize
         color: fontColor
         anchors.right: swithSummerEnable.left
@@ -247,30 +246,5 @@ Rectangle {
         anchors.top: line2.bottom
         anchors.topMargin: 20
         onCheckedChanged: isRevicse = true;
-    }
-
-    Connections{
-        target: main
-        onS_setLanguage:setLanguage(typeL);
-    }
-
-    function setLanguage(type){
-        switch(type){
-        case lEnglish:
-            labelSummerEnable.text = "Enable"
-            labelSunmerSet.text = "夏令时设置"
-            labeltimezone.text = "时区选择"
-            labelSwitchEnable.text = "Enable"
-            settxt.text = "NTP设置"
-
-            break;
-        case lChinese:
-            labelSummerEnable.text = "使能开关"
-            labelSunmerSet.text = "夏令时设置"
-            labeltimezone.text = "时区选择"
-            labelSwitchEnable.text = "使能开关"
-            settxt.text = "NTP设置"
-            break;
-        }
     }
 }

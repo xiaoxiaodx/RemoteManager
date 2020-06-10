@@ -12,6 +12,7 @@ import Qt.labs.settings 1.0
 Rectangle {
 
     id:playbackvideo
+    objectName: "playbackvideo"
     signal s_addDevice();
     signal st_showToastMsg(string str1);
     signal s_multiScreenNumChange(int num);
@@ -29,6 +30,7 @@ Rectangle {
     property bool  isPlay: false
 
 
+    property string curPlayChannel: ""
     MouseArea{
         anchors.fill: parent
         onClicked: ;
@@ -45,13 +47,19 @@ Rectangle {
         id:maincontent
         width: parent.width
         height: parent.height
-
+        objectName: "maincontent"
         color: "#252525"
 
         XVideoReplay{
             id:xVideoReplay
+            objectName: "replay"
             width:maincontent.width
             height:maincontent.height - rowRectHeight.height - timeline.height
+
+            onSignal_timeDate:{
+                timeline.indicatorTimeUpdate(pts)
+            }
+            Component.onCompleted: deviceModel.funSaveReplayVideo(xVideoReplay)
         }
 
         Rectangle{
@@ -76,27 +84,44 @@ Rectangle {
                     MouseArea{
                         anchors.fill: parent
                         hoverEnabled: true
-                        onPressed: imgslow.source = "qrc:/images/playback/play_slow_p.png"
-                        onReleased: imgslow.source = "qrc:/images/playback/play_slow.png"
+                        onReleased: imgslow.source = "qrc:/images/playback/play_slow_h.png"
+                        onPressed:{
+                            if(!isSelectChannel())
+                                return;
+                            imgslow.source = "qrc:/images/playback/play_slow_p.png"
+
+
+                           timeline.replaytimeSlowOrFast(-10)
+                        }
+                        onEntered: imgslow.source = "qrc:/images/playback/play_slow_h.png"
+                        onExited: imgslow.source = "qrc:/images/playback/play_slow.png"
                     }
                 }
 
                 Image {
                     id: imgplay
-                    source: "qrc:/images/playback/play.png"
-
+                    source: imgplay.isPlay?"qrc:/images/playback/play_pause.png":"qrc:/images/playback/play.png"
+                    property bool isPlay: false
                     width: 20
                     height: 20
                     anchors.verticalCenter: parent.verticalCenter
                     MouseArea{
                         anchors.fill: parent
-                        hoverEnabled: true
-                        onPressed: {
+                        onClicked: {
+                            if(!isSelectChannel())
+                                return;
 
-                            imgplay.source = "qrc:/images/playback/play_h.png"
-                            //player.play();
+                            if(!imgplay.isPlay){
+                                var map = {
+                                    cmd:"replay continue"};
+                                deviceModel.funSendData1(txtDeviceSelect.text,"replay continue",map);
+
+                            }else{
+                                var map1 = {
+                                    cmd:"replay pause"};
+                                deviceModel.funSendData1(txtDeviceSelect.text,"replay pause",map1);
+                            }
                         }
-                        onReleased: imgplay.source = "qrc:/images/playback/play.png"
                     }
                 }
 
@@ -110,8 +135,15 @@ Rectangle {
                     MouseArea{
                         anchors.fill: parent
                         hoverEnabled: true
-                        onPressed: imgfast.source = "qrc:/images/playback/play_fast_p.png"
-                        onReleased: imgfast.source = "qrc:/images/playback/play_fast.png"
+                        onReleased: imgfast.source = "qrc:/images/playback/play_fast_h.png"
+                        onPressed:{
+                            if(!isSelectChannel())
+                                return;
+                            imgfast.source = "qrc:/images/playback/play_fast_p.png"
+                            timeline.replaytimeSlowOrFast(10)
+                        }
+                        onEntered: imgfast.source = "qrc:/images/playback/play_fast_h.png"
+                        onExited: imgfast.source = "qrc:/images/playback/play_fast.png"
                     }
                 }
             }
@@ -192,6 +224,9 @@ Rectangle {
                         anchors.fill: parent
                         hoverEnabled: true
                         onPressed: {
+                            if(!isSelectChannel())
+                                return;
+
                             imgdate.source = "qrc:/images/warnmanager/date_p.png"
                             getRecordInfo(1,Qt.formatDate(calendar.getCurrentData(),"yyyyMMdd000000"));
 
@@ -279,7 +314,7 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         font.pixelSize: 12
                         color: "white"
-                        text: qsTr("正常录像")
+                        text: mylanguage.VideoNormal
                     }
                 }
                 Rectangle{
@@ -302,7 +337,7 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         font.pixelSize: 12
                         color: "white"
-                        text: qsTr("告警录像")
+                        text: mylanguage.VideoAlarm
                     }
                 }
                 Rectangle{
@@ -325,7 +360,7 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         font.pixelSize: 12
                         color: "white"
-                        text: qsTr("录像丢失")
+                        text: mylanguage.VideoLoss
                     }
                 }
 
@@ -394,22 +429,66 @@ Rectangle {
             onIndicatorTimeChange:{
                 //screen.funPlayTimeChange(deviceconfig.getRecordPath(),Qt.formatDate(calendar.getCurrentData(),"yyyyMMdd"),curTime)
                 var str = Qt.formatDate(calendar.getCurrentData(),"yyyy:MM:dd:") +curTime;
-                var map = {time:str};
+                var map = {
+                    cmd:"replay",
+                    time:str};
                 deviceModel.funSendData1(txtDeviceSelect.text,"replay",map);
-
             }
         }
     }
+
+
 
     DeviceSelectPop{
         id:deviceSelectPop
 
         mmodel:deviceModel
 
-        onS_txtChange: txtDeviceSelect.text = txt
+        onS_txtChange: {
+
+            if(txtDeviceSelect.text === ""){
+                txtDeviceSelect.text = txt
+                return
+            }
+
+            if(txt !== txtDeviceSelect.text){
+
+                askDialog.width = 427
+                askDialog.height = 176
+                var txtstr = "";
+                switch(curLanguage){
+                case lChinese:
+                    txtstr = "通道改变，将重置回放界面"
+                    break;
+                case lEnglish:
+                    break;
+                }
+                askDialog.askStr =txtstr
+                askDialog.imgSrc = "qrc:/images/icon_question.png"
+                askDialog.curType = askDialog.replayChannelChange
+                askDialog.open();
+            }
+
+        }
     }
 
+    Connections{
+        target: askDialog
+        onS_CurTypeMsg:{
+            if(askDialog.replayChannelChange === type){
 
+                var map1 = {
+                    cmd:"replay stop"};
+                deviceModel.funSendData1(txtDeviceSelect.text,"replay stop",map1);
+
+                timeline.resetParameter();
+
+                txtDeviceSelect.text = deviceSelectPop.curText
+
+                calendar.calendarEventModel.clear();
+            }
+        }
+    }
 
     MyCalendar{
         id:calendar
@@ -420,8 +499,10 @@ Rectangle {
         y:parent.height -115-314-2
         onS_dayChange:{
             //            timeline.updateDate(deviceconfig.getRecordPath(),value)
-
             //timeline.clearTimeWarn();
+
+            timeline.resetParameter();
+
             getRecordInfo(2,value)
         }
         onS_dayChange1:{
@@ -429,21 +510,24 @@ Rectangle {
             txtDate.text = value
         }
 
-        onS_mouthChange:getRecordInfo(1,value)
+        onS_mouthChange:{
+            calendar.calendarEventModel.clear();
+            getRecordInfo(1,value)
+        }
 
-        onS_yearChange: console.debug("onS_yearChange   "+value)
+        onS_yearChange: {
+
+                console.debug("onS_yearChange   "+value)
+            }
 
         // Component.onCompleted:getRecordInfo(2, Qt.formatDate(calendar.getCurrentData(),"yyyyMMdd000000"))
     }
-
-
-
 
     function getRecordInfo(type,date){
         console.debug("onS_mouthChange   "+type+"   "+date)
 
         if(txtDeviceSelect.text != ""){
-            var map = {method:type,time:date,msgid:date}
+            var map = {cmd:"getrecordinginfo",method:type,time:date,msgid:date}
             deviceModel.funSendData1(txtDeviceSelect.text,"getrecordinginfo",map)
         }
     }
@@ -451,7 +535,7 @@ Rectangle {
         target:deviceModel
 
         onSignal_p2pCallbackReply:{
-            console.debug("smap " + smap)
+            console.debug("smap " + smap.cmd)
             if(name === txtDeviceSelect.text){
                 if(smap.cmd === "getrecordinginfo"){
                     if(smap.infoType==="hourInfo"){
@@ -473,11 +557,24 @@ Rectangle {
                     }else if(smap.infoType==="mounthInfo"){
 
                         var listRecord = smap.data;
+
+                        console.debug("*****************  mounthInfo:  "+ listRecord);
+
                         for(var i=0;i<listRecord.length;i++){
                             calendar.calendarEventModel.append({type:listRecord[i]})
                         }
-                    }
 
+//                        for(var j=0;j<calendar.calendarEventModel.count;j++)
+//                            console.debug("*****************  calendarEventModel:  "+ calendar.calendarEventModel.get(j).type);
+                    }
+                }else if(smap.cmd === "replay"){
+                    imgplay.isPlay = true;
+                }else if(smap.cmd === "replay stop"){
+                    imgplay.isPlay = false;
+                }else if(smap.cmd === "replay pause"){
+                    imgplay.isPlay = false;
+                }else if(smap.cmd === "replay continue"){
+                    imgplay.isPlay = true;
                 }
             }
         }
@@ -487,22 +584,23 @@ Rectangle {
 
 
         }
-        //        onSignal_p2pCallbackReplayPause:isPlay = false
-        //        onSignal_p2pCallbackReplayContinue:isPlay=true
-        //        onSignal_p2pCallbackReplay:{
-        //            listdeviceInfo.get(listDevice.currentIndex).playBackState = "replay"
-        //            isPlay=true
-        //        }
-        // signal_p2pCallbackReplayVideoData(name,arr,arrlen);
-        onSignal_p2pCallbackReplayVideoData:{
 
-            //                    if(screenBlack.visible)
-            //                        screenBlack.visible = !screenBlack.visible
-            //     timeline.addMidValueTime(60);
+        onSignal_p2pCallbackReplayVideoData:{
             xVideoReplay.funSendVideoData(h264Arr)
+            timeline.indicatorTimeUpdate(pts)
         }
     }
 
+    function isSelectChannel(){
+        if(txtDeviceSelect.text === ""){
+            msgDialog.width = 300
+            msgDialog.height = 140
+            msgDialog.msgStr = "请选择通道！"
+            msgDialog.open();
+            return false;
+        }
+        return true;
+    }
 
     function setLanguage(type){
 

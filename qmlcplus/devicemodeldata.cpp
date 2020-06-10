@@ -1,8 +1,7 @@
 #include "devicemodeldata.h"
 #include "p2pworker.h"
 
-#include <QDebug>
-
+#include <debuglog.h>
 void DeviceModelData::createP2pThread(QString deviceDid,QString name,QString pwd)
 {
 
@@ -13,17 +12,16 @@ void DeviceModelData::createP2pThread(QString deviceDid,QString name,QString pwd
         m_p2pThread = new QThread;
         p2pWorker->moveToThread(m_p2pThread);
 
-        connect(p2pWorker,&P2pWorker::signal_sendH264,this,&DeviceModelData::slot_recH264);
+        connect(p2pWorker,&P2pWorker::signal_sendImg,this,&DeviceModelData::slot_recImg);
         connect(p2pWorker,&P2pWorker::signal_sendPcmALaw,this,&DeviceModelData::slot_recPcmALaw);
         connect(p2pWorker,&P2pWorker::signal_p2pReplyData,this,&DeviceModelData::slot_p2pReplyData);
         connect(this,&DeviceModelData::signal_connectP2pDev,p2pWorker,&P2pWorker::slot_connectDev);
         connect(p2pWorker,&P2pWorker::signal_reconnectP2pDev,this,&DeviceModelData::slot_reConnectP2pDev);
         connect(p2pWorker,&P2pWorker::signal_p2pConnectState,this,&DeviceModelData::slot_connectState);
 
-        connect(p2pWorker,&P2pWorker::signal_sendReplayH264,this,&DeviceModelData::slot_recReplayH264);
+        connect(p2pWorker,&P2pWorker::signal_sendReplayImg,this,&DeviceModelData::slot_recReplayImg);
         connect(p2pWorker,&P2pWorker::signal_loginState,this,&DeviceModelData::slot_p2pLoginState);
         connect(p2pWorker,&P2pWorker::signal_sendWarnImg,this,&DeviceModelData::slot_sendWarnImg);
-
 
         connect(m_p2pThread,&QThread::finished,p2pWorker,&P2pWorker::deleteLater);
         connect(m_p2pThread,&QThread::finished,m_p2pThread,&QThread::deleteLater);
@@ -31,15 +29,14 @@ void DeviceModelData::createP2pThread(QString deviceDid,QString name,QString pwd
 
         emit signal_connectP2pDev(deviceDid,name,pwd);
     }
-
-
     connect(&SendTimer,&QTimer::timeout,this,&DeviceModelData::slot_sendtimerout);
+}
 
+DeviceModelData::~DeviceModelData(){
+    qDebug()<<" DeviceModelData 析构";
 }
 
 void DeviceModelData::slot_p2pLoginState(int isSucc){
-
-
 
     if(isSucc>0){
         setisLogin(true);
@@ -55,16 +52,25 @@ void DeviceModelData::slot_sendWarnImg(QVariantMap map,QByteArray arrimg)
     emit signal_sendWarnInfo(m_deviceChannel,m_deviceName,map,arrimg);
 }
 
-void DeviceModelData::slot_recH264(QString name ,QVariant img,long long pts){
-    //qDebug()<<" slot_recH264    "<<name;
-    emit signal_recPlayVedio(m_deviceChannel,img,pts);
+void DeviceModelData::slot_recImg(QImage *img,quint64 pts){
+    if(playVideo != nullptr)
+    playVideo->recImg(img);
 }
 
 
+void DeviceModelData::slot_recH264(QString name ,QVariant img,long long pts){
+    qDebug()<<" slot_recH264    "<<name;
+    emit signal_recPlayVedio(m_deviceChannel,img,pts);
+}
+
+void DeviceModelData::slot_recReplayImg(QImage *img,quint64 pts){
+    if(replayVideo != nullptr)
+        replayVideo->slot_recReolayImg(img,pts);
+}
 
 void DeviceModelData::slot_recReplayH264(QString name ,QVariant img,long long pts){
-    //qDebug()<<" slot_recH264    "<<name;
-    emit signal_recReplayVedio(m_deviceChannel,img,pts);
+    //qDebug()<<" slot_recReplayH264    "<<name;
+   // emit signal_recReplayVedio(m_deviceChannel,img,pts);
 }
 
 void DeviceModelData::slot_recPcmALaw(QString name ,char* PcmALawArr,int arrLen,long long pts)
@@ -76,6 +82,7 @@ void DeviceModelData::slot_reConnectP2pDev(QString deviceDid,QString name,QStrin
 {
     emit signal_connectP2pDev(deviceDid,name,pwd);
 }
+
 void DeviceModelData::slot_connectState(QString name,int a,QString did,QString acc,QString pwd)
 {
     qDebug()<<"name "<<name<<"  "<<a;
@@ -97,26 +104,90 @@ void DeviceModelData::slot_connectState(QString name,int a,QString did,QString a
     emit signal_flushConnectState();
 }
 
-
-
 void DeviceModelData::slot_p2pReplyData(QString cmd,QVariantMap map)
 {
 
+    if(map.contains("statuscode")){
+
+        int statuscode = map.value("statuscode").toInt();
+
+        if(statuscode != 200){
+            QVariantMap maplogin;
+            maplogin.insert("cmd","login");
+
+            funP2pSendData("login",maplogin);
+            return;
+        }
+    }
+
+
+
     QString msgid1 = map.value("msgid").toString();
     QString cmd1 = map.value("cmd").toString();
-    qDebug()<<"移除命令   "<<cmd1;
     removeAlreadySend(cmd1,msgid1);
 
+    DebugLog::getInstance()->writeLog("remove cmd:"+cmd1);
 
     updatePar(map);
     //一些录像信息需要放松到qml中去渲染
-    emit signal_p2pReplyData(m_deviceName,map);
+    emit signal_p2pReplyData(m_deviceChannel,map);
+
+    if(cmd1.compare("getVedio")==0){
+        playState = PLAY;
+    }else if(cmd1.compare("stopVideo")==0){
+        playState = STOP;
+    }else if(cmd1.compare("replay")==0){
+        replayState = PLAY;
+    }else if(cmd1.compare("replay stop")==0){
+        replayState = STOP;
+    }else if(cmd1.compare("replay pause")==0){
+        replayState = PAUSE;
+    }else if(cmd1.compare("replay continue")==0){
+        replayState = PLAY;
+    }
+
 }
+
+QString DeviceModelData::getDeviceIdefiy()
+{
+    qDebug()<<"getDeviceIdefiy    ";
+    return m_deviceChannel;
+}
+
+void DeviceModelData::funP2pSendData(QString cmd,QVariantMap map)
+{
+
+    if(m_netState == 0)
+        return;
+
+
+    DebugLog::getInstance()->writeLog("send cmd:"+cmd);
+
+   QString cmd1 = map.value("cmd").toString();
+    if(cmd1.compare("replay")==0){
+
+
+    }else if(cmd1.compare("getVedio")==0){//同理，有回放在播放，则关闭回放
+        if(playState == PLAY)
+            return;
+    }else if(cmd1.compare("replay pause")){
+
+
+    }
+
+    QString msgid = createMsgId(map.value("cmd").toString());
+    map.insert("msgid",msgid);
+    listMsg.append(map);
+
+    if(!SendTimer.isActive())
+        SendTimer.start(sendertimerInter);
+}
+
 
 void DeviceModelData::updatePar(QVariantMap map)
 {
 
-     if(map.value("cmd").toString().compare("getosdparam")==0){
+    if(map.value("cmd").toString().compare("getosdparam")==0){
         if(map.contains("osdName"))
             m_osdName = map.value("osdName").toString();
         m_osdNameShowSwitch  = map.value("osdNameShowSwitch").toBool();
@@ -134,33 +205,21 @@ void DeviceModelData::updatePar(QVariantMap map)
 
     }else if(map.value("cmd").toString().compare("getiradinfo")==0){
 
-         //温度设置
-         //        QML_PROPERTY(bool,tempWarnSwitch)
-         //        QML_PROPERTY(float,tempWarnValue)
-         //        QML_PROPERTY(bool,tempScreenShot)
-         //        QML_PROPERTY(QString,tempScreenShotPath)
-         //        QML_PROPERTY(bool,tempBeerSwitch)
-         //        QML_PROPERTY(float,tempDrift)
-         //        QML_PROPERTY(float,tempControlLevel)
-         //        QML_PROPERTY(int,tempdriftcaplevelMax)  //2
-         //        QML_PROPERTY(int,tempdriftcaplevelMin)  //-2
-         //        QML_PROPERTY(int,tempcontrolcaplevelMax)    //13
-         //        QML_PROPERTY(int,tempcontrolcaplevelMin)  // 1
-         m_tempdriftcaplevelMax = map.value("tempdriftcaplevelMax").toInt();
-         m_tempdriftcaplevelMin = map.value("tempdriftcaplevelMin").toInt();
-         m_tempcontrolcaplevelMax = map.value("tempcontrolcaplevelMax").toInt();
-         m_tempcontrolcaplevelMax = map.value("tempcontrolcaplevelMax").toInt();
-         m_tempControlLevel = map.value("tempControlLevel").toInt();
-         m_tempDrift = map.value("tempDrift").toInt();
-         m_tempWarnValue = map.value("tempWarnValue").toFloat();
-         m_tempWarnSwitch = map.value("tempWarnSwitch").toBool();
+        m_tempdriftcaplevelMax = map.value("tempdriftcaplevelMax").toInt();
+        m_tempdriftcaplevelMin = map.value("tempdriftcaplevelMin").toInt();
+        m_tempcontrolcaplevelMax = map.value("tempcontrolcaplevelMax").toInt();
+        m_tempcontrolcaplevelMax = map.value("tempcontrolcaplevelMax").toInt();
+        m_tempControlLevel = map.value("tempControlLevel").toInt();
+        m_tempDrift = map.value("tempDrift").toInt();
+        m_tempWarnValue = map.value("tempWarnValue").toFloat();
+        m_tempWarnSwitch = map.value("tempWarnSwitch").toBool();
     }else if(map.value("cmd").toString().compare("getrecordparam")==0){
 
-       m_recordType = map.value("recordType").toInt();
-       m_recordStartT = map.value("recordStartT").toString();
-       m_recordEndT = map.value("recordEndT").toString();
-       m_recordWeeklyDate = map.value("recordWeeklyDate").toString();
-       m_recordResolution = map.value("recordResolution").toInt();
+        m_recordType = map.value("recordType").toInt();
+        m_recordStartT = map.value("recordStartT").toString();
+        m_recordEndT = map.value("recordEndT").toString();
+        m_recordWeeklyDate = map.value("recordWeeklyDate").toString();
+        m_recordResolution = map.value("recordResolution").toInt();
 
     }else if(map.value("cmd").toString().compare("getcurrenttime")==0){
         m_timeZone = map.value("timeZone").toString();
@@ -203,18 +262,6 @@ void DeviceModelData::fungetInitPar()
 
 }
 
-void DeviceModelData::funP2pSendData(QString cmd,QVariantMap map)
-{
-    qDebug()<<"funP2pSendData   "<<cmd<<"  "<<map;
-//    if(p2pWorker != nullptr)
-//        p2pWorker->p2pSendData(cmd,map);
-    QString msgid = createMsgId(map.value("cmd").toString());
-    map.insert("msgid",msgid);
-    listMsg.append(map);
-
-    if(!SendTimer.isActive())
-        SendTimer.start(sendertimerInter);
-}
 
 
 void DeviceModelData::slot_subscriptiontimerout()
@@ -232,11 +279,11 @@ void DeviceModelData::slot_sendtimerout()
     }else{
         QMap<QString,QVariant> map = listMsg.takeFirst();
 
-        //int sendcount = map.value("sendCount",0).toInt();
         //如果一条消息发送了多次则默认网络异常，则重新开始创建连接
         listMsg.append(map);
-            if(p2pWorker != nullptr)
-                p2pWorker->p2pSendData(map.value("cmd").toString(),map);
+
+        if(p2pWorker != nullptr)
+            p2pWorker->p2pSendData(map.value("cmd").toString(),map);
     }
 }
 

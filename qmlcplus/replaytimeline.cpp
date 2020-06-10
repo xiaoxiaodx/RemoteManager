@@ -283,8 +283,8 @@ void ReplayTimeline::drawScale(QPainter *painter,IntervalType type)
     int timeFromStart = startT.secsTo(replayCurrentTime);
     int dpix = (qreal)timeFromStart/secsPerPix;
     //  qDebug()<<"replayCurrentTime:"<<replayCurrentTime.fromMSecsSinceStartOfDay(<<"    startT:"<<startT;
-    qDebug()<<"replayCurrentTime:"<<replayCurrentTime<<"    startT:"<<startT;
-    qDebug()<<"timeFromStart:"<<timeFromStart<<"    secsPerPix:"<<secsPerPix;
+    //qDebug()<<"replayCurrentTime:"<<replayCurrentTime<<"    startT:"<<startT;
+    //qDebug()<<"timeFromStart:"<<timeFromStart<<"    secsPerPix:"<<secsPerPix;
 
     qreal resX = dpix + 30;
     qreal resY = rectFIndicator.y();
@@ -293,6 +293,17 @@ void ReplayTimeline::drawScale(QPainter *painter,IntervalType type)
     rectFIndicator.setRect(resX,resY,resW,resH);
     painter->fillRect(rectFIndicator,QBrush(QColor(255,0,0)));
 
+
+    painter->setPen(QColor(255,0,0));
+    QString indicatortimeStr = replayCurrentTime.toString("hh:mm:ss");
+
+    //字体
+    QFont newFont1;
+    newFont1.setPixelSize(8);
+    newFont1.setFamily("Microsoft Yahei");
+    QFontMetrics fontMetrics1(newFont1);
+    QRect rect1 = fontMetrics1.boundingRect(indicatortimeStr);
+    painter->drawText(rectFIndicator.x() - rect1.width()/2,rectFIndicator.y()+rectFIndicator.height()+5+rect1.height(),indicatortimeStr);
     //drawValue(painter);
 }
 
@@ -311,6 +322,15 @@ int ReplayTimeline::getIndicatorTime()
     qDebug()<<"cureent time :"<<replayCurrentTime;
 
 }
+
+void ReplayTimeline::resetParameter()
+{
+
+    removeTime();
+    replayCurrentTime.setHMS(0,0,0);
+    update();
+}
+
 void ReplayTimeline::setDate(QDate date)
 {
 
@@ -346,6 +366,15 @@ qreal ReplayTimeline::getsecsPerPix()
     }
     return secsPerPix;
 }
+
+
+void ReplayTimeline::replaytimeSlowOrFast(int sec)
+{
+    replayCurrentTime = replayCurrentTime.addSecs(sec);
+    emit indicatorTimeChange(replayCurrentTime.toString("hh:mm:ss"));;
+    //update();
+}
+
 void ReplayTimeline::mouseReleaseEvent(QMouseEvent *event){
     if(isIndicatorPress){
         // qDebug()<<  "mouseReleaseEvent "<<rectFIndicator;
@@ -354,16 +383,42 @@ void ReplayTimeline::mouseReleaseEvent(QMouseEvent *event){
         qreal secsPerPix = getsecsPerPix();
         int dSecs = (int)(secsPerPix * dx);
 
-        qDebug()<< "dx  "<<dx<<"    secs:"<<dSecs;
 
-        qDebug()<<"mouseReleaseEvent replayCurrentTime:"<<replayCurrentTime;
         replayCurrentTime = replayCurrentTime.addSecs(dSecs);
-        qDebug()<<"mouseReleaseEvent replayCurrentTime1:"<<replayCurrentTime;
-        //getIndicatorTime();
         emit indicatorTimeChange(replayCurrentTime.toString("hh:mm:ss"));;
         update();
     }
 }
+
+void ReplayTimeline::indicatorTimeUpdate(long long pts){
+
+
+
+    QDateTime time = QDateTime::fromTime_t(pts/1000000);//
+//    qDebug()<<"pts:"<<pts<<"    ptsUpdateFirst:"<<ptsUpdateFirst;
+//    if(!ptsUpdateFirst){
+//        prePts = pts;
+//        ptsUpdateFirst = true;
+//    }
+
+//    long long dePts = pts - prePts;
+
+
+
+//    prePts = pts;
+//    //在录像拖动的瞬间，在录像切换时间播放的瞬间，变化时间会跳变,因此忽略这次间隔
+//    //时间不变 则返回
+//    if(dePts == 0 ||dePts>10 || dePts <-10)
+//        return;
+//    //qDebug()<<"dePts:"<<dePts<<"    pts "<<pts<<"    prePts"<<prePts;
+//    replayCurrentTime = replayCurrentTime.addSecs(dePts);
+//    //emit indicatorTimeChange(replayCurrentTime.toString("hh:mm:ss"));
+
+    replayCurrentTime.setHMS(time.time().hour(),time.time().minute(),time.time().second());
+
+    update();
+}
+
 
 void ReplayTimeline::updateDate(QString relativePath,QString date)
 {
@@ -424,15 +479,10 @@ void ReplayTimeline::removeTime(){
 }
 void ReplayTimeline::mergeTimeInterval(QTime intervalStartT,int secsLen,int videoType)
 {
-
-
-
     if(videoType > 2){
-
         qDebug()<<"video type is err";
         return;
     }
-
 
     bool isDataIntersect = false;
 
@@ -446,7 +496,7 @@ void ReplayTimeline::mergeTimeInterval(QTime intervalStartT,int secsLen,int vide
 
     QTime intervalEndT = intervalStartT.addSecs(secsLen);
 
-    qDebug()<<"合并的区间:"<<intervalStartT.toString("hh:mm:ss")<<"    "<<intervalEndT.toString("hh:mm:ss");
+    qDebug()<<"合并的区间:"<<intervalVideotype<<"    "<<intervalStartT.toString("hh:mm:ss")<<"    "<<intervalEndT.toString("hh:mm:ss");
     for (int j=0;j<drawListInterval.size();j++) {
 
         TimeInterval* timeInterval=drawListInterval.at(j);
@@ -488,16 +538,10 @@ void ReplayTimeline::mergeTimeInterval(QTime intervalStartT,int secsLen,int vide
         timeinterval->type = intervalVideotype;
         drawListInterval.append(timeinterval);
     }
-
-
-
 //    for (int i=0;i<drawListInterval.size();i++) {
 //        TimeInterval *timeinterval = drawListInterval.at(i);
 //        qDebug()<<"qujian:"<<timeinterval->startTime.toString("hh:mm:ss")<<"    "<<timeinterval->endTime.toString("hh:mm:ss");
 //    }
-
-
-
 }
 //**time: "20200428230000"
 //**timeinfo: QMap(("cmd", QVariant(QString, "getrecordinginfo"))
@@ -510,7 +554,8 @@ void ReplayTimeline::setTimeWarn(QVariant timeInfo)
     QString time = timeInfo.toMap().value("time").toString();
     QString timeTypeStr =  timeInfo.toMap().value("data").toString();
 
-    qDebug()<<"setTimeWarn:"<<timeInfo.toMap();
+    qDebug()<<"setTimeWarn: time:"<<time;
+    qDebug()<<"setTimeWarn: timeTypeStr:"<<timeTypeStr;
     int sendcondH = time.mid(8,2).toInt();
     //获取第一个字符
     QString preIndexStr = timeTypeStr.at(0);
@@ -519,20 +564,18 @@ void ReplayTimeline::setTimeWarn(QVariant timeInfo)
 
     for(int i=1;i<timeTypeStr.size();i++){
         QString timeIndexstr = timeTypeStr.at(i);
-
         if(preIndexStr.compare(timeIndexstr) != 0)//当前字符与前一个不同则将之前的时间加入  区间列表
         {
             int timeType = timeIndexstr.toInt();
             int intervalLen = i - startIndex;   //相同类型的长度
 
             QTime timeStart(sendcondH,0,0);
-            mergeTimeInterval(timeStart.addSecs(startIndex*20),intervalLen*20,timeType);
+            mergeTimeInterval(timeStart.addSecs(startIndex*20),intervalLen*20,preIndexStr.toInt());
             //更新索引位置  和字符
             startIndex = i;
             preIndexStr = timeIndexstr;
         }
     }
-
 
     //最后一段同类型的区间直接合并
     int intervalLen = timeTypeStr.size() - startIndex;   //相同类型的长度
@@ -543,8 +586,6 @@ void ReplayTimeline::setTimeWarn(QVariant timeInfo)
     else
         mergeTimeInterval(timeStart.addSecs(startIndex*20),intervalLen*20,preIndexStr.toInt());
     //更新索引位置  和字符
-
-
     update();
 }
 

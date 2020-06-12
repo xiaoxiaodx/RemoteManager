@@ -17,6 +17,7 @@ Window {
           Qt.Window
     visible: true
 
+
     width:1400
     height:900
 

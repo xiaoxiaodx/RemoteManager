@@ -12,6 +12,9 @@
 #include "facedatamodel.h"
 #include "mylanguage.h"
 
+#include <debuglog.h>
+
+#include <QIcon>
 int main(int argc, char *argv[])
 {
 
@@ -25,8 +28,10 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("gaozhi.com"); //2
     //app.setApplicationName("remotemanager"); //3
 
+    QString iconFileDir = QCoreApplication::applicationDirPath()+"/myico.ico";
 
-    app.setWindowIcon(QIcon("./icon.png"));
+    DebugLog::getInstance()->writeLog(iconFileDir);
+    app.setWindowIcon(QIcon(iconFileDir));
     app.setApplicationName("");
     QQmlApplicationEngine engine;
     //    QmlLanguage qmlLanguage(app, engine);

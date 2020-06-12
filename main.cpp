@@ -23,8 +23,11 @@ int main(int argc, char *argv[])
     app.setFont(font);
     app.setOrganizationName("GaoZhi"); //1
     app.setOrganizationDomain("gaozhi.com"); //2
-    app.setApplicationName("remotemanager"); //3
+    //app.setApplicationName("remotemanager"); //3
 
+
+    app.setWindowIcon(QIcon("./icon.png"));
+    app.setApplicationName("");
     QQmlApplicationEngine engine;
     //    QmlLanguage qmlLanguage(app, engine);
     //    engine.rootContext()->setContextProperty("qmlLanguage", &qmlLanguage);

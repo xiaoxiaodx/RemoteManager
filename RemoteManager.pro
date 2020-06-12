@@ -1,17 +1,6 @@
 QT += quick multimedia network opengl
 CONFIG += c++11
 
-#QT += concurrent
-#TEMPLATE = app
-#QT += qml quick
-#QT += opengl
-#QT += gui
-#QT += quick
-#QT += network
-#QT += core
-#CONFIG += c++11
-#QT += multimedia
-
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Refer to the documentation for the

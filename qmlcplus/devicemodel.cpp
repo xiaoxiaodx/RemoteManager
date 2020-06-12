@@ -63,14 +63,6 @@ void DeviceModel::funDelayflushDevice(QObject *masterviewobj,QObject *replayobj1
 
 void DeviceModel::funflushDevice(QObject *masterviewobj,QObject *replayobj1)
 {
-    //    beginInsertRows(QModelIndex(),0,1);
-    //    m_listDevice.append(new DeviceModelData(true,"19911103","1111111",11,"sasads",55));
-    //    m_listDevice.append(new DeviceModelData(true,"19911103","1111111",22,"sasads",66));
-    //    m_listDevice.append(new DeviceModelData(true,"19911103","1111111",33,"sasads",77));
-    //    m_listDevice.append(new DeviceModelData(true,"19911103","1111111",44,"sasads",88));
-    //    endInsertRows();
-
-
     QFile file("device.info");
 
     if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
@@ -192,6 +184,7 @@ bool DeviceModel::funAddDevice(QString deviceID,QString name,QString account,QSt
     connect(modeldata,&DeviceModelData::signal_p2pReplyData,this,&DeviceModel::slot_recRepkyData);
     connect(modeldata,&DeviceModelData::signal_sendWarnInfo,this,&DeviceModel::slot_sendWarnInfo);
 
+    modeldata->createP2pThread(deviceID,account,pwd);
     m_listDevice.append(modeldata);
     QFile file("device.info");
     if(file.open(QIODevice::WriteOnly | QIODevice::Append)){

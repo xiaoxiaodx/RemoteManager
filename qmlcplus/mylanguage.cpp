@@ -14,17 +14,17 @@ MyLanguage::MyLanguage(QObject *parent) : QObject(parent)
 void MyLanguage::updateLanguage(int index)
 {
 
-    qDebug()<<">>>>>>   updateLanguage:"<<index;
+    //qDebug()<<">>>>>>   updateLanguage:"<<index;
 
     if(index < listLanInfo.size()){
 
         LanInfo laninfo = listLanInfo.at(index);
-        qDebug()<<">>>>>>   laninfo:"<<laninfo.lanName;
+        //qDebug()<<">>>>>>   laninfo:"<<laninfo.lanName;
         QMap<QString,QString> entryMap = laninfo.entryMap;
         QMap<QString, QString>::const_iterator i = entryMap.constBegin();
 
         while(i != entryMap.constEnd()){
-            qDebug()<<">>>>>> "<<i.key()<<" "<<i.value();
+           // qDebug()<<">>>>>> "<<i.key()<<" "<<i.value();
             //主预览
             if(i.key().compare("Masterview")==0){
                 setMasterview(i.value());
@@ -50,8 +50,8 @@ void MyLanguage::updateLanguage(int index)
                 setVideoLoss(i.value());
             }
             //对话框
-            else if(i.key().compare("AskMsgSelectChannel")==0){
-                setAskMsgSelectChannel(i.value());
+            else if(i.key().compare("PopMsgSelectChannel")==0){
+                setPopMsgSelectChannel(i.value());
             }else if(i.key().compare("AskMsgDelete")==0){
                 setAskMsgDelete(i.value());
             }else if(i.key().compare("AskMsgExit")==0){
@@ -60,6 +60,8 @@ void MyLanguage::updateLanguage(int index)
                 setAskMsgEnsure(i.value());
             }else if(i.key().compare("AskMsgCancel")==0){
                 setAskMsgCancel(i.value());
+            }else if(i.key().compare("AskMsgChannelChange")==0){
+                setAskMsgChannelChange(i.value());
             }
             //设备管理
             else if(i.key().compare("BatchDelete")==0){
@@ -209,6 +211,11 @@ void MyLanguage::updateLanguage(int index)
 
         emit signal_updateLan();
     }
+}
+
+QString MyLanguage::getCurPath(){
+
+    return QDir::currentPath();
 }
 
 

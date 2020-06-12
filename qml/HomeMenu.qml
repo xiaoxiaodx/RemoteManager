@@ -26,11 +26,9 @@ Rectangle {
             anchors.left: parent.left
             anchors.leftMargin: 30
             anchors.verticalCenter: parent.verticalCenter
-            //            anchors.bottom: parent.bottom
-            //            anchors.bottomMargin: 10
             width: 144
             height: 40
-            source: "qrc:/images/logo.png"
+            source: "file:///"+mylanguage.getCurPath()+"/logo.png"
         }
 
         QmlTabBarButtonH{
@@ -38,7 +36,7 @@ Rectangle {
             height: parent.height
             width: parent.width - btnImg.width - windowMenu.width-60
             anchors.left: btnImg.right
-            anchors.leftMargin: 60
+            anchors.leftMargin: 20
             btnBgColor:"transparent"
             btnBgSelectColor:"#272727"
             mflagColor:"#80ffffff"
@@ -46,15 +44,14 @@ Rectangle {
             textSelectColor:"white"
             txtLeftMargin:7
             textSize:18
-//            Component.onCompleted: {
-//                tabbarBtn.barModel.append({txtStr:mylanguage.Masterview})
-//                tabbarBtn.barModel.append({txtStr:mylanguage.VideoPlayback})
-//                tabbarBtn.barModel.append({txtStr:mylanguage.DeviceManagement})
-//                tabbarBtn.barModel.append({txtStr:mylanguage.AlarmManagement})
-//                //                tabbarBtn.barModel.append({txtStr:qsTr("数据管理")})
-//                //                tabbarBtn.barModel.append({txtStr:qsTr("关于")})
-
-//            }
+            //            Component.onCompleted: {
+            //                tabbarBtn.barModel.append({txtStr:mylanguage.Masterview})
+            //                tabbarBtn.barModel.append({txtStr:mylanguage.VideoPlayback})
+            //                tabbarBtn.barModel.append({txtStr:mylanguage.DeviceManagement})
+            //                tabbarBtn.barModel.append({txtStr:mylanguage.AlarmManagement})
+            //                //                tabbarBtn.barModel.append({txtStr:qsTr("数据管理")})
+            //                //                tabbarBtn.barModel.append({txtStr:qsTr("关于")})
+            //            }
         }
 
         MouseArea{
@@ -198,7 +195,16 @@ Rectangle {
     }
 
 
-
+    Timer {
+        interval: 600;
+        running: true;
+        repeat: false
+        triggeredOnStart:false
+        onTriggered:{
+            console.debug("***************  timer")
+            mylanguage.updateLanguage(cmb.currentIndex);
+        }
+    }
 
 
 

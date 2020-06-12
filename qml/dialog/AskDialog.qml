@@ -40,7 +40,6 @@ Popup {
 
         radius: 3
 
-        //设置标题栏区域为拖拽区域
         Image {
             id: img
             width: 22
@@ -48,7 +47,7 @@ Popup {
             anchors.left: parent.left
             anchors.leftMargin: 40
             anchors.top: parent.top
-            anchors.topMargin: 40
+            anchors.topMargin: 30
             source: imgSrc//"qrc:/images/icon_question.png"
         }
 
@@ -56,7 +55,10 @@ Popup {
             id: txt
             anchors.left: img.right
             anchors.leftMargin: 16
-            anchors.verticalCenter: img.verticalCenter
+            width: parent.width - 94
+            lineHeight: 1.2
+            anchors.top: img.top
+            wrapMode: Text.WordWrap
             text: qsTr("text")
         }
         Rectangle{
@@ -67,8 +69,8 @@ Popup {
             border.color: "#3B84F6"
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            anchors.rightMargin: 40
-            anchors.bottomMargin: 40
+            anchors.rightMargin: 20
+            anchors.bottomMargin: 20
             Text {
                 id: txtEnsure
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -76,7 +78,7 @@ Popup {
                 elide: Text.ElideMiddle
                 font.pixelSize: 14
                 color: "#3B84F6"
-                text: qsTr("确定")
+                text: mylanguage.AskMsgEnsure
             }
             MouseArea{
                 anchors.fill: parent
@@ -106,7 +108,7 @@ Popup {
                 elide: Text.ElideMiddle
                 font.pixelSize: 14
                 color: "#909399"
-                text: qsTr("取消")
+                text: mylanguage.AskMsgCancel
             }
             MouseArea{
                 anchors.fill: parent
@@ -128,34 +130,6 @@ Popup {
     }
 
 
-    Connections{
-        target: main
-        onS_setLanguage:setLanguage(typeL);
-    }
 
-    function setLanguage(type){
-        switch(type){
-        case lEnglish:
-            txtCancel.text = "Cancel"
-            txtEnsure.text = "Confirm "
-            break;
-        case lKorean:
-            txtCancel.text = "취소"
-            txtEnsure.text = "확인"
-            break;
-        case lItaly:
-            txtCancel.text = "Annullato"
-            txtEnsure.text = "Confermare"
-            break;
-        case lChinese:
-            txtCancel.text = "取消"
-            txtEnsure.text = "确定"
-            break;
-        case lRussian:
-            txtCancel.text = "Отмена"
-            txtEnsure.text = "Подтвердить"
-            break;
-        }
-    }
 }
 

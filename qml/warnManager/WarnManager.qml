@@ -259,7 +259,7 @@ Rectangle {
                 anchors.leftMargin: warnTempHeaderLeftMargin
                 font.pixelSize: fontSize
                 color: "#333333"
-                font.bold: curLanguage===lKorean
+                //font.bold: curLanguage===lKorean
                 text: mylanguage.WarnTemp
             }
             Text {
@@ -268,7 +268,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: warnImgHeaderLeftMargin
                 font.pixelSize: fontSize
-                font.bold: curLanguage===lKorean
+                //font.bold: curLanguage===lKorean
                 color: "#333333"
                 text: mylanguage.WarnSnapshot
             }
@@ -278,7 +278,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: deleteHeaderLeftMargin
                 font.pixelSize: fontSize
-                font.bold: curLanguage===lKorean
+                //font.bold: curLanguage===lKorean
                 color: "#333333"
                 text: mylanguage.Operating
             }

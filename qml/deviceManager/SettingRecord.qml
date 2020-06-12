@@ -17,7 +17,7 @@ Rectangle {
     property bool isRevicse: false//是否有修改
     //与线的左对齐线
 
-    property int parSetFirstAlignLine: curLanguage === lChinese?78:curLanguage === lEnglish?108:78
+    property int parSetFirstAlignLine: 78
     color: "#ffffff"
 
     Settings {
@@ -243,9 +243,8 @@ Rectangle {
         text: mylanguage.Quality
         font.pixelSize: fontSize
         color: fontColor
-        anchors.left: line.left
-        anchors.leftMargin: 20
-        //anchors.rightMargin: 10
+        anchors.right: cmbResolution.left
+        anchors.rightMargin: 10
         anchors.verticalCenter: cmbResolution.verticalCenter
     }
 
@@ -260,8 +259,8 @@ Rectangle {
         id:cmbResolution
         width:130
         height: 28
-        anchors.left: labelResolution.right
-        anchors.leftMargin:10
+        anchors.left: line.left
+        anchors.leftMargin: parSetFirstAlignLine
         anchors.top: line.bottom
         anchors.topMargin: 54
         contentBg: "#ffffff"

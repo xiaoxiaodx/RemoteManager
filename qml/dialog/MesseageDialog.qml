@@ -45,8 +45,8 @@ Popup {
             anchors.left: parent.left
             anchors.leftMargin: 20
             anchors.top: parent.top
-            anchors.topMargin: 20
-            source: "qrc:/images/icon_question.png"
+            anchors.topMargin: 40
+            source: "qrc:/images/icon_msg.png"
         }
 
         Text {
@@ -54,33 +54,24 @@ Popup {
             anchors.left: img.right
             anchors.leftMargin: 16
             anchors.verticalCenter: img.verticalCenter
+            lineHeight: 1.2
+            anchors.top: img.top
+            wrapMode: Text.WordWrap
             text: qsTr("text")
         }
-        Rectangle{
-            id:btnEnsure
-            width: txtEnsure.width +24
-            height: 34
-            border.width: 1
-            border.color: "#3B84F6"
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            anchors.rightMargin: 20
-            anchors.bottomMargin: 20
-            Text {
-                id: txtEnsure
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                elide: Text.ElideMiddle
-                font.pixelSize: 14
-                color: "#3B84F6"
-                text: qsTr("确定")
-            }
-            MouseArea{
-                anchors.fill: parent
-                onClicked: {
 
-                    close();
-                }
+        Image {
+            id: imgclose
+            width: 10
+            height: 10
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.rightMargin: 10
+            anchors.topMargin: 10
+            source: "qrc:/images/modal-close.png"
+            MouseArea{
+                anchors.fill:parent
+                onClicked: root.close()
             }
         }
 
@@ -95,34 +86,5 @@ Popup {
     }
 
 
-    Connections{
-        target: main
-        onS_setLanguage:setLanguage(typeL);
-    }
-
-    function setLanguage(type){
-        switch(type){
-        case lEnglish:
-
-            txtEnsure.text = "Confirm "
-            break;
-        case lKorean:
-
-            txtEnsure.text = "확인"
-            break;
-        case lItaly:
-
-            txtEnsure.text = "Confermare"
-            break;
-        case lChinese:
-
-            txtEnsure.text = "确定"
-            break;
-        case lRussian:
-
-            txtEnsure.text = "Подтвердить"
-            break;
-        }
-    }
 }
 

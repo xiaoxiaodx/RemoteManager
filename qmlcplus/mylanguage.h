@@ -32,7 +32,8 @@ class MyLanguage : public QObject
     QML_PROPERTY(QString,VideoWarn)
     QML_PROPERTY(QString,VideoLoss)
     //对话框
-    QML_PROPERTY(QString,AskMsgSelectChannel)
+    QML_PROPERTY(QString,PopMsgSelectChannel)
+    QML_PROPERTY(QString,AskMsgChannelChange)
     QML_PROPERTY(QString,AskMsgDelete)
     QML_PROPERTY(QString,AskMsgExit)
     QML_PROPERTY(QString,AskMsgEnsure)
@@ -113,6 +114,7 @@ public:
 
     Q_INVOKABLE void updateLanguage(int filenam);
     Q_INVOKABLE QVariant getLanMenu();
+    Q_INVOKABLE QString getCurPath();
 signals:
 
     void signal_updateLan();

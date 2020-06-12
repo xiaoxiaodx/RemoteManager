@@ -82,15 +82,13 @@ Rectangle {
 
                 onClicked: {
 
-                    if(curLanguage===lRussian)
-                        askDialog.width = 500
-                    else
-                        askDialog.width = 427
+                    askDialog.width = 427
                     askDialog.height = 176
                     askDialog.askStr = mylanguage.AskMsgDelete
                     askDialog.imgSrc = "qrc:/images/ico_warn.png"
                     askDialog.curType = askDialog.deviceInfoMutipleDelete
                     askDialog.open();
+
                 }
                 onPressed: rectBatchDelete.color = "#81C3FF"
                 onReleased: rectBatchDelete.color = "#0486FE"
@@ -254,9 +252,7 @@ Rectangle {
             model: netstateModel
             onCurrentIndexChanged: {
 
-                //                    curLanguage = currentIndex
-                //                    main.s_setLanguage(currentIndex);
-                //s_temImage(currentIndex);
+
             }
         }
 
@@ -302,7 +298,7 @@ Rectangle {
                 anchors.leftMargin: deviceIDHeaderLeftMargin
                 font.pixelSize: fontSize
                 color: "#333333"
-                font.bold: curLanguage===lKorean
+
                 text: mylanguage.DeviceDid
             }
             Text {
@@ -312,7 +308,7 @@ Rectangle {
                 anchors.leftMargin: deviceNameHeaderLeftMargin
                 font.pixelSize: fontSize
                 color: "#333333"
-                font.bold: curLanguage===lKorean
+
                 text: mylanguage.DeviceName
             }
 
@@ -323,7 +319,7 @@ Rectangle {
                 anchors.leftMargin: deviceChnHeaderLeftMargin
                 font.pixelSize: fontSize
                 color: "#333333"
-                font.bold: curLanguage===lKorean
+
                 text: mylanguage.DeviceChannel
             }
 
@@ -334,7 +330,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: recordPathHeaderLeftMargin
                 font.pixelSize: fontSize
-                font.bold: curLanguage===lKorean
+
                 color: "#333333"
                 text: mylanguage.DeviceVideoSavePath
             }
@@ -344,7 +340,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: stateHeaderLeftMargin
                 font.pixelSize: fontSize
-                font.bold: curLanguage===lKorean
+
                 color: "#333333"
                 text: mylanguage.DeviceNetState
             }
@@ -355,7 +351,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: doHeaderLeftMargin
                 font.pixelSize: fontSize
-                font.bold: curLanguage===lKorean
+
                 color: "#333333"
                 text: mylanguage.Operating
             }
@@ -478,32 +474,12 @@ Rectangle {
                         onPressed: imgDelete.source = "qrc:/images/datamanager/delete_p.png"
                         onReleased: imgDelete.source = "qrc:/images/datamanager/delete.png"
                         onClicked: {
-                            if(curLanguage === lRussian)
-                                askDialog.width = 500
-                            else
-                                askDialog.width = 427
+
+                            askDialog.width = 427
 
                             askDialog.height = 176
 
-                            var askstr = "";
-                            switch(curLanguage){
-                            case lChinese:
-                                askstr = "确认删除设备吗？"
-                                break;
-                            case lEnglish:
-                                askstr = "Confirm to delete?"
-                                break;
-                            case lKorean:
-                                askstr = "삭제 정보를 확인합니까?"
-                                break;
-                            case lItaly:
-                                askstr = "Cancello L’Informazione?"
-                                break;
-                            case lRussian:
-                                askstr = "Вы уверены, что хотите удалить информацию?"
-                                break;
-                            }
-                            askDialog.askStr = askstr
+                            askDialog.askStr = mylanguage.AskMsgDelete
                             askDialog.imgSrc = "qrc:/images/ico_warn.png"
                             askDialog.curType = askDialog.deviceInfoSingleDelete
                             askDialog.open();

@@ -80,16 +80,10 @@ Rectangle {
 
                 onClicked: {
 
-                    if(curLanguage===lRussian)
-                        askDialog.width = 500
-                    else
-                        askDialog.width = 427
+
+                    askDialog.width = 427
                     askDialog.height = 176
-                    askDialog.askStr = curLanguage=== lChinese?"确认要删除所选信息吗？":
-                                                                curLanguage===lEnglish?"Confirm to delete?":
-                                                                                        curLanguage===lKorean?"삭제하시겠습니까?":
-                                                                                                               curLanguage===lItaly?"Cancella Tutta la Selezione?":
-                                                                                                                                     curLanguage===lRussian?"Вы уверены, что хотите удалить информацию?":"";
+                    askDialog.askStr = mylanguage.AskMsgDelete
                     askDialog.imgSrc = "qrc:/images/ico_warn.png"
                     askDialog.curType = askDialog.warnInfoMutipleDelete
                     askDialog.open();
@@ -318,7 +312,7 @@ Rectangle {
                 anchors.leftMargin: photoHeaderLeftMargin
                 font.pixelSize: fontSize
                 color: "#333333"
-                font.bold: curLanguage===lKorean
+
                 text: qsTr("人像图片")
             }
             Text {
@@ -328,7 +322,7 @@ Rectangle {
                 anchors.leftMargin: numberHeaderLeftMargin
                 font.pixelSize: fontSize
                 color: "#333333"
-                font.bold: curLanguage===lKorean
+               // font.bold: curLanguage===lKorean
                 text: qsTr("编号")
             }
             Text {
@@ -338,7 +332,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: nameHeaderLeftMargin
                 font.pixelSize: fontSize
-                font.bold: curLanguage===lKorean
+                //font.bold: curLanguage===lKorean
                 color: "#333333"
                 text: qsTr("姓名")
             }
@@ -348,7 +342,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: importTimeHeaderLeftMargin
                 font.pixelSize: fontSize
-                font.bold: curLanguage===lKorean
+                //font.bold: curLanguage===lKorean
                 color: "#333333"
                 text: qsTr("导入时间")
             }
@@ -359,7 +353,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: doHeaderLeftMargin
                 font.pixelSize: fontSize
-                font.bold: curLanguage===lKorean
+                //font.bold: curLanguage===lKorean
                 color: "#333333"
                 text: qsTr("操作")
             }

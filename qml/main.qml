@@ -41,19 +41,13 @@ Window {
 
     property int windowSizeState: 1 //1：正常，0最小化，2最大化
 
-    property int curLanguage: 0
-    property int lChinese: 0
-    property int lEnglish: 1
-    property int lItaly: 2
-    property int lKorean: 3
-    property int lRussian: 4
 
     signal s_setLanguage(var typeL);
 
     signal s_playvideo(var channel ,var h264Arr,var pts)
 
 
-    Component.onCompleted: s_setLanguage(curLanguage)
+
     onVisibilityChanged: {
 
         console.debug("visibly change "+visibility)
@@ -155,11 +149,7 @@ Window {
         onWinClose:{
             askDialog.width = 427
             askDialog.height = 176
-            askDialog.askStr = curLanguage=== lChinese?"确认退出系统吗？":
-                                                        curLanguage===lEnglish?"Confirm to exit ?":
-                                                                                curLanguage===lKorean?"나가시겠습니까?":
-                                                                                                       curLanguage===lItaly?"Uscita Dal Sistema?":
-                                                                                                                             curLanguage===lRussian?"Подтвердить выход?":"";
+            askDialog.askStr =  mylanguage.AskMsgExit
             askDialog.imgSrc = "qrc:/images/icon_question.png"
             askDialog.curType = askDialog.exeClose
             askDialog.open();

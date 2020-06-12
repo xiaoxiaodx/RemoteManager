@@ -41,7 +41,6 @@
         <file>images/language_down.png</file>
         <file>images/lock.png</file>
         <file>images/lock_p.png</file>
-        <file>images/logo.png</file>
         <file>images/logo1.png</file>
         <file>images/logo2.png</file>
         <file>images/replay.png</file>
@@ -153,5 +152,6 @@
         <file>qml/dialog/MesseageDialog.qml</file>
         <file>images/playback/play_pause.png</file>
         <file>images/playback/play_pause_h.png</file>
+        <file>images/icon_msg.png</file>
     </qresource>
 </RCC>

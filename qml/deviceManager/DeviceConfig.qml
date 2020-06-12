@@ -215,7 +215,7 @@ Popup {
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.pixelSize: 12
                     color: "#D9D9D9"
-                    text: qsTr("取消")
+                    text: mylanguage.AskMsgCancel
                 }
                 MouseArea{
                     anchors.fill: parent
@@ -243,7 +243,7 @@ Popup {
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.pixelSize: 12
                     color: "#0486FE"
-                    text: qsTr("确认")
+                    text: mylanguage.AskMsgEnsure
                 }
                 MouseArea{
                     anchors.fill: parent

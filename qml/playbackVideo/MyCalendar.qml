@@ -293,7 +293,7 @@ Popup {
                 font.pixelSize: 14
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: "#3B84F6"
-                text: qsTr("取消")
+                text: mylanguage.AskMsgEnsure
             }
 
 
@@ -322,7 +322,7 @@ Popup {
                 font.pixelSize: 14
                 color: "#3B84F6"
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("取消")
+                text: mylanguage.AskMsgCancel
             }
 
             MouseArea{
@@ -352,18 +352,9 @@ Popup {
 
     function getMouthYearStr(year,month){
 
-        switch(curLanguage){
-        case lChinese:
-            return year+qsTr('年 ') + month+qsTr('月');
-        case lEnglish:
-            return year + " "+getEnglishMouth(month);
-        case lKorean:
-            return year + " "+getEnglishMouth(month);
-        case lItaly:
-            return year + " "+getItalyMouth(month);
-        case lRussian:
-            return year + " "+getRussianMouth(month);
-        }
+
+        return year + " "+getEnglishMouth(month);
+
 
     }
 
@@ -456,18 +447,21 @@ Popup {
 
     function getWeeklyStr(week){
 
-       // console.debug("week:"+week);
-        switch(curLanguage){
-        case lChinese:
-            return getChineseWeekly(week);
-        case lEnglish:
-            return getEnglishWeekly(week);
-        case lKorean:
-            return getEnglishWeekly(week);
-        case lItaly:
-            return getItalyWeekly(week);
-        case lRussian:
-            return getRussianWeekly(week);
+        switch(week){
+        case 1:
+            return mylanguage.Mon;
+        case 2:
+            return mylanguage.Tue;
+        case 3:
+            return mylanguage.Wed;
+        case 4:
+            return mylanguage.Thu;
+        case 5:
+            return mylanguage.Fri;
+        case 6:
+            return mylanguage.Sat;
+        case 7:
+            return mylanguage.Sun;
         }
 
     }
@@ -544,36 +538,5 @@ Popup {
             return "Вс";
         }
     }
-
-    Connections{
-        target: main
-        onS_setLanguage:setLanguage(typeL);
-    }
-
-    function setLanguage(type){
-        switch(type){
-        case lEnglish:
-            txtCancel.text = "Cancel"
-            txtEnsure.text = "Confirm "
-            break;
-        case lKorean:
-            txtCancel.text = "취소"
-            txtEnsure.text = "확인"
-            break;
-        case lItaly:
-            txtCancel.text = "Annullato"
-            txtEnsure.text = "Confermare"
-            break;
-        case lChinese:
-            txtCancel.text = "取消"
-            txtEnsure.text = "确定"
-            break;
-        case lRussian:
-            txtCancel.text = "Отмена"
-            txtEnsure.text = "Подтвердить"
-            break;
-        }
-    }
-
 
 }

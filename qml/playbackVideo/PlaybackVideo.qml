@@ -455,15 +455,8 @@ Rectangle {
 
                 askDialog.width = 427
                 askDialog.height = 176
-                var txtstr = "";
-                switch(curLanguage){
-                case lChinese:
-                    txtstr = "通道改变，将重置回放界面"
-                    break;
-                case lEnglish:
-                    break;
-                }
-                askDialog.askStr =txtstr
+
+                askDialog.askStr =mylanguage.AskMsgChannelChange
                 askDialog.imgSrc = "qrc:/images/icon_question.png"
                 askDialog.curType = askDialog.replayChannelChange
                 askDialog.open();
@@ -595,7 +588,7 @@ Rectangle {
         if(txtDeviceSelect.text === ""){
             msgDialog.width = 300
             msgDialog.height = 140
-            msgDialog.msgStr = "请选择通道！"
+            msgDialog.msgStr = mylanguage.PopMsgSelectChannel
             msgDialog.open();
             return false;
         }

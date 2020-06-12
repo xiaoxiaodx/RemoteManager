@@ -31,8 +31,8 @@ Rectangle {
 
     property string curDevTypeStr:"E03"
     //第一根左对齐线
-    property int parSetFirstAlignLine: curLanguage === lChinese?102:curLanguage === lEnglish?230:curLanguage === lKorean?204:curLanguage ===lRussian?210:300
-    property int parSetSecondAlignLine: curLanguage === lChinese?262:curLanguage === lEnglish?488:curLanguage === lKorean?388:curLanguage ===lRussian?538:700
+    property int parSetFirstAlignLine: 142
+    property int parSetSecondAlignLine: 302
 
     property int tempdriftcapMax: 2
     property int tempdriftcapMin: -2

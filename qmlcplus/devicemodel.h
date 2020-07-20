@@ -34,15 +34,13 @@ public:
     Q_INVOKABLE void funDeleteSelect();
     Q_INVOKABLE bool funAddDevice(QString deviceID,QString name,QString account="admin",QString pwd="admin");
     Q_INVOKABLE void funSendData(int index,QString cmd,QVariantMap map);
-    Q_INVOKABLE void funBatchSendData(QVariantMap map);
+    Q_INVOKABLE void funBatchSendData(QString cmd ,QVariantMap map);
     Q_INVOKABLE void funSendData1(QString channel,QString cmd,QVariantMap map);
     Q_INVOKABLE void funSetAllSelect(bool isSelect);//选中所有数据
-    Q_INVOKABLE QVariant funGetDevice(int index);
+    //Q_INVOKABLE QVariant funGetDevice(int index);
     Q_INVOKABLE QVariant funGetDevice(QString  channel);
 
     Q_INVOKABLE void funSwitchPage(int page);
-
-
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role ) const override;

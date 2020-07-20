@@ -96,7 +96,7 @@ Rectangle {
         id:windowMenu
         anchors.right: parent.right
         anchors.rightMargin: 10
-        width: 350
+        width: 320
         height: 20
         anchors.topMargin: 6
         anchors.top: parent.top
@@ -111,14 +111,14 @@ Rectangle {
             onClick:sFullScreen()
         }
 
-        QmlImageButton{
-            width: 20
-            height: 20
-            imgSourseHover: "qrc:/images/login.png"
-            imgSourseNormal: "qrc:/images/login.png"
-            imgSoursePress: "qrc:/images/login.png"
-            onClick:sLogin()
-        }
+//        QmlImageButton{
+//            width: 20
+//            height: 20
+//            imgSourseHover: "qrc:/images/login.png"
+//            imgSourseNormal: "qrc:/images/login.png"
+//            imgSoursePress: "qrc:/images/login.png"
+//            onClick:sLogin()
+//        }
 
         Rectangle{
             id:rectLanguage

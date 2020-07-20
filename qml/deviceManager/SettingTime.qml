@@ -61,12 +61,10 @@ Rectangle {
                 cmd:"setcurrenttime",
                 timezone:cmbtimezone.currentIndex
             };
-
             if(isBatchSet)
-                deviceModel.funBatchSendData("setcurrenttime",map);
+                deviceModel.funBatchSendData("setcurrenttime",map1);
             else
                 deviceModel.funSendData1(deviceChannel,"setcurrenttime",map1);
-            //model.updateTime(isBatchSet,swithNtpEnable.checked,inputurl.text,cmbtimezone.currentIndex,swithSummerEnable.checked);
         }
     }
 

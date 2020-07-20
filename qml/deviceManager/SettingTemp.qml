@@ -2,29 +2,29 @@ import QtQuick.Controls 2.5
 import QtQuick 2.0
 import QtGraphicalEffects 1.12
 import QtQuick.Dialogs 1.3
-import Qt.labs.settings 1.0
+//import Qt.labs.settings 1.0
 import "../simpleControl"
 Rectangle {
     id: root
 
-    signal s_timeSwith(bool mchecked);
-    signal s_warnSwith(bool mchecked);
-    signal s_screenShotSwith(bool mchecked);
-    signal s_beerSwith(bool mchecked);
-    signal s_recordSwith(bool mchecked);
-    signal s_temSet(var mvalue);
-    signal s_screenShotPathSet(var mvalue);
-    signal s_recordPathSet(var mvalue);
+//    signal s_timeSwith(bool mchecked);
+//    signal s_warnSwith(bool mchecked);
+//    signal s_screenShotSwith(bool mchecked);
+//    signal s_beerSwith(bool mchecked);
+//    signal s_recordSwith(bool mchecked);
+//    signal s_temSet(var mvalue);
+//    signal s_screenShotPathSet(var mvalue);
+//    signal s_recordPathSet(var mvalue);
     //    signal s_temDrift(var mvalue);
 
-    signal s_getInitPar();
+//    signal s_getInitPar();
 
-    signal s_temOffset(var mvalue);
-    signal s_temMax(var mvalue);
-    signal s_temMin(var mvalue);
-    signal s_temImage(var mvalue);
+//    signal s_temOffset(var mvalue);
+//    signal s_temMax(var mvalue);
+//    signal s_temMin(var mvalue);
+//    signal s_temImage(var mvalue);
 
-    signal s_iradInfoSet(var mvalue);
+//    signal s_iradInfoSet(var mvalue);
 
     property int fontSize: 12
     property color fontColor: "#606266"
@@ -40,21 +40,7 @@ Rectangle {
     property int tempcontrolcapMin: 0
 
     property bool isRevicse: false//是否有修改
-    Settings {
-        id:setting
 
-        fileName: "config.ini"
-
-
-        property alias tempwarn:swichWarn.checked
-        property alias temptemp:inputTem.text
-        property alias tempscreenshot:swichScreenShot.checked
-        property alias tempbeer:swichBeer.checked
-        property alias tempscreenshotpath:inputScreenShotPath.text
-        property alias tempdrift:inputTempDrift.text
-        property alias tempthreshold:inputTempMin.text
-
-    }
 
     function setTempPar(tempenable,tempvalue,screenshotswitch,screenshotpath,beerenable,drift,threshold,tempcontrolcaplevelMin,tempcontrolcaplevelMax,tempdriftcaplevelMin,tempdriftcaplevelMax){
         isRevicse = false
@@ -179,7 +165,7 @@ Rectangle {
             txtColor: Qt.rgba(0,0,0,0.65)
             text: "38"
             color: "#ffffff"
-            onTextChanged: s_temSet(inputTem.text)
+            onTextChanged: isRevicse = true;
         }
         Text {
             id: txtTem1
@@ -210,7 +196,7 @@ Rectangle {
             anchors.topMargin: 68
             onCheckedChanged: {
 
-                s_screenShotSwith(checked)
+                //s_screenShotSwith(checked)
                 isRevicse = true;
             }
         }
@@ -298,7 +284,10 @@ Rectangle {
             anchors.leftMargin: parSetFirstAlignLine
             anchors.top: line2.bottom
             anchors.topMargin:111
-            onCheckedChanged: s_beerSwith(checked)
+            onCheckedChanged: {
+                isRevicse = true;
+            }
+                //s_beerSwith(checked)
         }
 
 
@@ -342,7 +331,7 @@ Rectangle {
                 color: "#ffffff"
                 isReadOnly:true
                 onTextChanged: {
-                    s_temOffset(inputTempDrift.text);
+
                     isRevicse = true;
                 }
             }
@@ -447,18 +436,18 @@ Rectangle {
                 isReadOnly:true
                 color: "#ffffff"
                 onTextChanged: {
-                    if(inputTempMin.text === "1")
-                        s_temMin("21");
-                    else if(inputTempMin.text === "2")
-                        s_temMin("24");
-                    else if(inputTempMin.text === "3")
-                        s_temMin("26");
-                    else if(inputTempMin.text === "4")
-                        s_temMin("28");
-                    else if(inputTempMin.text === "5")
-                        s_temMin("30");
-                    else if(inputTempMin.text === "6")
-                        s_temMin("32");
+//                    if(inputTempMin.text === "1")
+//                        s_temMin("21");
+//                    else if(inputTempMin.text === "2")
+//                        s_temMin("24");
+//                    else if(inputTempMin.text === "3")
+//                        s_temMin("26");
+//                    else if(inputTempMin.text === "4")
+//                        s_temMin("28");
+//                    else if(inputTempMin.text === "5")
+//                        s_temMin("30");
+//                    else if(inputTempMin.text === "6")
+//                        s_temMin("32");
                     isRevicse = true;
                 }
             }
@@ -524,8 +513,6 @@ Rectangle {
         }
     }
 
-
-
     FileDialog {
         id: fileDialog
         property string pathname:""
@@ -551,202 +538,202 @@ Rectangle {
     }
 
 
-    function iradInfoSet(){
+//    function iradInfoSet(){
 
-        var osdenableV;
-        if(swithTime.checked)
-            osdenableV = 1
-        else
-            osdenableV = 0
-        var alarmtempEnableV;
-        if(swichWarn.checked)
-            alarmtempEnableV = 1;
-        else
-            alarmtempEnableV = 0;
+//        var osdenableV;
+//        if(swithTime.checked)
+//            osdenableV = 1
+//        else
+//            osdenableV = 0
+//        var alarmtempEnableV;
+//        if(swichWarn.checked)
+//            alarmtempEnableV = 1;
+//        else
+//            alarmtempEnableV = 0;
 
-        var map ={
-            osdenable:osdenableV,
-            alarmtempEnable:alarmtempEnableV,
-            alarmtemp:inputTem.text,
-            tempdrift:inputTempDrift.text,
-            tempcontrol:inputTempMin.text,
-            cmd:"setiradinfo"
-        }
-        s_iradInfoSet(map);
-    }
-
-
-    function getRecordPath(){
-        return setting.recordPath;
-    }
-    function getScrennShotPath(){
-        return setting.screenShotPath;
-    }
-    function getTemDrift(){
-        return setting.temDrift
-    }
-    function setTemDrift(mvalue){
-        inputTempDrift.text = mvalue;
-    }
+//        var map ={
+//            osdenable:osdenableV,
+//            alarmtempEnable:alarmtempEnableV,
+//            alarmtemp:inputTem.text,
+//            tempdrift:inputTempDrift.text,
+//            tempcontrol:inputTempMin.text,
+//            cmd:"setiradinfo"
+//        }
+//        s_iradInfoSet(map);
+//    }
 
 
-    function getWarnTem(){
-        return setting.warnTem
-    }
-    function setWarnTem(mvalue){
-        inputTem.text = mvalue
-    }
-
-    function getSwitchWarn()
-    {
-        return setting.switchWarn;
-    }
-
-    function setSwitchWarn(mvalue)
-    {
-        swichWarn.checked = mvalue
-    }
-
-    function getSwitchTime(){
-        return setting.switchTime
-    }
-
-    function setSwitchTime(mvalue){
-        swithTime.checked = mvalue
-    }
-
-    function getSwitchRecord(){
-        return setting.switchRecord
-    }
-
-    function getSwitchScreenShot(){
-        return setting.switchScreenShot
-    }
-
-    function getSwitchBeer(){
-        return setting.switchBeer
-    }
-
-    function setTempContrl(mavlue){
-        inputTempMin.text = mavlue
-    }
-
-    function setTcpip(value){
-        setting.tcpip = value
-    }
-    function setIsOpenAdjustRect(value){
-        setting.isOpenAdjustRect = value
-    }
-
-    function setRedRect(pw,ph,rx,ry,rw,rh){
+//    function getRecordPath(){
+//        return setting.recordPath;
+//    }
+//    function getScrennShotPath(){
+//        return setting.screenShotPath;
+//    }
+//    function getTemDrift(){
+//        return setting.temDrift
+//    }
+//    function setTemDrift(mvalue){
+//        inputTempDrift.text = mvalue;
+//    }
 
 
-        if(curDevTypeStr === "e03"){
-            setting.e03showParentW = pw
-            setting.e03showParentH = ph
-            setting.e03showRectX = rx
-            setting.e03showRectY = ry
-            setting.e03showRectW = rw
-            setting.e03showRectH = rh
-        }else if(curDevTypeStr === "f03"){
-            setting.f03showParentW = pw
-            setting.f03showParentH = ph
-            setting.f03showRectX = rx
-            setting.f03showRectY = ry
-            setting.f03showRectW = rw
-            setting.f03showRectH = rh
-        }else if(curDevTypeStr === "d04"){
-            setting.d04showParentW = pw
-            setting.d04showParentH = ph
-            setting.d04showRectX = rx
-            setting.d04showRectY = ry
-            setting.d04showRectW = rw
-            setting.d04showRectH = rh
-        }else if(curDevTypeStr === "d06"){
-            setting.d06showParentW = pw
-            setting.d06showParentH = ph
-            setting.d06showRectX = rx
-            setting.d06showRectY = ry
-            setting.d06showRectW = rw
-            setting.d06showRectH = rh
-        }
-    }
+//    function getWarnTem(){
+//        return setting.warnTem
+//    }
+//    function setWarnTem(mvalue){
+//        inputTem.text = mvalue
+//    }
+
+//    function getSwitchWarn()
+//    {
+//        return setting.switchWarn;
+//    }
+
+//    function setSwitchWarn(mvalue)
+//    {
+//        swichWarn.checked = mvalue
+//    }
+
+//    function getSwitchTime(){
+//        return setting.switchTime
+//    }
+
+//    function setSwitchTime(mvalue){
+//        swithTime.checked = mvalue
+//    }
+
+//    function getSwitchRecord(){
+//        return setting.switchRecord
+//    }
+
+//    function getSwitchScreenShot(){
+//        return setting.switchScreenShot
+//    }
+
+//    function getSwitchBeer(){
+//        return setting.switchBeer
+//    }
+
+//    function setTempContrl(mavlue){
+//        inputTempMin.text = mavlue
+//    }
+
+//    function setTcpip(value){
+//        setting.tcpip = value
+//    }
+//    function setIsOpenAdjustRect(value){
+//        setting.isOpenAdjustRect = value
+//    }
+
+//    function setRedRect(pw,ph,rx,ry,rw,rh){
 
 
-    function getTcpip(){
-        return setting.tcpip
-    }
-    function getIsOpenAdjustRect(){
-        return setting.isOpenAdjustRect
-    }
-    function getShowRectX(){
+//        if(curDevTypeStr === "e03"){
+//            setting.e03showParentW = pw
+//            setting.e03showParentH = ph
+//            setting.e03showRectX = rx
+//            setting.e03showRectY = ry
+//            setting.e03showRectW = rw
+//            setting.e03showRectH = rh
+//        }else if(curDevTypeStr === "f03"){
+//            setting.f03showParentW = pw
+//            setting.f03showParentH = ph
+//            setting.f03showRectX = rx
+//            setting.f03showRectY = ry
+//            setting.f03showRectW = rw
+//            setting.f03showRectH = rh
+//        }else if(curDevTypeStr === "d04"){
+//            setting.d04showParentW = pw
+//            setting.d04showParentH = ph
+//            setting.d04showRectX = rx
+//            setting.d04showRectY = ry
+//            setting.d04showRectW = rw
+//            setting.d04showRectH = rh
+//        }else if(curDevTypeStr === "d06"){
+//            setting.d06showParentW = pw
+//            setting.d06showParentH = ph
+//            setting.d06showRectX = rx
+//            setting.d06showRectY = ry
+//            setting.d06showRectW = rw
+//            setting.d06showRectH = rh
+//        }
+//    }
 
-        if(curDevTypeStr === "e03"){
-            return setting.e03showRectX
-        }else if(curDevTypeStr === "f03"){
-            return setting.f03showRectX
-        }else if(curDevTypeStr === "d04"){
-            return setting.d04showRectX
-        }else if(curDevTypeStr === "d06"){
-            return setting.d06showRectX
-        }
-    }
-    function getShowRectY(){
-        if(curDevTypeStr === "e03"){
-            return setting.e03showRectY
-        }else if(curDevTypeStr === "f03"){
-            return setting.f03showRectY
-        }else if(curDevTypeStr === "d04"){
-            return setting.d04showRectY
-        }else if(curDevTypeStr === "d06"){
-            return setting.d06showRectY
-        }
 
-    }
-    function getShowRectW(){
-        if(curDevTypeStr === "e03"){
-            return setting.e03showRectW
-        }else if(curDevTypeStr === "f03"){
-            return setting.f03showRectW
-        }else if(curDevTypeStr === "d04"){
-            return setting.d04showRectW
-        }else if(curDevTypeStr === "d06"){
-            return setting.d06showRectW
-        }
-    }
-    function getShowRectH(){
-        if(curDevTypeStr === "e03"){
-            return setting.e03showRectH
-        }else if(curDevTypeStr === "f03"){
-            return setting.f03showRectH
-        }else if(curDevTypeStr === "d04"){
-            return setting.d04showRectH
-        }else if(curDevTypeStr === "d06"){
-            return setting.d06showRectH
-        }
-    }
-    function getShowParentW(){
-        if(curDevTypeStr === "e03"){
-            return setting.e03showParentW
-        }else if(curDevTypeStr === "f03"){
-            return setting.f03showParentW
-        }else if(curDevTypeStr === "d04"){
-            return setting.d04showParentW
-        }else if(curDevTypeStr === "d06"){
-            return setting.d06showParentW
-        }
-    }
-    function getShowParentH(){
-        if(curDevTypeStr === "e03"){
-            return setting.e03showParentH
-        }else if(curDevTypeStr === "f03"){
-            return setting.f03showParentH
-        }else if(curDevTypeStr === "d04"){
-            return setting.d04showParentH
-        }else if(curDevTypeStr === "d06"){
-            return setting.d06showParentH
-        }
-    }
+//    function getTcpip(){
+//        return setting.tcpip
+//    }
+//    function getIsOpenAdjustRect(){
+//        return setting.isOpenAdjustRect
+//    }
+//    function getShowRectX(){
+
+//        if(curDevTypeStr === "e03"){
+//            return setting.e03showRectX
+//        }else if(curDevTypeStr === "f03"){
+//            return setting.f03showRectX
+//        }else if(curDevTypeStr === "d04"){
+//            return setting.d04showRectX
+//        }else if(curDevTypeStr === "d06"){
+//            return setting.d06showRectX
+//        }
+//    }
+//    function getShowRectY(){
+//        if(curDevTypeStr === "e03"){
+//            return setting.e03showRectY
+//        }else if(curDevTypeStr === "f03"){
+//            return setting.f03showRectY
+//        }else if(curDevTypeStr === "d04"){
+//            return setting.d04showRectY
+//        }else if(curDevTypeStr === "d06"){
+//            return setting.d06showRectY
+//        }
+
+//    }
+//    function getShowRectW(){
+//        if(curDevTypeStr === "e03"){
+//            return setting.e03showRectW
+//        }else if(curDevTypeStr === "f03"){
+//            return setting.f03showRectW
+//        }else if(curDevTypeStr === "d04"){
+//            return setting.d04showRectW
+//        }else if(curDevTypeStr === "d06"){
+//            return setting.d06showRectW
+//        }
+//    }
+//    function getShowRectH(){
+//        if(curDevTypeStr === "e03"){
+//            return setting.e03showRectH
+//        }else if(curDevTypeStr === "f03"){
+//            return setting.f03showRectH
+//        }else if(curDevTypeStr === "d04"){
+//            return setting.d04showRectH
+//        }else if(curDevTypeStr === "d06"){
+//            return setting.d06showRectH
+//        }
+//    }
+//    function getShowParentW(){
+//        if(curDevTypeStr === "e03"){
+//            return setting.e03showParentW
+//        }else if(curDevTypeStr === "f03"){
+//            return setting.f03showParentW
+//        }else if(curDevTypeStr === "d04"){
+//            return setting.d04showParentW
+//        }else if(curDevTypeStr === "d06"){
+//            return setting.d06showParentW
+//        }
+//    }
+//    function getShowParentH(){
+//        if(curDevTypeStr === "e03"){
+//            return setting.e03showParentH
+//        }else if(curDevTypeStr === "f03"){
+//            return setting.f03showParentH
+//        }else if(curDevTypeStr === "d04"){
+//            return setting.d04showParentH
+//        }else if(curDevTypeStr === "d06"){
+//            return setting.d06showParentH
+//        }
+//    }
 
 
 

@@ -105,7 +105,6 @@ void P2pWorker::slot_connectDev(QString deviceDid,QString name,QString pwd)
     m_password = pwd;
     m_account = name;
 
-    //qDebug()<<"m_did  "<<m_did<<"   "<<m_account<<"    "<<m_password;
     if(!isP2pInitSucc)
         p2pinit();
 
@@ -175,7 +174,7 @@ void P2pWorker::slot_startLoopRead()
                     }else if(i==0){//命令通道
                         this->processUnPkg1(buff,(int)readSize);
                     }else if(i ==2){//告警图片通道
-                        //qDebug()<<"通道*** "<<i<<" 有"<<readSize<<"个数据："<<endl;
+                       // qDebug()<<"通道*** "<<i<<" 有"<<readSize<<"个数据："<<endl;
                         this->processUnPkg1(buff,(int)readSize);
                     }
                 }
@@ -218,6 +217,13 @@ int P2pWorker::p2pSendData(QString cmd,QVariant map)
         arr.append(m_appKey,32);
         qDebug()<<" m_appKey "<<arr.toHex();
         ret = writeBuff1(CMD_USR_KEY, m_appKey, 32);
+
+    }else if(cmd.compare("p2pAlarmPush")==0){
+
+        int swithPush = map.toMap().value("pushEnable").toInt();
+        QString pushCmd = "alarm -act set -alarmenable "+QString::number(swithPush);
+
+        ret = writeBuff1(CMD_SET_P2PPUSH,pushCmd.toLocal8Bit().data(),pushCmd.length());
 
     }else if(cmd.compare("getVedio")==0){
 
@@ -511,7 +517,7 @@ void P2pWorker::processUnPkg(char *buff,int len)
                 QByteArray arr ;
                 arr.append(readDataBuffStream.data(),needLen);
                 map = p2pProtrol.unJsonPacket(arr);
-                //qDebug()<<"新协议:"<<m_cmd;
+
             }else
                 qDebug()<<"未知命令111:"<<m_cmd;
 
@@ -710,8 +716,13 @@ void P2pWorker::processUnPkg1(char *buff,int len)
             }else if(mCmd_cmd == CMD_VIDEO_STOP){
                 callbackmap.insert("cmd","stopVideo");
                 emit signal_p2pReplyData(m_name,callbackmap);
+            }else if(mCmd_cmd == CMD_SET_P2PPUSH){
+                callbackmap.insert("cmd","p2pAlarmPush");
+                emit signal_p2pReplyData(m_name,callbackmap);
             }else
                 qDebug()<<"未知命令1:"<<mCmd_cmd;
+
+
 
             readDataBuffCmd.remove(0,cmdneedLen);
             resetCmdParseVariant();
@@ -753,7 +764,6 @@ int P2pWorker::writeBuff1(unsigned int cmd,char* buff,int bufflen)
     return ret;
     //    QByteArray arr;
     //    arr.append(sendBuff,sendBufflen);
-
     //    qDebug()<<"writeBuff1   "<<ret<<"    "<<arr.toHex();
 }
 

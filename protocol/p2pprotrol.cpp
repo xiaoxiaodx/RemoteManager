@@ -22,7 +22,6 @@ QByteArray P2pProtrol::makeJsonPacket(QString cmd,QVariant msgContent)
 
         jObject.insert("data",jObjectData);
 
-
     }else if (cmd.compare("setptzmove")==0) {
 
         QJsonObject jObjectData ;
@@ -457,9 +456,9 @@ QMap<QString,QVariant> P2pProtrol::unJsonPacket(QByteArray &arr)
 
     }else if(cmd.compare("getalarmparam") == 0){
         QJsonObject jObjectData = jsDoc.object().value("data").toObject();
-        if(jObjectData.value("alarmrecordenabled").toInt()>0){
-            map.insert("recordType",1);
-        }
+
+        map.insert("alarmrecordenabled",jObjectData.value("alarmrecordenabled").toInt());
+
 
     }else if(cmd.compare("getntpparam") == 0){
 

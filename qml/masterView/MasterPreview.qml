@@ -50,6 +50,7 @@ Rectangle {
                 id: devicelisttxt
                 font.pixelSize: 16
                 color: "#303133"
+                font.bold: true
                 anchors.left: deviceImg.right
                 anchors.leftMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
@@ -130,6 +131,9 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     text: model.deviceName
                 }
+
+
+
                 Image {
                     width: 16
                     height: 16
@@ -553,6 +557,7 @@ Rectangle {
                     if(mW16.checked)gridViewVideo.addjustWindowNum(4)
                 }
             }
+            layer.enabled: true
         }
     }
 

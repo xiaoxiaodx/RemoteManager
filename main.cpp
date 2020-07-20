@@ -40,13 +40,10 @@ int main(int argc, char *argv[])
     //    translator.load("en_US.qm");
     //    app.installTranslator(&translator);
 
-
-
     qmlRegisterType<XVideo>("XVideo", 1, 0, "XVideo");
     qmlRegisterType<ScreenVideo>("ScreenVideo", 1, 0, "ScreenVideo");
     qmlRegisterType<ReplayTimeline>("TimeLine", 1, 0, "TimeLine");
     qmlRegisterType<XVideoReplay>("XVideoReplay", 1, 0, "XVideoReplay");
-
 
     qmlRegisterType<WarnModel>("WarnModel", 1, 0, "WarnModel");
     qmlRegisterType<DeviceModel>("DeviceModel", 1, 0, "DeviceModel");

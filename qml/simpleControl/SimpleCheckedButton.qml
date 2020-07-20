@@ -17,6 +17,8 @@ Rectangle {
     property ExclusiveGroup exclusiveGroup: null //对外开放一个ExclusiveGroup接口，用于绑定同个组
 
 
+    signal click();
+
     onExclusiveGroupChanged: {
         if (exclusiveGroup) {
             exclusiveGroup.bindCheckable(checkButton)
@@ -51,6 +53,7 @@ Rectangle {
                 checked = true
             else
                 checked = !checked
+            click();
         }
     }
 }

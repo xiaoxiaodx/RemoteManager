@@ -511,6 +511,7 @@ Rectangle {
                         anchors.fill: parent
                         onClicked: {
 
+                            console.debug("openDeviceConfig "+model.deviceChannel+" " + model.deviceName)
                             openDeviceConfig(false,model.deviceChannel)
 
                         }
@@ -540,16 +541,29 @@ Rectangle {
     function openDeviceConfig(isBatchSet,channel){
 
 
-        var deviceInfo = deviceModel.funGetDevice(channel);
 
+        console.debug("openDeviceConfig "+isBatchSet)
+        console.debug("channel "+channel)
 
 
         deviceconfig.isBatchSet = isBatchSet;
         deviceconfig.deviceChannel = channel;
 
-        deviceInfo.fungetInitPar();
-        busyWait.open();
-        delaytimer.start();
+        if(isBatchSet){
+
+            deviceconfig.open()
+        }else{
+            var deviceInfo = deviceModel.funGetDevice(channel);
+
+            console.debug("channel:"+channel)
+
+            deviceInfo.fungetInitPar();
+
+            deviceconfig.curModel = deviceInfo
+            busyWait.open();
+            delaytimer.start();
+        }
+
     }
 
 

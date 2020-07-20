@@ -2,7 +2,7 @@ import QtQuick.Controls 2.5
 import QtQuick 2.0
 import QtGraphicalEffects 1.12
 import QtQuick.Dialogs 1.3
-import Qt.labs.settings 1.0
+//import Qt.labs.settings 1.0
 import QtQuick.Controls 1.4
 import "../simpleControl"
 import "../warnManager"
@@ -20,25 +20,25 @@ Rectangle {
     property int parSetFirstAlignLine: 78
     color: "#ffffff"
 
-    Settings {
-        id:setting
-        fileName: "config.ini"
-        property alias recordclose: checkRecordClose.checked
-        property alias recordwarnvideo: checkWarnVideo.checked
-        property alias recordfullday: checkRecordFullDay.checked
-        property alias recordresolution:cmbResolution.currentIndex
-        property alias recordpath: inputrecordPath.text
-        property alias recordstarttime: txttimeStart.text
-        property alias recordendtime: txttimeEnd.text
-        property alias recordmonday: checkMonday.checked
-        property alias recordtusday:checkTusday.checked
-        property alias recordwensday:checkWensday.checked
-        property alias recordtursday:checkTursday.checked
-        property alias recordfriday:checkFriday.checked
-        property alias recordsatday:checkSatday.checked
-        property alias recordsunday:checkSunday.checked
-        property alias recordallweekly:weeklyAllSelect.checked
-    }
+    //    Settings {
+    //        id:setting
+    //        fileName: "config.ini"
+    //        property alias recordclose: checkRecordClose.checked
+    //        property alias recordwarnvideo: checkWarnVideo.checked
+    //        property alias recordfullday: checkRecordFullDay.checked
+    //        property alias recordresolution:cmbResolution.currentIndex
+    //        property alias recordpath: inputrecordPath.text
+    //        property alias recordstarttime: txttimeStart.text
+    //        property alias recordendtime: txttimeEnd.text
+    //        property alias recordmonday: checkMonday.checked
+    //        property alias recordtusday:checkTusday.checked
+    //        property alias recordwensday:checkWensday.checked
+    //        property alias recordtursday:checkTursday.checked
+    //        property alias recordfriday:checkFriday.checked
+    //        property alias recordsatday:checkSatday.checked
+    //        property alias recordsunday:checkSunday.checked
+    //        property alias recordallweekly:weeklyAllSelect.checked
+    //    }
 
     function setRecord(type,resolution,path,startT,endT,weekly){
 
@@ -93,6 +93,8 @@ Rectangle {
             checkSunday.checked = false;
 
 
+        synchronizeAllSelectBtn();
+
 
     }
 
@@ -126,7 +128,7 @@ Rectangle {
 
             var weekly = 0;
             if(checkMonday.checked)
-               weekly += 1;
+                weekly += 1;
             if(checkTusday.checked)
                 weekly += 2;
             if(checkWensday.checked)
@@ -136,7 +138,7 @@ Rectangle {
             if(checkFriday.checked)
                 weekly += 16;
             if(checkSatday.checked)
-               weekly += 32;
+                weekly += 32;
             if(checkSunday.checked)
                 weekly += 64;
 
@@ -513,7 +515,26 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: mylanguage.AllSelect
-        onCheckedChanged: isRevicse = true;
+        onCheckedChanged: {
+
+            isRevicse = true;
+
+
+
+
+        }
+
+        onClick: {
+            console.debug( " **************** "+weeklyAllSelect.checked)
+            checkSunday.checked = weeklyAllSelect.checked
+            checkSatday.checked = weeklyAllSelect.checked
+            checkFriday.checked = weeklyAllSelect.checked
+            checkTursday.checked = weeklyAllSelect.checked
+            checkWensday.checked = weeklyAllSelect.checked
+            checkTusday.checked = weeklyAllSelect.checked
+            checkMonday.checked = weeklyAllSelect.checked
+
+        }
     }
 
     SimpleCheckedButton{
@@ -528,7 +549,11 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: mylanguage.Sun
-        onCheckedChanged: isRevicse = true;
+        onCheckedChanged: {
+            isRevicse = true;
+
+        }
+        onClick: synchronizeAllSelectBtn();
     }
 
     SimpleCheckedButton{
@@ -543,7 +568,11 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: mylanguage.Mon
-        onCheckedChanged: isRevicse = true;
+        onCheckedChanged: {
+            isRevicse = true;
+
+        }
+        onClick: synchronizeAllSelectBtn();
     }
 
     SimpleCheckedButton{
@@ -558,7 +587,11 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: mylanguage.Tue
-        onCheckedChanged: isRevicse = true;
+        onCheckedChanged: {
+            isRevicse = true;
+
+        }
+        onClick: synchronizeAllSelectBtn();
     }
 
     SimpleCheckedButton{
@@ -573,7 +606,11 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: mylanguage.Wed
-        onCheckedChanged: isRevicse = true;
+        onCheckedChanged: {
+            isRevicse = true;
+
+        }
+        onClick: synchronizeAllSelectBtn();
     }
 
     SimpleCheckedButton{
@@ -588,7 +625,12 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: mylanguage.Thu
-        onCheckedChanged: isRevicse = true;
+        onCheckedChanged: {
+
+            isRevicse = true;
+
+        }
+        onClick: synchronizeAllSelectBtn();
     }
 
     SimpleCheckedButton{
@@ -603,7 +645,11 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: mylanguage.Fri
-        onCheckedChanged: isRevicse = true;
+        onCheckedChanged: {
+            isRevicse = true;
+
+        }
+        onClick: synchronizeAllSelectBtn();
     }
 
     SimpleCheckedButton{
@@ -618,7 +664,25 @@ Rectangle {
         txtFont.pixelSize: fontSize
         txtColor: fontColor
         text: mylanguage.Sat
-        onCheckedChanged: isRevicse = true;
+        onCheckedChanged: {
+            isRevicse = true;
+
+        }
+        onClick: synchronizeAllSelectBtn();
+    }
+
+    function synchronizeAllSelectBtn(){
+
+        if(weeklyAllSelect.checked){
+
+            if(!checkSunday.checked || !checkSatday.checked || !checkFriday.checked || !checkTursday.checked || !checkWensday.checked || !checkTusday.checked || !checkMonday.checked)
+                weeklyAllSelect.checked = false
+        }else{
+            if(checkSunday.checked && checkSatday.checked && checkFriday.checked && checkTursday.checked && checkWensday.checked && checkTusday.checked && checkMonday.checked)
+                weeklyAllSelect.checked = true
+
+        }
+
     }
 
 

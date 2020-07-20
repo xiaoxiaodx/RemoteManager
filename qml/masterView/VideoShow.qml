@@ -108,7 +108,7 @@ Rectangle {
         height: 50
         width: parent.width-2
         color:"#88000000"
-        visible:mIsSelected
+        visible:false;//mIsSelected
         //            opacity: 0
 
         //            states: [

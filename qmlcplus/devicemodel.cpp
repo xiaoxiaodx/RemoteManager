@@ -228,26 +228,28 @@ void DeviceModel::funSendData(int index,QString cmd,QVariantMap map)
         modeldata->funP2pSendData(cmd,map);
 }
 
-void DeviceModel::funBatchSendData(QVariantMap map){
+void DeviceModel::funBatchSendData(QString cmd ,QVariantMap map){
+
+    qDebug()<<"funBatchSendData:"<<map;
 
     for (int i=0;i<m_listDevice.size();i++) {
 
         if(m_listDevice.at(i)->isSelect()){
-            DeviceModelData *date = m_listDevice.takeAt(i);
-            date->funP2pSendData("",map);
+            DeviceModelData *date = m_listDevice.at(i);
+            date->funP2pSendData(cmd,map);
         }
     }
 }
 
 void DeviceModel::funSendData1(QString channel,QString cmd,QVariantMap map)
 {
-    qDebug()<<"funSendData1 "<<channel;
-    qDebug()<<"funSendData2 "<<m_listDevice.size();
+//    qDebug()<<"funSendData1 "<<channel;
+//    qDebug()<<"funSendData2 "<<m_listDevice.size();
     for (int i=0;i<m_listDevice.size();i++) {
-        qDebug()<<"funSendData3 "<<i;
+//        qDebug()<<"funSendData3 "<<i;
         DeviceModelData *modeldata =    m_listDevice.at(i);
-        qDebug()<<"funSendData4    ";
-        qDebug()<<"deviceChannel    "<<modeldata->getDeviceIdefiy();
+//        qDebug()<<"funSendData4    ";
+//        qDebug()<<"deviceChannel    "<<modeldata->getDeviceIdefiy();
         if(modeldata != nullptr && modeldata->getDeviceIdefiy().compare(channel)==0){
             modeldata->funP2pSendData(cmd,map);
             break;
@@ -265,14 +267,16 @@ void DeviceModel::slot_flustConnectState()
 
 QVariant DeviceModel::funGetDevice(QString channel)
 {
-
-    for (int i= 0;i<m_listDevice.size() ;i++) {
+    qDebug()<<"funGetDevice "<<channel;
+    for (int i = 0;i<m_listDevice.size() ;i++) {
         DeviceModelData *modeldata = m_listDevice.at(i);
         if(modeldata->deviceChannel().compare(channel)==0){
-
+            qDebug()<<"funGetDevice "<<"getDevice succ";
             return QVariant::fromValue(modeldata);
         }
     }
+    qDebug()<<"funGetDevice "<<"getDevice faile";
+    return QVariant();
 }
 
 void DeviceModel::funSwitchPage(int page)
@@ -307,16 +311,14 @@ void DeviceModel::funSwitchPage(int page)
     }
 }
 
-QVariant DeviceModel::funGetDevice(int index)
-{
-    if(m_listDevice.size() <= index || index < 0){
-        DebugLog::getInstance()->writeLog("获取设备信息异常:index 越界或者异常");
-        return QVariant();
-    }
-
-
-    return QVariant::fromValue(m_listDevice.at(index));
-}
+//QVariant DeviceModel::funGetDevice(int index)
+//{
+//    if(m_listDevice.size() <= index || index < 0){
+//        DebugLog::getInstance()->writeLog("获取设备信息异常:index 越界或者异常");
+//        return QVariant();
+//    }
+//    return QVariant::fromValue(m_listDevice.at(index));
+//}
 
 
 void DeviceModel::funDeleteIndex(int index)
@@ -343,7 +345,9 @@ void DeviceModel::funDeleteIndex(int index)
             QString imgInfoStr = modeldata->deviceId()+" "+modeldata->deviceName()+" "+modeldata->deviceChannel()+" "+modeldata->recordSavePath();
             QTextStream out(&file);
             out <<imgInfoStr<<"\n";
+
         }
+
         file.close();
     }
 }

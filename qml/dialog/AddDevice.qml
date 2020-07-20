@@ -46,6 +46,10 @@ Popup {
             anchors.rightMargin: 20
             anchors.verticalCenter: txttitle.verticalCenter
             source: "qrc:/images/modal-close.png"
+            MouseArea{
+                anchors.fill: parent
+                onClicked: root.close()
+            }
         }
 
         Text {

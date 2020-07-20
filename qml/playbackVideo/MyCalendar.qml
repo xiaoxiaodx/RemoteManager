@@ -213,7 +213,7 @@ Popup {
                     //color: "transparent"
                     height: the_calendar.height/8
                     Label {
-                        text: getWeeklyStr(styleData.dayOfWeek+1)//control.__locale.dayName(styleData.dayOfWeek, control.dayOfWeekFormat)
+                        text: getWeeklyStr(styleData.dayOfWeek)//control.__locale.dayName(styleData.dayOfWeek, control.dayOfWeekFormat)
                         anchors.centerIn: parent
                         color:Qt.rgba(0,0,0,0.65)
                         font.pixelSize: 12
@@ -447,6 +447,9 @@ Popup {
 
     function getWeeklyStr(week){
 
+
+        if(week === 0)
+            week = 7
         switch(week){
         case 1:
             return mylanguage.Mon;

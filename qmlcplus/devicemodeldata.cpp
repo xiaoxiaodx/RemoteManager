@@ -88,13 +88,16 @@ void DeviceModelData::slot_connectState(QString name,int a,QString did,QString a
     qDebug()<<"name "<<name<<"  "<<a;
 
     if(a>0){
-        qDebug()<<("p2p login succ , start login");
+        qDebug()<<("p2p connect succ , start login");
         QVariantMap map;
         map.insert("username","admin");
         map.insert("password","admin");
         if(p2pWorker != nullptr){
             p2pWorker->p2pSendData("login",map);
         }
+
+
+
 
     }else {//断开后进行重新连接
         qDebug()<<("p2p login fail , start reconnect");
@@ -109,23 +112,18 @@ void DeviceModelData::slot_p2pReplyData(QString cmd,QVariantMap map)
 
     if(map.contains("statuscode")){
 
-        int statuscode = map.value("statuscode").toInt();
-
-        if(statuscode != 200){
-            QVariantMap maplogin;
-            maplogin.insert("cmd","login");
-
-            funP2pSendData("login",maplogin);
-            return;
-        }
+//        int statuscode = map.value("statuscode").toInt();
+//        if(statuscode != 200){
+//            QVariantMap maplogin;
+//            maplogin.insert("cmd","login");
+//            funP2pSendData("login",maplogin);
+//            return;
+//        }
     }
-
-
 
     QString msgid1 = map.value("msgid").toString();
     QString cmd1 = map.value("cmd").toString();
     removeAlreadySend(cmd1,msgid1);
-
     DebugLog::getInstance()->writeLog("remove cmd:"+cmd1);
 
     updatePar(map);
@@ -133,6 +131,11 @@ void DeviceModelData::slot_p2pReplyData(QString cmd,QVariantMap map)
     emit signal_p2pReplyData(m_deviceChannel,map);
 
     if(cmd1.compare("getVedio")==0){
+        QVariantMap map;
+        map.insert("cmd","p2pAlarmPush");
+        map.insert("pushEnable",1);
+        funP2pSendData("p2pAlarmPush",map);
+
         playState = PLAY;
     }else if(cmd1.compare("stopVideo")==0){
         playState = STOP;
@@ -150,20 +153,20 @@ void DeviceModelData::slot_p2pReplyData(QString cmd,QVariantMap map)
 
 QString DeviceModelData::getDeviceIdefiy()
 {
-    qDebug()<<"getDeviceIdefiy    ";
+    //qDebug()<<"getDeviceIdefiy    ";
     return m_deviceChannel;
 }
 
 void DeviceModelData::funP2pSendData(QString cmd,QVariantMap map)
 {
 
+    qDebug()<<"funP2pSendData   "<<map.value("cmd").toString();
     if(m_netState == 0)
         return;
 
-
     DebugLog::getInstance()->writeLog("send cmd:"+cmd);
 
-   QString cmd1 = map.value("cmd").toString();
+    QString cmd1 = map.value("cmd").toString();
     if(cmd1.compare("replay")==0){
 
 
@@ -215,7 +218,7 @@ void DeviceModelData::updatePar(QVariantMap map)
         m_tempWarnSwitch = map.value("tempWarnSwitch").toBool();
     }else if(map.value("cmd").toString().compare("getrecordparam")==0){
 
-        m_recordType = map.value("recordType").toInt();
+        //m_recordType = map.value("recordType").toInt();
         m_recordStartT = map.value("recordStartT").toString();
         m_recordEndT = map.value("recordEndT").toString();
         m_recordWeeklyDate = map.value("recordWeeklyDate").toString();
@@ -225,13 +228,10 @@ void DeviceModelData::updatePar(QVariantMap map)
         m_timeZone = map.value("timeZone").toString();
 
     }else if(map.value("cmd").toString().compare("getalarmparam")==0){
-        m_recordType = map.value("recordType").toInt();
-
+        m_recordType = map.value("alarmrecordenabled").toInt();
     }else if(map.value("cmd").toString().compare("getntpparam")==0){
-
         m_timeNtpSwtich = map.value("timeNtpSwtich").toBool();
         m_timeNtpUrl = map.value("timeNtpUrl").toString();
-
     }
 
 }

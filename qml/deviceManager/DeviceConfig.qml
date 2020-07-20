@@ -23,6 +23,13 @@ Popup {
     property string deviceChannel: "-1"
 
     property int curSelectIndex: 0
+
+    property var curModel;
+
+    onOpened: {
+        updateCurPageParameterInfo(curSelectIndex)
+    }
+
     Rectangle {
         id: rect
         anchors.fill: parent
@@ -45,21 +52,11 @@ Popup {
                 anchors.verticalCenter: parent.verticalCenter
                 font.pixelSize: fontPixSize
                 text: {
-
-                    if(isBatchSet){
-
+                    if(isBatchSet){+98
                         mylanguage.BatchSetting
-
                     }else{
-
-
                         mylanguage.Set+"(ch:"+deviceChannel+")"
-
-
                     }
-
-
-
                 }
                 color: "white"
             }
@@ -133,35 +130,37 @@ Popup {
 
                                 curSelectIndex = index
 
-                                console.debug("curSelectIndex   "+curSelectIndex)
+                                updateCurPageParameterInfo(index)
+//                                console.debug("curSelectIndex   "+curSelectIndex)
 
-                                var deviceInfo = deviceModel.funGetDevice(deviceChannel);
+//                                console.debug("deviceChannel   "+deviceChannel)
+//                                var deviceInfo = curModel//deviceModel.funGetDevice(deviceChannel);
 
-                                switch(index){
-                                case 0:
-                                    console.debug("settingosd:"+deviceInfo.osdTimeShowSwitch+"    "+deviceInfo.osdNameShowSwitch+"    "+deviceInfo.osdName)
-                                    settingosd.setOSD(deviceInfo.osdTimeShowSwitch,deviceInfo.osdNameShowSwitch,deviceInfo.osdName);
-                                    break;
-                                case 1:
-                                    console.debug("settingrecord:"+deviceInfo.recordType+"    "+deviceInfo.recordResolution+"    "+deviceInfo.recordPath+"    "+deviceInfo.recordStartT+"    "+deviceInfo.recordEndT+"    "+deviceInfo.recordWeeklyDate)
-                                    settingrecord.setRecord(deviceInfo.recordType,deviceInfo.recordResolution,deviceInfo.recordPath,deviceInfo.recordStartT,deviceInfo.recordEndT,deviceInfo.recordWeeklyDate)
-                                    break;
-                                case 2:
-                                    console.debug("settingrtmp:"+deviceInfo.rtmpSwitch+"    "+deviceInfo.recordResolution+"    "+deviceInfo.rtmpUrl+"    "+deviceInfo.rtmpUser+"    "+deviceInfo.rtmpPassword)
-                                    settingrtmp.setRtmp(deviceInfo.rtmpSwitch,deviceInfo.recordResolution,deviceInfo.rtmpUrl,deviceInfo.rtmpUser,deviceInfo.rtmpPassword)
-                                    break;
-                                case 3:
-                                    console.debug("settingtime:"+deviceInfo.timeNtpSwtich+"    "+deviceInfo.timeNtpUrl+"    "+deviceInfo.timeZone+"    "+deviceInfo.timeSummerSwitch)
-                                    settingtime.settimePar(deviceInfo.timeNtpSwtich,deviceInfo.timeNtpUrl,deviceInfo.timeZone,deviceInfo.timeSummerSwitch)
-                                    break;
-                                case 4:
-                                    console.debug("setTempPar:"+deviceInfo.tempWarnSwitch+"    "+deviceInfo.tempWarnValue+"    "+deviceInfo.tempScreenShot+"    "+deviceInfo.tempScreenShotPath+"    "+deviceInfo.tempBeerSwitch+"    "+deviceInfo.tempDrift+"    "+deviceInfo.tempControlLevel)
-                                    settingtemp.setTempPar(deviceInfo.tempWarnSwitch,deviceInfo.tempWarnValue,deviceInfo.tempScreenShot,deviceInfo.tempScreenShotPath,deviceInfo.tempBeerSwitch,deviceInfo.tempDrift,deviceInfo.tempControlLevel
-                                                           ,deviceInfo.tempdriftcaplevelMin,deviceInfo.tempdriftcaplevelMax,deviceInfo.tempcontrolcaplevelMin,deviceInfo.tempcontrolcaplevelMax)
-                                    break;
-                                case 5:
-                                    break;
-                                }
+//                                switch(index){
+//                                case 0:
+//                                    console.debug("settingosd:"+deviceInfo.osdTimeShowSwitch+"    "+deviceInfo.osdNameShowSwitch+"    "+deviceInfo.osdName)
+//                                    settingosd.setOSD(deviceInfo.osdTimeShowSwitch,deviceInfo.osdNameShowSwitch,deviceInfo.osdName);
+//                                    break;
+//                                case 1:
+//                                    console.debug("settingrecord:"+deviceInfo.recordType+"    "+deviceInfo.recordResolution+"    "+deviceInfo.recordPath+"    "+deviceInfo.recordStartT+"    "+deviceInfo.recordEndT+"    "+deviceInfo.recordWeeklyDate)
+//                                    settingrecord.setRecord(deviceInfo.recordType,deviceInfo.recordResolution,deviceInfo.recordPath,deviceInfo.recordStartT,deviceInfo.recordEndT,deviceInfo.recordWeeklyDate)
+//                                    break;
+//                                case 2:
+//                                    console.debug("settingrtmp:"+deviceInfo.rtmpSwitch+"    "+deviceInfo.recordResolution+"    "+deviceInfo.rtmpUrl+"    "+deviceInfo.rtmpUser+"    "+deviceInfo.rtmpPassword)
+//                                    settingrtmp.setRtmp(deviceInfo.rtmpSwitch,deviceInfo.recordResolution,deviceInfo.rtmpUrl,deviceInfo.rtmpUser,deviceInfo.rtmpPassword)
+//                                    break;
+//                                case 3:
+//                                    console.debug("settingtime:"+deviceInfo.timeNtpSwtich+"    "+deviceInfo.timeNtpUrl+"    "+deviceInfo.timeZone+"    "+deviceInfo.timeSummerSwitch)
+//                                    settingtime.settimePar(deviceInfo.timeNtpSwtich,deviceInfo.timeNtpUrl,deviceInfo.timeZone,deviceInfo.timeSummerSwitch)
+//                                    break;
+//                                case 4:
+//                                    console.debug("setTempPar:"+deviceInfo.tempWarnSwitch+"    "+deviceInfo.tempWarnValue+"    "+deviceInfo.tempScreenShot+"    "+deviceInfo.tempScreenShotPath+"    "+deviceInfo.tempBeerSwitch+"    "+deviceInfo.tempDrift+"    "+deviceInfo.tempControlLevel)
+//                                    settingtemp.setTempPar(deviceInfo.tempWarnSwitch,deviceInfo.tempWarnValue,deviceInfo.tempScreenShot,deviceInfo.tempScreenShotPath,deviceInfo.tempBeerSwitch,deviceInfo.tempDrift,deviceInfo.tempControlLevel
+//                                                           ,deviceInfo.tempdriftcaplevelMin,deviceInfo.tempdriftcaplevelMax,deviceInfo.tempcontrolcaplevelMin,deviceInfo.tempcontrolcaplevelMax)
+//                                    break;
+//                                case 5:
+//                                    break;
+//                                }
                             }
                         }
                     }
@@ -264,6 +263,37 @@ Popup {
     }
 
 
+    function updateCurPageParameterInfo(index){
+
+        var deviceInfo = curModel//deviceModel.funGetDevice(deviceChannel);
+
+        switch(index){
+        case 0:
+            console.debug("settingosd:"+deviceInfo.osdTimeShowSwitch+"    "+deviceInfo.osdNameShowSwitch+"    "+deviceInfo.osdName)
+            settingosd.setOSD(deviceInfo.osdTimeShowSwitch,deviceInfo.osdNameShowSwitch,deviceInfo.osdName);
+            break;
+        case 1:
+            console.debug("settingrecord:"+deviceInfo.recordType+"    "+deviceInfo.recordResolution+"    "+deviceInfo.recordPath+"    "+deviceInfo.recordStartT+"    "+deviceInfo.recordEndT+"    "+deviceInfo.recordWeeklyDate)
+            settingrecord.setRecord(deviceInfo.recordType,deviceInfo.recordResolution,deviceInfo.recordPath,deviceInfo.recordStartT,deviceInfo.recordEndT,deviceInfo.recordWeeklyDate)
+            break;
+        case 2:
+            console.debug("settingrtmp:"+deviceInfo.rtmpSwitch+"    "+deviceInfo.recordResolution+"    "+deviceInfo.rtmpUrl+"    "+deviceInfo.rtmpUser+"    "+deviceInfo.rtmpPassword)
+            settingrtmp.setRtmp(deviceInfo.rtmpSwitch,deviceInfo.recordResolution,deviceInfo.rtmpUrl,deviceInfo.rtmpUser,deviceInfo.rtmpPassword)
+            break;
+        case 3:
+            console.debug("settingtime:"+deviceInfo.timeNtpSwtich+"    "+deviceInfo.timeNtpUrl+"    "+deviceInfo.timeZone+"    "+deviceInfo.timeSummerSwitch)
+            settingtime.settimePar(deviceInfo.timeNtpSwtich,deviceInfo.timeNtpUrl,deviceInfo.timeZone,deviceInfo.timeSummerSwitch)
+            break;
+        case 4:
+            console.debug("setTempPar:"+deviceInfo.tempWarnSwitch+"    "+deviceInfo.tempWarnValue+"    "+deviceInfo.tempScreenShot+"    "+deviceInfo.tempScreenShotPath+"    "+deviceInfo.tempBeerSwitch+"    "+deviceInfo.tempDrift+"    "+deviceInfo.tempControlLevel)
+            settingtemp.setTempPar(deviceInfo.tempWarnSwitch,deviceInfo.tempWarnValue,deviceInfo.tempScreenShot,deviceInfo.tempScreenShotPath,deviceInfo.tempBeerSwitch,deviceInfo.tempDrift,deviceInfo.tempControlLevel
+                                   ,deviceInfo.tempdriftcaplevelMin,deviceInfo.tempdriftcaplevelMax,deviceInfo.tempcontrolcaplevelMin,deviceInfo.tempcontrolcaplevelMax)
+            break;
+        case 5:
+            break;
+        }
+    }
+
     function updateParameterInfo(channel){
 
 
@@ -273,8 +303,6 @@ Popup {
         settingrtmp.updateParameterInfo()
         settingtemp.updateParameterInfo()
         settingtime.updateParameterInfo()
-
-
     }
 
 
